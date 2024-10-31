@@ -47,7 +47,7 @@ const Login = () => {
     </View>
   );
 };
-
+//..
 const styles = StyleSheet.create({
   background: {
     height: 250,
