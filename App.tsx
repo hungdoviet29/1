@@ -4,6 +4,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Provider } from 'react-redux';
 
+// Import các màn hình Admin
+import AdminScreen from './ScreensAdmin/AdminScreen';
+
 // Import các màn hình
 import FindScreen from './Screens/Find';
 import Favorite from './Screens/Favorite';
@@ -53,6 +56,7 @@ const AppNavigator = ({ navigationRef }) => {
     <View style={styles.container}>
       <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Splash" component={Splash} />
+        <Stack.Screen name="AdminHome" component={AdminScreen} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Home" component={HomeScreen} />
