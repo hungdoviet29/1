@@ -1,48 +1,69 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { addToCart } from '../redux/actions/cartActions'; // Đảm bảo đường dẫn chính xác
+import { useNavigation } from '@react-navigation/native';
 
 const FavoriteScreen = () => {
-    const favoriteItems = [
-        { id: 1, name: 'Printed Shirt', price: 28, image: require('../acssets/acer2.png') },
-        { id: 2, name: 'Leather Jacket', price: 36, image: require('../acssets/Asus1.png') },
-        { id: 3, name: 'Washed Jeans', price: 19, image: require('../acssets/HP2.png') },
-        { id: 4, name: 'Green Hodie', price: 45, image: require('../acssets/acer2.png') },
-    ];
+    const navigation = useNavigation();
+    // Lấy danh sách sản phẩm yêu thích từ Redux
+    const favoriteItems = useSelector(state => state.favorites.favorites) || [];
+    const dispatch = useDispatch();
+
+    // Hàm thêm tất cả sản phẩm vào giỏ hàng
+    const handleAddAllToCart = () => {
+        if (favoriteItems.length === 0) {
+            alert("Không có sản phẩm nào trong danh sách yêu thích!");
+            return;
+        }
+
+        favoriteItems.forEach(item => {
+            dispatch(addToCart({ ...item, quantity: 1 })); // Thay đổi nếu bạn có thuộc tính số lượng
+            navigation.navigate('Cart');
+        });
+
+        alert("Đã thêm tất cả sản phẩm vào giỏ hàng!");
+    };
+
     return (
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => { /* Back navigation logic */ }}>
+                <TouchableOpacity onPress={() => { /* Logic quay lại màn hình trước */ }}>
                     <Image source={require('../acssets/BackButton.png')} style={styles.icon} />
                 </TouchableOpacity>
                 <Text style={styles.headerText}>Favorite</Text>
             </View>
 
             <ScrollView contentContainerStyle={styles.favoriteContainer}>
-                {/* Favorite Items */}
-                {favoriteItems.map(item => (
-                    <View key={item.id} style={styles.favoriteItem}>
-                        <Image source={item.image} style={styles.itemImage} />
-                        <View style={styles.itemDetails}>
-                            <Text style={styles.itemName}>{item.name}</Text>
-                            <Text style={styles.itemCollection}>GEETA COLLECTION</Text>
-                            <Text style={styles.itemPrice}>${item.price}.00 USD</Text>
+                {/* Danh sách sản phẩm yêu thích */}
+                {favoriteItems.length === 0 ? (
+                    <Text style={styles.emptyMessage}>Chưa có sản phẩm nào trong danh sách yêu thích!</Text>
+                ) : (
+                    favoriteItems.map(item => (
+                        <View key={item._id} style={styles.favoriteItem}>
+                            <Image source={{ uri: item.hinhAnh }} style={styles.itemImage} />
+                            <View style={styles.itemDetails}>
+                                <Text style={styles.itemName}>{item.ten}</Text>
+                                {/* <Text style={styles.itemCollection}>GEETA COLLECTION</Text> */}
+                                <Text style={styles.itemPrice}>{item.gia.toLocaleString()} VND</Text>
+                            </View>
+                            <TouchableOpacity>
+                                <Text style={styles.arrow}>➔</Text>
+                            </TouchableOpacity>
                         </View>
-                        <TouchableOpacity>
-                            <Text style={styles.arrow}>➔</Text>
-                        </TouchableOpacity>
-                    </View>
-                ))}
+                    ))
+                )}
             </ScrollView>
 
-            {/* Add All to Cart Button */}
+            {/* Nút thêm tất cả vào giỏ hàng */}
             <View style={styles.addToCartBar}>
-                <TouchableOpacity style={styles.addToCartButton}>
+                <TouchableOpacity style={styles.addToCartButton} onPress={handleAddAllToCart}>
                     <Text style={styles.addToCartText}>ADD ALL TO CART</Text>
                 </TouchableOpacity>
             </View>
 
-            {/* Bottom Navigation */}
+            {/* Thanh điều hướng dưới cùng */}
             <View style={styles.bottomNavigation}>
                 <TouchableOpacity>
                     <Image source={require('../acssets/home.png')} style={styles.iconNav} />
@@ -157,6 +178,12 @@ const styles = StyleSheet.create({
     iconNav: {
         width: 24,
         height: 24,
+    },
+    emptyMessage: {
+        fontSize: 16,
+        color: '#888',
+        textAlign: 'center',
+        marginTop: 20,
     },
 });
 

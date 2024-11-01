@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,15 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToFavorites, removeFromFavorites } from '../redux/favoriteSlice'; // Thêm import cho Redux
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const favorites = useSelector(state => state.favorites.favorites); // Lấy danh sách yêu thích từ Redux
   const [laptops, setLaptops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('Popular');
@@ -24,19 +28,19 @@ const HomeScreen = () => {
     // Xác định link API cho từng danh mục
     switch (category) {
       case 'Popular':
-        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop';
+        apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
         break;
       case 'Trending':
-        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop';
+        apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
         break;
       case 'News':
-        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop';
+        apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
         break;
       case 'Sale':
-        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop';
+        apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
         break;
       default:
-        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop'; // URL mặc định
+        apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop'; // URL mặc định
     }
 
     axios
@@ -60,6 +64,17 @@ const HomeScreen = () => {
     setActiveCategory(category);
     fetchData(category);
   };
+
+  const handleAddToFavorites = laptop => {
+    const isFavorite = favorites.some(item => item._id === laptop._id);
+    if (isFavorite) {
+      dispatch(removeFromFavorites(laptop._id)); // Xóa sản phẩm khỏi yêu thích
+    } else {
+      dispatch(addToFavorites(laptop)); // Thêm sản phẩm vào danh sách yêu thích
+    }
+  };
+
+  const isFavorite = laptop => Array.isArray(favorites) && favorites.some(item => item._id === laptop._id);
 
   return (
     <View style={styles.container}>
@@ -94,42 +109,17 @@ const HomeScreen = () => {
 
       {/* Categories */}
       <View style={styles.categories}>
-        <TouchableOpacity onPress={() => handleCategoryPress('Popular')}>
-          <Text
-            style={[
-              styles.category,
-              activeCategory === 'Popular' && styles.categoryActive,
-            ]}>
-            Popular
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleCategoryPress('Trending')}>
-          <Text
-            style={[
-              styles.category,
-              activeCategory === 'Trending' && styles.categoryActive,
-            ]}>
-            Trending
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleCategoryPress('News')}>
-          <Text
-            style={[
-              styles.category,
-              activeCategory === 'News' && styles.categoryActive,
-            ]}>
-            News
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleCategoryPress('Sale')}>
-          <Text
-            style={[
-              styles.category,
-              activeCategory === 'Sale' && styles.categoryActive,
-            ]}>
-            Sale
-          </Text>
-        </TouchableOpacity>
+        {['Popular', 'Trending', 'News', 'Sale'].map(category => (
+          <TouchableOpacity key={category} onPress={() => handleCategoryPress(category)}>
+            <Text
+              style={[
+                styles.category,
+                activeCategory === category && styles.categoryActive,
+              ]}>
+              {category}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
       {/* Product List */}
@@ -145,10 +135,10 @@ const HomeScreen = () => {
                 <View style={styles.product} key={laptop._id}>
                   <TouchableOpacity
                     onPress={() =>
-                      navigation.navigate('ProductScreen', {product: laptop})
+                      navigation.navigate('ProductScreen', { product: laptop })
                     }>
                     <Image
-                      source={{uri: laptop.hinhAnh}}
+                      source={{ uri: laptop.hinhAnh }}
                       style={styles.productImage}
                     />
                     <Text style={styles.productName}>{laptop.ten}</Text>
@@ -156,9 +146,11 @@ const HomeScreen = () => {
                       {laptop.gia.toLocaleString()} VND
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.heartIconContainer}>
+                  <TouchableOpacity
+                    style={styles.heartIconContainer}
+                    onPress={() => handleAddToFavorites(laptop)}>
                     <Image
-                      source={require('../acssets/Vector.png')}
+                      source={isFavorite(laptop) ? require('../acssets/VectorRed.png') : require('../acssets/Vector.png')}
                       style={styles.heartIcon}
                     />
                   </TouchableOpacity>
@@ -172,24 +164,24 @@ const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#fff'},
-  loadingContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  header: {flexDirection: 'row', justifyContent: 'space-between', padding: 16},
-  profileImage: {width: 40, height: 40, borderRadius: 20},
-  headerIcons: {flexDirection: 'row'},
-  icon: {width: 24, height: 24, marginLeft: 16},
+  container: { flex: 1, backgroundColor: '#fff' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', padding: 16 },
+  profileImage: { width: 40, height: 40, borderRadius: 20 },
+  headerIcons: { flexDirection: 'row' },
+  icon: { width: 24, height: 24, marginLeft: 16 },
   categories: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 16,
   },
-  category: {fontSize: 16, fontWeight: 'bold', color: '#999'},
+  category: { fontSize: 16, fontWeight: 'bold', color: '#999' },
   categoryActive: {
     color: '#6C63FF',
     borderBottomWidth: 2,
     borderBottomColor: '#6C63FF',
   },
-  productScrollView: {paddingVertical: 16},
+  productScrollView: { paddingVertical: 16 },
   productList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -204,16 +196,16 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
-  productImage: {width: 100, height: 100, resizeMode: 'contain'},
+  productImage: { width: 100, height: 100, resizeMode: 'contain' },
   productName: {
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 10,
     textAlign: 'center',
   },
-  productPrice: {fontSize: 14, color: '#888', marginTop: 5},
-  heartIconContainer: {position: 'absolute', top: 10, right: 10},
-  heartIcon: {width: 20, height: 20},
+  productPrice: { fontSize: 14, color: '#888', marginTop: 5 },
+  heartIconContainer: { position: 'absolute', top: 10, right: 10 },
+  heartIcon: { width: 20, height: 20 },
 });
 
 export default HomeScreen;
