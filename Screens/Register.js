@@ -35,16 +35,13 @@ const Register = () => {
 
     try {
       // Gửi yêu cầu POST để thêm người dùng mới vào API
-      const response = await fetch(
-        'http://172.20.10.6:3000/users/register',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newUser),
+      const response = await fetch('http://localhost:3000/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify(newUser),
+      });
 
       if (response.ok) {
         // Nếu đăng ký thành công, chuyển đến màn hình đăng nhập

@@ -24,19 +24,19 @@ const HomeScreen = () => {
     // Xác định link API cho từng danh mục
     switch (category) {
       case 'Popular':
-        apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
+        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop';
         break;
       case 'Trending':
-        apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
+        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop';
         break;
       case 'News':
-        apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
+        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop';
         break;
       case 'Sale':
-        apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
+        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop';
         break;
       default:
-        apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop'; // URL mặc định
+        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop'; // URL mặc định
     }
 
     axios
