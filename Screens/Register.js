@@ -36,7 +36,7 @@ const Register = () => {
     try {
       // Gửi yêu cầu POST để thêm người dùng mới vào API
       const response = await fetch(
-        'http://192.168.137.236:3000/users/register',
+        'http://172.20.10.6:3000/users/register',
         {
           method: 'POST',
           headers: {
