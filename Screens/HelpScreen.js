@@ -1,13 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const HelpScreen = () => {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-      <TouchableOpacity>
-          <Image source={require('../acssets/BackButton.png')}  />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Image source={require('../acssets/BackButton.png')} style={styles.icon} />
         </TouchableOpacity>
         <Text style={styles.headerText}>Help</Text>
         <View style={styles.headerSpacer} />
@@ -15,19 +18,28 @@ const HelpScreen = () => {
 
       {/* Policy List */}
       <View style={styles.policyContainer}>
-        <TouchableOpacity style={styles.policyButton}>
+        <TouchableOpacity
+          style={styles.policyButton}
+          onPress={() => navigation.navigate('Membershippolicy')}
+        >
           <Text style={styles.policyText}>Chính sách thành viên</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.policyButton}>
-          <Text style={styles.policyText}>Chính sách thành viên</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.policyButton}>
+        <TouchableOpacity
+          style={styles.policyButton}
+          onPress={() => navigation.navigate('ReturnPolicyScreen')}
+        >
           <Text style={styles.policyText}>Chính sách đổi trả</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.policyButton}>
+        <TouchableOpacity
+          style={styles.policyButton}
+          onPress={() => navigation.navigate('WarrantyPolicyScreen')}
+        >
           <Text style={styles.policyText}>Chính sách bảo hành</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.policyButton}>
+        <TouchableOpacity
+          style={styles.policyButton}
+          onPress={() => navigation.navigate('PaymentPolicyScreen')}
+        >
           <Text style={styles.policyText}>Chính sách thanh toán</Text>
         </TouchableOpacity>
       </View>
@@ -50,6 +62,7 @@ const HelpScreen = () => {
     </View>
   );
 };
+//dùhdufhd
 
 const styles = StyleSheet.create({
   container: {
@@ -63,18 +76,17 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 16,
   },
-  backText: {
-    fontSize: 24,
-    color: '#333',
+  icon: {
+    width: 24,
+    height: 24,
   },
   headerText: {
     fontSize: 18,
     fontWeight: 'bold',
   },
   headerSpacer: {
-    width: 24, // Để cân đối khoảng trống bên phải
+    width: 24,
   },
-
   policyContainer: {
     paddingHorizontal: 16,
     borderWidth: 1,
@@ -95,7 +107,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
-
   bottomNavigation: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -109,14 +120,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  bottomIcon: {
-    fontSize: 24,
-  },
   iconNav: {
     width: 24,
     height: 24,
   },
-
 });
 
 export default HelpScreen;

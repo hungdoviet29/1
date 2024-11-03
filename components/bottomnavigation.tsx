@@ -44,7 +44,7 @@ const BottomNavigation = () => {
       {/* Nút Profile */}
       <TouchableOpacity
         style={styles.button}
-
+        onPress={() => navigation.navigate('Profile')}
       >
         <Image
           source={require('../acssets/profile.png')} // Đảm bảo đường dẫn đúng
@@ -54,6 +54,7 @@ const BottomNavigation = () => {
     </View>
   );
 };
+//ỷyere
 
 // Tạo style cho Bottom Navigation
 const styles = StyleSheet.create({

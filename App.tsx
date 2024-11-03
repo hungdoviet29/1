@@ -28,7 +28,6 @@ import ForgotPasswordScreen from './Screens/ForgotPasswordScreen';
 import OrderSuccesScreen from './Screens/OrderSuccesScreen';
 import OrderFailedScreen from './Screens/OrderFailedScreen';
 import ShippingScreen from './Screens/ShippingScreen';
-
 // Import component Bottom Navigation
 import BottomNavigation from './components/bottomnavigation';
 import ProductScreen from './Screens/Buy';
@@ -38,9 +37,11 @@ import { store } from './redux/store';
 import NotificationScreen from './Screens/NotificationScreen';
 import OTPVerificationScreen from './Screens/OTPVerificationScreen';
 import ResetPasswordScreen from './Screens/ResetPasswordScreen';
+import ReturnPolicyScreen from './Screens/ReturnPolicyScreen'
+import MembershipPolicy from './Screens/Membershippolicy';
 
 const Stack = createStackNavigator();
-
+//chghd
 const AppNavigator = ({ navigationRef }) => {
   const [currentRouteName, setCurrentRouteName] = useState('Splash');
 
@@ -63,6 +64,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Find" component={FindScreen} />
         <Stack.Screen name="Favorite" component={Favorite} />
+        <Stack.Screen name="Profile" component={MembershipPolicy} />
         <Stack.Screen name="Buy" component={BuyScreen} />
         <Stack.Screen name="Cart" component={CartScreen} />
         <Stack.Screen name="OderScreen" component={OderScreen} />
@@ -83,8 +85,8 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="ShippingScreen" component={ShippingScreen} />
       </Stack.Navigator>
 
-      {/* Chỉ hiển thị Bottom Navigation khi không phải các màn hình Splash, Login, Register */}
-      {currentRouteName !== 'Splash' && currentRouteName !== 'Login' && currentRouteName !== 'Register' && (
+      {/* Chỉ hiển thị Bottom Navigation khi không phải các màn hình Splash, Login, Register, MembershipPolicy */}
+      {currentRouteName !== 'Splash' && currentRouteName !== 'Login' && currentRouteName !== 'Register' && currentRouteName !== 'Membershipolicy' && (
         <BottomNavigation />
       )}
     </View>

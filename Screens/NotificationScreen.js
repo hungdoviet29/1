@@ -1,3 +1,4 @@
+
 // NotificationScreen.js
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
@@ -25,10 +26,11 @@ const NotificationScreen = () => {
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.list}
       />
+
     </View>
   );
-};
 
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,

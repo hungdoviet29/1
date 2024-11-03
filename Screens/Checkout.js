@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     itemImage: {
-        width: 60,
+        width: 60, 
         height: 60,
         resizeMode: 'contain',
         marginRight: 16,
