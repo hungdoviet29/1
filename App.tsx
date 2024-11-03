@@ -6,8 +6,15 @@ import { Provider } from 'react-redux';
 
 // Import các màn hình Admin
 import AdminScreen from './ScreensAdmin/AdminScreen';
+import UserManagementScreen from './ScreensAdmin/UserManagementScreen';
+import PortfolioManagement from './ScreensAdmin/PortfolioManagement';
+import ProductManagementScreen from './ScreensAdmin/ProductManagementScreen';
+import OrderManagement from './ScreensAdmin/OrderManagement';
+import ContactScreen from './ScreensAdmin/ContactScreen';
+import ProfileScreen from './ScreensAdmin/ProfileScreen';
+import StatisticalScreen from './ScreensAdmin/Statistical';
 
-// Import các màn hình
+// Import các màn hình chính
 import FindScreen from './Screens/Find';
 import Favorite from './Screens/Favorite';
 import BuyScreen from './Screens/Buy';
@@ -28,29 +35,38 @@ import ForgotPasswordScreen from './Screens/ForgotPasswordScreen';
 import OrderSuccesScreen from './Screens/OrderSuccesScreen';
 import OrderFailedScreen from './Screens/OrderFailedScreen';
 import ShippingScreen from './Screens/ShippingScreen';
+import NotificationScreen from './Screens/NotificationScreen';
+import OTPVerificationScreen from './Screens/OTPVerificationScreen';
+import ResetPasswordScreen from './Screens/ResetPasswordScreen';
+import ReturnPolicyScreen from './Screens/ReturnPolicyScreen';
+import MembershipPolicy from './Screens/Membershippolicy';
+
 // Import component Bottom Navigation
 import BottomNavigation from './components/bottomnavigation';
 import ProductScreen from './Screens/Buy';
 import { getCartItems } from './redux/AsyncStorage';
 import { loadCart } from './redux/cartSlice';
 import { store } from './redux/store';
-import NotificationScreen from './Screens/NotificationScreen';
-import OTPVerificationScreen from './Screens/OTPVerificationScreen';
-import ResetPasswordScreen from './Screens/ResetPasswordScreen';
-import ReturnPolicyScreen from './Screens/ReturnPolicyScreen'
-import MembershipPolicy from './Screens/Membershippolicy';
-import UserManagementScreen from './ScreensAdmin/UserManagementScreen';
-import PortfolioManagement from './ScreensAdmin/PortfolioManagement';
-import ProductManagementScreen from './ScreensAdmin/ProductManagementScreen';
-import OrderManagement from './ScreensAdmin/OrderManagement';
-import ContactScreen from './ScreensAdmin/ContactScreen';
-import ProfileScreen from './ScreensAdmin/ProfileScreen';
-import StatisticalScreen from './ScreensAdmin/Statistical';
 
 const Stack = createStackNavigator();
-//chghd
+
 const AppNavigator = ({ navigationRef }) => {
   const [currentRouteName, setCurrentRouteName] = useState('Splash');
+
+  // Danh sách các màn hình không hiển thị BottomNavigation
+  const noBottomNavScreens = [
+    'Splash',
+    'Login',
+    'Register',
+    'AdminHome',
+    'UserManagementScreen',
+    'PortfolioManagement',
+    'ProductManagementScreen',
+    'OrderManagement',
+    'ContactScreen',
+    'ProfileScreen'
+    // 'Statistical'
+  ];
 
   useEffect(() => {
     const unsubscribe = navigationRef.current?.addListener('state', () => {
@@ -97,11 +113,10 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="ContactScreen" component={ContactScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         {/* <Stack.Screen name="Statistical" component={StatisticalScreen} /> */}
-
       </Stack.Navigator>
 
-      {/* Chỉ hiển thị Bottom Navigation khi không phải các màn hình Splash, Login, Register, MembershipPolicy */}
-      {currentRouteName !== 'Splash' && currentRouteName !== 'Login' && currentRouteName !== 'Register' && currentRouteName !== 'Membershipolicy' && (
+      {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}
+      {!noBottomNavScreens.includes(currentRouteName) && (
         <BottomNavigation />
       )}
     </View>
