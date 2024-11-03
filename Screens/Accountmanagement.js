@@ -1,7 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import RNRestart from 'react-native-restart'; // Đảm bảo bạn đã cài đặt thư viện này
 
 const AccountManagement = () => {
+  const navigation = useNavigation();
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Đăng xuất",
+      "Bạn có chắc chắn muốn đăng xuất?",
+      [
+        { text: "Hủy", style: "cancel" },
+        { text: "Đăng xuất", onPress: () => RNRestart.Restart() }
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
@@ -31,6 +46,10 @@ const AccountManagement = () => {
           <Text style={styles.optionText}>FAQ</Text>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Đăng xuất</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -87,6 +106,19 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 16,
+  },
+  logoutButton: {
+    marginTop: 30,
+    backgroundColor: '#FF3B30',
+    padding: 15,
+    borderRadius: 10,
+    width: '90%',
+    alignItems: 'center',
+  },
+  logoutText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
