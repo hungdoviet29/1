@@ -39,6 +39,13 @@ import OTPVerificationScreen from './Screens/OTPVerificationScreen';
 import ResetPasswordScreen from './Screens/ResetPasswordScreen';
 import ReturnPolicyScreen from './Screens/ReturnPolicyScreen'
 import MembershipPolicy from './Screens/Membershippolicy';
+import UserManagementScreen from './ScreensAdmin/UserManagementScreen';
+import PortfolioManagement from './ScreensAdmin/PortfolioManagement';
+import ProductManagementScreen from './ScreensAdmin/ProductManagementScreen';
+import OrderManagement from './ScreensAdmin/OrderManagement';
+import ContactScreen from './ScreensAdmin/ContactScreen';
+import ProfileScreen from './ScreensAdmin/ProfileScreen';
+import StatisticalScreen from './ScreensAdmin/Statistical';
 
 const Stack = createStackNavigator();
 //chghd
@@ -83,6 +90,14 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="OTPVerificationScreen" component={OTPVerificationScreen} />
         <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
         <Stack.Screen name="ShippingScreen" component={ShippingScreen} />
+        <Stack.Screen name="UserManagementScreen" component={UserManagementScreen} />
+        <Stack.Screen name="PortfolioManagement" component={PortfolioManagement} />
+        <Stack.Screen name="ProductManagementScreen" component={ProductManagementScreen} />
+        <Stack.Screen name="OrderManagement" component={OrderManagement} />
+        <Stack.Screen name="ContactScreen" component={ContactScreen} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="Statistical" component={StatisticalScreen} />
+
       </Stack.Navigator>
 
       {/* Chỉ hiển thị Bottom Navigation khi không phải các màn hình Splash, Login, Register, MembershipPolicy */}

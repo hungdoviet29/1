@@ -1,67 +1,53 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const AdminScreen = () => {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>ADMIN</Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.item}>
-          <Image
-            source={require('../acssets/user_icon.png')}
-            style={styles.icon}
-          />
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('UserManagementScreen')}>
+          <Image source={require('../acssets/user_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Quản lí người dùng</Text>
-        </View>
-        <View style={styles.item}>
-          <Image
-            source={require('../acssets/category_icon.png')}
-            style={styles.icon}
-          />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('CategoryManagement')}>
+          <Image source={require('../acssets/category_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Quản lí danh mục</Text>
-        </View>
-        <View style={styles.item}>
-          <Image
-            source={require('../acssets/product_icon.png')}
-            style={styles.icon}
-          />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('ProductManagement')}>
+          <Image source={require('../acssets/product_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Quản lí sản phẩm</Text>
-        </View>
-        <View style={styles.item}>
-          <Image
-            source={require('../acssets/order_icon.png')}
-            style={styles.icon}
-          />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('OrderManagement')}>
+          <Image source={require('../acssets/order_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Đơn hàng</Text>
-        </View>
-        <View style={styles.item}>
-          <Image
-            source={require('../acssets/contact_icon.png')}
-            style={styles.icon}
-          />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('ContactManagement')}>
+          <Image source={require('../acssets/contact_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Quản lí liên hệ</Text>
-        </View>
-        <View style={styles.item}>
-          <Image
-            source={require('../acssets/profile_icon.png')}
-            style={styles.icon}
-          />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('ProfileDetail')}>
+          <Image source={require('../acssets/profile_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Chi tiết hồ sơ</Text>
-        </View>
-        <View style={styles.item}>
-          <Image
-            source={require('../acssets/statistics_icon.png')}
-            style={styles.icon}
-          />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Statistics')}>
+          <Image source={require('../acssets/statistics_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Thống kê</Text>
-        </View>
-        <View style={styles.item}>
-          <Image
-            source={require('../acssets/promotion_icon.png')}
-            style={styles.icon}
-          />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Promotions')}>
+          <Image source={require('../acssets/promotion_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Khuyến mãi</Text>
-        </View>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
