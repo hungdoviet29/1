@@ -1,11 +1,11 @@
 import React from 'react';
-import {View, Text, StyleSheet, Image, ScrollView} from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 
 const AdminScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>ADMIN</Text>
-      <ScrollView>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.item}>
           <Image
             source={require('../acssets/user_icon.png')}
@@ -53,7 +53,7 @@ const AdminScreen = () => {
             source={require('../acssets/statistics_icon.png')}
             style={styles.icon}
           />
-          <Text style={styles.itemText}>thống kê</Text>
+          <Text style={styles.itemText}>Thống kê</Text>
         </View>
         <View style={styles.item}>
           <Image
@@ -71,13 +71,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f4f4f4',
+  },
+  scrollContainer: {
     padding: 16,
+    paddingBottom: 50, // Thêm khoảng trống để cuộn dễ dàng
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginVertical: 20,
   },
   item: {
     flexDirection: 'row',
