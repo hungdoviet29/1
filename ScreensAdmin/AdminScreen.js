@@ -14,32 +14,32 @@ const AdminScreen = () => {
           <Text style={styles.itemText}>Quản lí người dùng</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('CategoryManagement')}>
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('PortfolioManagement')}>
           <Image source={require('../acssets/category_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Quản lí danh mục</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('ProductManagement')}>
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('ProductManagementScreen')}>
           <Image source={require('../acssets/product_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Quản lí sản phẩm</Text>
         </TouchableOpacity>
-
+ 
         <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('OrderManagement')}>
           <Image source={require('../acssets/order_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Đơn hàng</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('ContactManagement')}>
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('ContactScreen')}>
           <Image source={require('../acssets/contact_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Quản lí liên hệ</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('ProfileDetail')}>
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('ProfileScreen')}>
           <Image source={require('../acssets/profile_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Chi tiết hồ sơ</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Statistics')}>
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Statistical')}>
           <Image source={require('../acssets/statistics_icon.png')} style={styles.icon} />
           <Text style={styles.itemText}>Thống kê</Text>
         </TouchableOpacity>
