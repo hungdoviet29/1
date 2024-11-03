@@ -1,13 +1,18 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
+import { addNotification } from '../redux/notificationSlice';
 import { loadCart } from '../redux/cartSlice';
+import { addOrder } from '../redux/orderSlice'; // Đảm bảo đường dẫn đúng
 
 const CheckoutScreen = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
+    const route = useRoute();
+
     const cartItems = useSelector(state => state.cart.items);
+    const { shippingInfo } = route.params || {}; // Lấy thông tin giao hàng từ route params
     const [deliveryMethod, setDeliveryMethod] = React.useState('Select Method');
     const [paymentMethod, setPaymentMethod] = React.useState('None');
     const [promoCode, setPromoCode] = React.useState('');
@@ -20,7 +25,7 @@ const CheckoutScreen = () => {
 
     useEffect(() => {
         calculateTotalCost(cartItems); // Tính toán tổng chi phí mỗi khi giỏ hàng hoặc phí giao hàng thay đổi
-    }, [cartItems, deliveryCost]); // Bao gồm deliveryCost để tính toán lại nếu có thay đổi
+    }, [cartItems, deliveryCost]);
 
     const calculateTotalCost = (items) => {
         if (!Array.isArray(items)) return;
@@ -29,7 +34,7 @@ const CheckoutScreen = () => {
         const productTotal = items.reduce((sum, item) => {
             const price = item.gia || 0; // Lấy giá sản phẩm
             const quantity = item.quantity || 0; // Lấy số lượng sản phẩm
-            return sum += (price * quantity); // Tính tổng tiền cho sản phẩm
+            return sum + (price * quantity); // Tính tổng tiền cho sản phẩm
         }, 0);
 
         // Tính tổng chi phí bao gồm phí giao hàng
@@ -84,6 +89,14 @@ const CheckoutScreen = () => {
     };
 
     const confirmOrder = () => {
+        const newOrder = {
+            id: new Date().getTime(), // Tạo ID cho đơn hàng mới
+            shippingInfo, // Lấy thông tin giao hàng
+            totalAmount: totalCost, // Lấy tổng chi phí
+            status: 'Chờ xử lý', // Trạng thái mặc định
+            hinhAnh: cartItems[0]?.hinhAnh || '', // Ví dụ: hình ảnh từ sản phẩm đầu tiên
+        };
+    
         Alert.alert(
             'Confirm Order',
             `Total Cost: ${totalCost.toLocaleString()} VND\n` +
@@ -93,11 +106,28 @@ const CheckoutScreen = () => {
             'Proceed with placing the order?',
             [
                 { text: 'Cancel', style: 'cancel' },
-                { text: 'Confirm', onPress: () => navigation.navigate('OrderSuccesScreen') },
+                { 
+                    text: 'Confirm', 
+                    onPress: () => {
+                        // Thêm đơn hàng mới vào Redux
+                        dispatch(addOrder(newOrder));
+                        // Thêm thông báo mới vào Redux
+                        dispatch(addNotification({
+                            message: `Bạn đã thanh toán đơn hàng thành công lúc ${new Date().toLocaleTimeString()}`,
+                            timestamp: new Date().toLocaleString(),
+                        }));
+                        // Chuyển đến màn hình OrderScreen và truyền thông tin giao hàng và tổng tiền
+                        navigation.navigate('ShippingScreen', { totalCost });
+                    }
+                },
             ]
         );
     };
-
+    
+    
+    
+    
+    
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -115,7 +145,7 @@ const CheckoutScreen = () => {
                         <View key={index} style={styles.productItem}>
                             <Image source={{ uri: item.hinhAnh }} style={styles.itemImage} />
                             <View style={styles.productDetails}>
-                                <Text style={styles.productName}> {item.ten}</Text>
+                                <Text style={styles.productName}>{item.ten}</Text>
                                 <Text style={styles.productPrice}>{item.gia.toLocaleString()} VND x {item.quantity}</Text>
                             </View>
                         </View>
@@ -206,45 +236,41 @@ const styles = StyleSheet.create({
     productList: {
         paddingHorizontal: 16,
         paddingTop: 10,
-        backgroundColor: '#FFF',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
+        paddingBottom: 20,
     },
     productItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F4F4FB',
-        borderRadius: 10,
         marginBottom: 10,
-        padding: 10,
     },
     productDetails: {
         flex: 1,
     },
     productName: {
         fontSize: 16,
+        fontWeight: 'bold',
         color: '#333',
     },
     productPrice: {
         fontSize: 14,
-        color: '#888',
+        color: '#666',
     },
     checkoutSection: {
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
         padding: 16,
-        backgroundColor: '#FFF',
-        borderRadius: 10,
-        marginBottom: 20,
+        elevation: 5,
     },
     row: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#E0E0E0',
+        marginBottom: 16,
     },
     rowLabel: {
         fontSize: 16,
+        fontWeight: 'bold',
         color: '#333',
     },
     rowAction: {
@@ -253,43 +279,44 @@ const styles = StyleSheet.create({
     },
     actionText: {
         fontSize: 16,
-        color: '#6C63FF',
-        marginRight: 5,
+        color: '#666',
+        marginRight: 8,
     },
     arrowIcon: {
-        width: 15,
-        height: 15,
-        tintColor: '#6C63FF',
+        width: 14,
+        height: 14,
+        tintColor: '#888',
     },
     totalText: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#6C63FF',
+        color: '#333',
     },
     placeOrderButton: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: '#6C63FF',
-        padding: 12,
+        paddingVertical: 12,
         borderRadius: 8,
-        marginVertical: 15,
+        marginTop: 16,
+    },
+    placeOrderText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#fff',
+        marginLeft: 8,
+    },
+    termsText: {
+        fontSize: 12,
+        color: '#666',
+        textAlign: 'center',
+        marginTop: 16,
     },
     truckIcon: {
         width: 20,
         height: 20,
-        tintColor: '#FFF',
-        marginRight: 10,
-    },
-    placeOrderText: {
-        fontSize: 18,
-        color: '#FFF',
-        fontWeight: 'bold',
-    },
-    termsText: {
-        fontSize: 12,
-        color: '#888',
-        textAlign: 'center',
-        marginTop: 10,
+        tintColor: '#fff',
     },
 });
 

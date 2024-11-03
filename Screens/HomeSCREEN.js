@@ -24,19 +24,19 @@ const HomeScreen = () => {
     // Xác định link API cho từng danh mục
     switch (category) {
       case 'Popular':
-        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop';
+        apiUrl = 'http:/192.168.55.176:3000/LapTop/getListLapTop';
         break;
       case 'Trending':
-        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop';
+        apiUrl = 'http:/192.168.55.176:3000/LapTop/getListLapTop';
         break;
       case 'News':
-        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop';
+        apiUrl = 'http:/192.168.55.176:3000/LapTop/getListLapTop';
         break;
       case 'Sale':
-        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop';
+        apiUrl = 'http:/192.168.55.176:3000/LapTop/getListLapTop';
         break;
       default:
-        apiUrl = 'http:/Localhost:3000/LapTop/getListLapTop'; // URL mặc định
+        apiUrl = 'http:/192.168.55.176:3000/LapTop/getListLapTop'; // URL mặc định
     }
 
     axios
@@ -70,7 +70,7 @@ const HomeScreen = () => {
           style={styles.profileImage}
         />
         <View style={styles.headerIcons}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>navigation.navigate('NotificationScreen')}>
             <Image
               source={require('../acssets/bell.png')}
               style={styles.icon}

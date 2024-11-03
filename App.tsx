@@ -27,6 +27,7 @@ import CommentScreen from './Screens/CommentScreen';
 import ForgotPasswordScreen from './Screens/ForgotPasswordScreen';
 import OrderSuccesScreen from './Screens/OrderSuccesScreen';
 import OrderFailedScreen from './Screens/OrderFailedScreen';
+import ShippingScreen from './Screens/ShippingScreen';
 
 // Import component Bottom Navigation
 import BottomNavigation from './components/bottomnavigation';
@@ -79,6 +80,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
         <Stack.Screen name="OTPVerificationScreen" component={OTPVerificationScreen} />
         <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
+        <Stack.Screen name="ShippingScreen" component={ShippingScreen} />
       </Stack.Navigator>
 
       {/* Chỉ hiển thị Bottom Navigation khi không phải các màn hình Splash, Login, Register */}
