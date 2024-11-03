@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   ImageBackground,
   StyleSheet,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 const Login = () => {
   const navigation = useNavigation();
@@ -16,22 +16,33 @@ const Login = () => {
   const [error, setError] = useState(null);
 
   const handleLogin = async () => {
+   
     try {
-      const response = await fetch('http://172.20.10.6:3000/users');
-      const users = await response.json();
+      const response = await fetch('http://192.168.0.104:3000/users');
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const text = await response.text();
+      console.log('Response Text:', text);
+  
+      let users;
+      try {
+        users = JSON.parse(text);
+      } catch (error) {
+        throw new Error('Invalid JSON response');
+      }
+  
       const user = users.find(
         user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau,
       );
-      // Log thông tin người dùng
+  
       console.log('User found:', user);
-
+  
       if (user) {
-        console.log('Roll:', user.roll); // Kiểm tra thuộc tính roll
-        if (user.roll === 1) {
-          navigation.navigate('AdminHome');
-        } else {
-          navigation.navigate('Home');
-        }
+        console.log('Roll:', user.roll);
+        navigation.navigate(user.roll === 1 ? 'AdminHome' : 'Home');
       } else {
         setError('Thông tin đăng nhập không đúng.');
       }
@@ -40,11 +51,12 @@ const Login = () => {
       console.error('Lỗi trong quá trình đăng nhập:', error);
     }
   };
+  
 
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require('../acssets/laplogin.png')}
+        source={require('../acssets/laplogin.png')} // Đảm bảo đường dẫn hình ảnh là chính xác
         style={styles.background}>
         <Text style={styles.welcomeText}>Welcome Back!</Text>
         <Text style={styles.subText}>

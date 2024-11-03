@@ -27,6 +27,9 @@ import CommentScreen from './Screens/CommentScreen';
 import ForgotPasswordScreen from './Screens/ForgotPasswordScreen';
 import OrderSuccesScreen from './Screens/OrderSuccesScreen';
 import OrderFailedScreen from './Screens/OrderFailedScreen';
+import Membershippolicy from './Screens/Membershippolicy';
+import WarrantyPolicyScreen from './Screens/WarrantyPolicyScreen';
+import PaymentPolicyScreen from './Screens/PaymentPolicyScreen';
 
 // Import component Bottom Navigation
 import BottomNavigation from './components/bottomnavigation';
@@ -37,9 +40,10 @@ import { store } from './redux/store';
 import NotificationScreen from './Screens/NotificationScreen';
 import OTPVerificationScreen from './Screens/OTPVerificationScreen';
 import ResetPasswordScreen from './Screens/ResetPasswordScreen';
+import ReturnPolicyScreen from './Screens/ReturnPolicyScreen'
 
 const Stack = createStackNavigator();
-
+//chghd
 const AppNavigator = ({ navigationRef }) => {
   const [currentRouteName, setCurrentRouteName] = useState('Splash');
 
@@ -62,6 +66,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Find" component={FindScreen} />
         <Stack.Screen name="Favorite" component={Favorite} />
+        <Stack.Screen name="Profile" component={Membershippolicy} />
         <Stack.Screen name="Buy" component={BuyScreen} />
         <Stack.Screen name="Cart" component={CartScreen} />
         <Stack.Screen name="OderScreen" component={OderScreen} />
@@ -79,10 +84,15 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
         <Stack.Screen name="OTPVerificationScreen" component={OTPVerificationScreen} />
         <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
+        <Stack.Screen name="Membershippolicy" component={Membershippolicy} />
+        <Stack.Screen name="ReturnPolicyScreen" component={ReturnPolicyScreen} />
+        <Stack.Screen name="WarrantyPolicyScreen" component={WarrantyPolicyScreen} />
+        <Stack.Screen name="PaymentPolicyScreen" component={PaymentPolicyScreen} />
+        
       </Stack.Navigator>
 
-      {/* Chỉ hiển thị Bottom Navigation khi không phải các màn hình Splash, Login, Register */}
-      {currentRouteName !== 'Splash' && currentRouteName !== 'Login' && currentRouteName !== 'Register' && (
+      {/* Chỉ hiển thị Bottom Navigation khi không phải các màn hình Splash, Login, Register, MembershipPolicy */}
+      {currentRouteName !== 'Splash' && currentRouteName !== 'Login' && currentRouteName !== 'Register' && currentRouteName !== 'Membershipolicy' && (
         <BottomNavigation />
       )}
     </View>
