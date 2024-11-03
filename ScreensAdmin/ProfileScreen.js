@@ -8,14 +8,14 @@ const ProfileScreen = () => {
       
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton}>
-          <Image source={require('./assets/images/back.png')} style={styles.backIcon} />
+          <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Chi tiết hồ sơ</Text>
       </View>
 
       
       <View style={styles.profileContainer}>
-        <Image source={require('./assets/images/hihi.png')} style={styles.profileImage} />
+        <Image source={require('../acssets/hihi.png')} style={styles.profileImage} />
         <Text style={styles.profileName}>NGUYỄN VĂN ADMIN</Text>
         <Text style={styles.profileId}>ID: 0336394558</Text>
       </View>
@@ -25,7 +25,7 @@ const ProfileScreen = () => {
         
        
         <View style={styles.fieldRow}>
-          <Image source={require('./assets/images/profile.png')} style={styles.fieldIcon} />
+          <Image source={require('../acssets/profile.png')} style={styles.fieldIcon} />
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.fieldInput}
@@ -33,14 +33,14 @@ const ProfileScreen = () => {
               editable={false}
             />
             <TouchableOpacity style={styles.editButton}>
-              <Image source={require('./assets/images/but.png')} style={styles.editIcon} />
+              <Image source={require('../acssets/but.png')} style={styles.editIcon} />
             </TouchableOpacity>
           </View>
         </View>
 
        
         <View style={styles.fieldRow}>
-          <Image source={require('./assets/images/profile.png')} style={styles.fieldIcon} />
+          <Image source={require('../acssets/profile.png')} style={styles.fieldIcon} />
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.fieldInput}
@@ -49,14 +49,14 @@ const ProfileScreen = () => {
               editable={false}
             />
             <TouchableOpacity style={styles.editButton}>
-              <Image source={require('./assets/images/but.png')} style={styles.editIcon} />
+              <Image source={require('../acssets/but.png')} style={styles.editIcon} />
             </TouchableOpacity>
           </View>
         </View>
 
        
         <View style={styles.fieldRow}>
-          <Image source={require('./assets/images/profile.png')} style={styles.fieldIcon} />
+          <Image source={require('../acssets/profile.png')} style={styles.fieldIcon} />
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.fieldInput}
@@ -64,7 +64,7 @@ const ProfileScreen = () => {
               editable={false}
             />
             <TouchableOpacity style={styles.editButton}>
-              <Image source={require('./assets/images/but.png')} style={styles.editIcon} />
+              <Image source={require('../acssets/but.png')} style={styles.editIcon} />
             </TouchableOpacity>
           </View>
         </View>

@@ -7,7 +7,7 @@ const ContactScreen = () => {
       {/* Back Arrow Icon and Title */}
       <View style={styles.headerRow}>
         <TouchableOpacity style={styles.backButton}>
-          <Image source={require('../acssets/back.png')} style={styles.backIcon} />
+          <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
         </TouchableOpacity>
         <Text style={styles.title}>Quản lí liên hệ</Text>
         {/* Placeholder for spacing */}
@@ -28,7 +28,7 @@ const ContactScreen = () => {
         <Text style={styles.label}>Email</Text>
         <TextInput style={styles.input} value="Lapstore@gmail.com" />
         <TouchableOpacity style={styles.iconButton}>
-          <Image source={require('.../acssets/but.png')} style={styles.icon} />
+          <Image source={require('../acssets/fix.png')} style={styles.icon} />
         </TouchableOpacity>
       </View>
 
@@ -37,7 +37,7 @@ const ContactScreen = () => {
         <Text style={styles.label}>Address</Text>
         <Text style={styles.address}>123 Phuong Canh - Nam Từ Liêm - Hà Nội</Text>
         <TouchableOpacity style={styles.iconButton}>
-          <Image source={require('../acssets/delete.png')} style={styles.icon} />
+          <Image source={require('../acssets/bin.png')} style={styles.icon} />
         </TouchableOpacity>
       </View>
 

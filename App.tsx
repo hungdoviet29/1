@@ -96,7 +96,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="OrderManagement" component={OrderManagement} />
         <Stack.Screen name="ContactScreen" component={ContactScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-        <Stack.Screen name="Statistical" component={StatisticalScreen} />
+        {/* <Stack.Screen name="Statistical" component={StatisticalScreen} /> */}
 
       </Stack.Navigator>
 
