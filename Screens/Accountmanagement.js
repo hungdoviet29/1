@@ -39,7 +39,10 @@ const AccountManagement = () => {
           <Text style={styles.optionText}>Thông tin liên hệ</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity 
+          style={styles.option} 
+          onPress={() => navigation.navigate('DirectMessaging')}  // Navigate to Direct Messaging screen
+        >
           <Image source={require('../acssets/tb.png')} style={styles.icon} />
           <Text style={styles.optionText}>Nhắn tin trực tiếp</Text>
         </TouchableOpacity>

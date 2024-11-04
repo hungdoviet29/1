@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
+
 const ShippingScreen = () => {
     const navigation = useNavigation();
     const [name, setName] = useState('');
@@ -9,25 +10,22 @@ const ShippingScreen = () => {
     const [phone, setPhone] = useState('');
 
     const route = useRoute();
+
     const handleContinue = () => {
         if (!name || !address || !phone) {
             Alert.alert('Error', 'Please fill in all the fields');
             return;
         }
-    
+
         const shippingInfo = {
             name,
             address,
             phone,
         };
-    
-        // Chuyển đến OrderScreen và truyền thông tin giao hàng cùng tổng tiền
-        navigation.navigate('OderScreen', { shippingInfo, totalCost: route.params?.totalCost });
+
+        // Navigate to OrderScreen and pass shipping info along with total cost
+        navigation.navigate('OrderScreen', { shippingInfo, totalCost: route.params?.totalCost });
     };
-    
-    
-    
-    
 
     return (
         <View style={styles.container}>
@@ -63,6 +61,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#FFF',
+        justifyContent: 'flex-start', // Keep elements at the top
     },
     header: {
         fontSize: 24,
@@ -81,6 +80,7 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 5,
         alignItems: 'center',
+        marginTop: 300, // Adjust this value to move the button down slightly
     },
     continueText: {
         color: '#FFF',

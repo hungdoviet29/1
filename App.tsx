@@ -41,6 +41,7 @@ import ResetPasswordScreen from './Screens/ResetPasswordScreen';
 import ReturnPolicyScreen from './Screens/ReturnPolicyScreen';
 import MembershipPolicy from './Screens/Membershippolicy';
 import EditInfo from './Screens/EditInfo';
+import DirectMessaging from './Screens/DirectMessaging';
 // Import component Bottom Navigation
 import BottomNavigation from './components/bottomnavigation';
 import ProductScreen from './Screens/Buy';
@@ -87,6 +88,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="EditInfo" component={EditInfo} /> 
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Find" component={FindScreen} />
+        <Stack.Screen name="DirectMessaging" component={DirectMessaging} />
         <Stack.Screen name="Favorite" component={Favorite} />
         <Stack.Screen name="Profile" component={MembershipPolicy} />
         <Stack.Screen name="Buy" component={BuyScreen} />
@@ -113,6 +115,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="OrderManagement" component={OrderManagement} />
         <Stack.Screen name="ContactScreen" component={ContactScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        
         {/* <Stack.Screen name="Statistical" component={StatisticalScreen} /> */}
       </Stack.Navigator>
 
