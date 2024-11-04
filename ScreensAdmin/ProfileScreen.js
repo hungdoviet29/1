@@ -18,14 +18,14 @@ const ProfileScreen = () => {
       {/* Header with Back Arrow and Title */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton}>
-          <Image source={require('./acssets/images/back.png')} style={styles.backIcon} />
+          <Image source={require('../acssets/back.png')} style={styles.backIcon} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Chi tiết hồ sơ</Text>
       </View>
 
       {/* Profile Section */}
       <View style={styles.profileContainer}>
-        <Image source={require('./acssets/images/hihi.png')} style={styles.profileImage} />
+        <Image source={require('../acssets/hihi.png')} style={styles.profileImage} />
         <Text style={styles.profileName}>NGUYỄN VĂN ADMIN</Text>
         <Text style={styles.profileId}>ID: 0336394558</Text>
       </View>
@@ -35,7 +35,7 @@ const ProfileScreen = () => {
         
         {/* Email Field */}
         <View style={styles.fieldRow}>
-          <Image source={require('./acssets/images/profile.png')} style={styles.fieldIcon} />
+          <Image source={require('../acssets/profile.png')} style={styles.fieldIcon} />
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.fieldInput}
@@ -47,14 +47,14 @@ const ProfileScreen = () => {
               style={styles.editButton}
               onPress={() => setIsEditingEmail(!isEditingEmail)}
             >
-              <Image source={require('./acssets/images/but.png')} style={styles.editIcon} />
+              <Image source={require('../acssets/but.png')} style={styles.editIcon} />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Password Field */}
         <View style={styles.fieldRow}>
-          <Image source={require('./acssets/images/profile.png')} style={styles.fieldIcon} />
+          <Image source={require('../acssets/profile.png')} style={styles.fieldIcon} />
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.fieldInput}
@@ -67,14 +67,14 @@ const ProfileScreen = () => {
               style={styles.editButton}
               onPress={() => setIsEditingPassword(!isEditingPassword)}
             >
-              <Image source={require('./acssets/images/but.png')} style={styles.editIcon} />
+              <Image source={require('../acssets/but.png')} style={styles.editIcon} />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Phone Number Field */}
         <View style={styles.fieldRow}>
-          <Image source={require('./assets/images/profile.png')} style={styles.fieldIcon} />
+          <Image source={require('../acssets/profile.png')} style={styles.fieldIcon} />
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.fieldInput}
@@ -86,7 +86,7 @@ const ProfileScreen = () => {
               style={styles.editButton}
               onPress={() => setIsEditingPhone(!isEditingPhone)}
             >
-              <Image source={require('./acssets/images/but.png')} style={styles.editIcon} />
+              <Image source={require('../acssets/but.png')} style={styles.editIcon} />
             </TouchableOpacity>
           </View>
         </View>
