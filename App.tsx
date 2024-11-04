@@ -40,7 +40,7 @@ import OTPVerificationScreen from './Screens/OTPVerificationScreen';
 import ResetPasswordScreen from './Screens/ResetPasswordScreen';
 import ReturnPolicyScreen from './Screens/ReturnPolicyScreen';
 import MembershipPolicy from './Screens/Membershippolicy';
-
+import EditInfo from './Screens/EditInfo';
 // Import component Bottom Navigation
 import BottomNavigation from './components/bottomnavigation';
 import ProductScreen from './Screens/Buy';
@@ -84,6 +84,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="AdminHome" component={AdminScreen} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="EditInfo" component={EditInfo} /> 
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Find" component={FindScreen} />
         <Stack.Screen name="Favorite" component={Favorite} />

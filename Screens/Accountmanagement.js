@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import RNRestart from 'react-native-restart'; // Đảm bảo bạn đã cài đặt thư viện này
+import RNRestart from 'react-native-restart';
 
 const AccountManagement = () => {
   const navigation = useNavigation();
@@ -26,7 +26,10 @@ const AccountManagement = () => {
       </View>
 
       <View style={styles.optionsContainer}>
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity 
+          style={styles.option} 
+          onPress={() => navigation.navigate('EditInfo')}  // Navigate to EditInfo screen
+        >
           <Image source={require('../acssets/tt.png')} style={styles.icon} />
           <Text style={styles.optionText}>Chỉnh sửa thông tin</Text>
         </TouchableOpacity>
@@ -40,14 +43,9 @@ const AccountManagement = () => {
           <Image source={require('../acssets/tb.png')} style={styles.icon} />
           <Text style={styles.optionText}>Nhắn tin trực tiếp</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity style={styles.option}>
-          <Image source={require('../acssets/qa.png')} style={styles.icon} />
-          <Text style={styles.optionText}>FAQ</Text>
-        </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Login')}>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutText}>Đăng xuất</Text>
       </TouchableOpacity>
     </View>
