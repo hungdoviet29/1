@@ -9,23 +9,28 @@ const DirectMessaging = () => {
 
   const handleSend = () => {
     if (message.trim()) {
-      setMessages([...messages, { id: Date.now().toString(), text: message }]);
+      setMessages([...messages, { id: Date.now().toString(), text: message, sender: 'user' }]);
       setMessage('');
     }
   };
 
   const handleBackPress = () => {
-    navigation.goBack(); // Go back to the previous screen
+    navigation.goBack();
   };
 
   const handleAddImage = () => {
-    // Placeholder function to handle adding an image
     console.log("Add image functionality will go here.");
   };
 
   const renderMessage = ({ item }) => (
-    <View style={styles.messageContainer}>
-      <Text style={styles.messageText}>{item.text}</Text>
+    <View style={[styles.messageRow, item.sender === 'user' ? styles.userMessageRow : styles.otherMessageRow]}>
+      <Image
+        source={{ uri: 'https://example.com/avatar.jpg' }} // Replace with actual avatar source
+        style={styles.avatar}
+      />
+      <View style={[styles.messageContainer, item.sender === 'user' ? styles.userMessage : styles.otherMessage]}>
+        <Text style={styles.messageText}>{item.text}</Text>
+      </View>
     </View>
   );
 
@@ -47,20 +52,20 @@ const DirectMessaging = () => {
         contentContainerStyle={styles.messageList}
       />
 
-      {/* Input */}
-      <View style={styles.inputContainer}>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddImage}>
-          <Image source={require('../acssets/but.png')} style={styles.addButtonIcon} />
-        </TouchableOpacity>
+      {/* Centered Input Section */}
+      <View style={styles.centeredInputContainer}>
+        <Image source={{ uri: 'https://example.com/avatar.jpg' }} style={styles.avatarOnInput} />
+        
         <TextInput
           style={styles.input}
-          placeholder="Nhập tin nhắn..."
+          placeholder="Type a message..."
           value={message}
           onChangeText={setMessage}
-          multiline={true}
+          multiline
         />
+        
         <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-          <Text style={styles.sendButtonText}>Gửi</Text>
+          <Text style={styles.sendButtonText}>Send</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -71,7 +76,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
-    padding: 10,
   },
   header: {
     flexDirection: 'row',
@@ -80,13 +84,10 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    marginBottom: 10,
   },
   backButton: {
     position: 'absolute',
     left: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
   },
   backButtonText: {
     color: '#007AFF',
@@ -97,67 +98,79 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   messageList: {
-    paddingBottom: 90, // Increased to create space for the input area
+    paddingVertical: 10,
+    paddingBottom: 150, // Leave space for input area
+  },
+  messageRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginVertical: 8,
+    paddingHorizontal: 10,
+  },
+  userMessageRow: {
+    justifyContent: 'flex-end',
+  },
+  otherMessageRow: {
+    justifyContent: 'flex-start',
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 8,
   },
   messageContainer: {
-    backgroundColor: '#FFF',
     padding: 10,
     borderRadius: 10,
-    marginBottom: 10,
+    maxWidth: '75%',
+  },
+  userMessage: {
+    backgroundColor: '#DCF8C6',
+    alignSelf: 'flex-end',
+  },
+  otherMessage: {
+    backgroundColor: '#FFFFFF',
     alignSelf: 'flex-start',
-    maxWidth: '80%',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
   },
   messageText: {
     fontSize: 16,
     color: '#000',
   },
-  inputContainer: {
+  centeredInputContainer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: '10%',  // Adjusted to place it in the middle of the screen
     left: 10,
     right: 10,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#FFF',
-    padding: 15,
-    borderRadius: 15,
-    height: 150,
+    padding: 10,
+    borderRadius: 20,
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 3,
   },
-  addButton: {
+  avatarOnInput: {
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10, // Space between button and input
-  },
-  addButtonIcon: {
-    width: 24, // Adjust size as needed
-    height: 24, // Adjust size as needed
+    borderRadius: 20,
+   
   },
   input: {
     flex: 1,
     padding: 10,
-    borderRadius: 10,
     backgroundColor: '#EFEFEF',
+    borderRadius: 20,
+    marginHorizontal: 8,
     maxHeight: 80,
-    textAlignVertical: 'top',
   },
   sendButton: {
     backgroundColor: '#007AFF',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginLeft: 10,
+    padding: 10,
+    borderRadius: 20,
   },
   sendButtonText: {
     color: '#FFF',

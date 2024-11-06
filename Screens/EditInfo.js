@@ -1,13 +1,20 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const EditInfo = () => {
   const navigation = useNavigation();
+  const [editingField, setEditingField] = useState(null); // Track the field being edited
+  const [inputValue, setInputValue] = useState(''); // Track input value for the field
 
-  const handleEdit = (field) => {
-    // Navigate to a detailed edit screen or handle the edit logic here
-    alert(`Chỉnh sửa ${field}`);
+  const handleEditStart = (field) => {
+    setEditingField(field);
+    setInputValue(''); // Set to the current value if you have default values
+  };
+
+  const handleSave = () => {
+    alert(`${editingField} updated to: ${inputValue}`);
+    setEditingField(null); // End editing
   };
 
   return (
@@ -16,21 +23,38 @@ const EditInfo = () => {
         <Text style={styles.backText}>←</Text>
       </TouchableOpacity>
 
-      
-
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <View style={styles.profileContainer}>
           <Image source={require('../acssets/profile.png')} style={styles.avatar} />
-          <TouchableOpacity style={styles.editIconContainer} onPress={() => handleEdit("Profile Picture")}>
+          <TouchableOpacity style={styles.editIconContainer} onPress={() => handleEditStart("Profile Picture")}>
             <Image source={require('../acssets/fix.png')} style={styles.editIcon} />
           </TouchableOpacity>
         </View>
 
+        {/* Mapping fields to create editable items */}
         {["Họ và tên", "Email", "Số điện thoại", "Địa chỉ", "Ngày sinh", "Giới tính", "Mật khẩu", "Quốc tịch"].map((item) => (
-          <TouchableOpacity key={item} style={styles.fieldContainer} onPress={() => handleEdit(item)}>
-            <Text style={styles.fieldText}>{item}</Text>
-            <Image source={require('../acssets/fix.png')} style={styles.editIcon} />
-          </TouchableOpacity>
+          <View key={item} style={styles.fieldContainer}>
+            {editingField === item ? (
+              <>
+                <TextInput
+                  style={styles.input}
+                  placeholder={`Enter new ${item}`}
+                  value={inputValue}
+                  onChangeText={setInputValue}
+                />
+                <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
+                  <Text style={styles.saveButtonText}>Save</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <Text style={styles.fieldText}>{item}</Text>
+                <TouchableOpacity onPress={() => handleEditStart(item)}>
+                  <Image source={require('../acssets/fix.png')} style={styles.editIcon} />
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
         ))}
       </ScrollView>
     </View>
@@ -50,14 +74,9 @@ const styles = StyleSheet.create({
   backText: {
     fontSize: 20,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   scrollViewContainer: {
     alignItems: 'center',
-    paddingBottom: 20, // Optional: Adds padding at the bottom of the scroll view
+    paddingBottom: 20,
   },
   profileContainer: {
     alignItems: 'center',
@@ -94,6 +113,23 @@ const styles = StyleSheet.create({
   },
   fieldText: {
     fontSize: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    flex: 1,
+    marginRight: 10,
+  },
+  saveButton: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  saveButtonText: {
+    color: '#FFF',
   },
 });
 

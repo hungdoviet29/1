@@ -31,19 +31,19 @@ const ShippingScreen = () => {
         <View style={styles.container}>
             <Text style={styles.header}>Shipping Information</Text>
             <TextInput 
-                style={styles.input}
+                style={[styles.input, { borderColor: '#007AFF' }]}
                 placeholder="Name"
                 value={name}
                 onChangeText={setName}
             />
             <TextInput 
-                style={styles.input}
+                style={[styles.input, { borderColor: '#8A2BE2' }]}
                 placeholder="Address"
                 value={address}
                 onChangeText={setAddress}
             />
             <TextInput 
-                style={styles.input}
+                style={[styles.input, { borderColor: '#8A2BE2' }]}
                 placeholder="Phone"
                 value={phone}
                 onChangeText={setPhone}
@@ -61,26 +61,26 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#FFF',
-        justifyContent: 'flex-start', // Keep elements at the top
+        justifyContent: 'center', // Center elements on the screen
     },
     header: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 30,
     },
     input: {
-        borderWidth: 1,
-        borderColor: '#E0E0E0',
-        padding: 10,
-        borderRadius: 5,
-        marginBottom: 15,
+        borderWidth: 2,
+        padding: 15,  // Increase padding for larger input box
+        borderRadius: 8,
+        marginBottom: 20,
+        fontSize: 18,  // Larger font size for bigger text
     },
     continueButton: {
         backgroundColor: '#6C63FF',
         padding: 15,
-        borderRadius: 5,
+        borderRadius: 8,
         alignItems: 'center',
-        marginTop: 300, // Adjust this value to move the button down slightly
+        marginTop: 30,
     },
     continueText: {
         color: '#FFF',
