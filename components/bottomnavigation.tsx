@@ -25,7 +25,7 @@ const BottomNavigation = () => {
         onPress={() => navigation.navigate('Cart')}
       >
         <Image
-          source={require('../acssets/BasketIcon.png')} // Đảm bảo đường dẫn đúng
+          source={require('../acssets/shoppingcart.png')} // Đảm bảo đường dẫn đúng
           style={styles.icon}
         />
       </TouchableOpacity>
@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   icon: {
-    width: 24,
-    height: 24,
+    width: 27,
+    height: 25,
   },
 });
 
