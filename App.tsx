@@ -65,8 +65,8 @@ const AppNavigator = ({ navigationRef }) => {
     'ProductManagementScreen',
     'OrderManagement',
     'ContactScreen',
-    'ProfileScreen'
-    // 'Statistical'
+    'ProfileScreen',
+    'Statistical'
   ];
 
   useEffect(() => {
@@ -116,7 +116,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="ContactScreen" component={ContactScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         
-        {/* <Stack.Screen name="Statistical" component={StatisticalScreen} /> */}
+        <Stack.Screen name="Statistical" component={StatisticalScreen} />
       </Stack.Navigator>
 
       {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}
