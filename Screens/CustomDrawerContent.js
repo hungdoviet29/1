@@ -23,25 +23,16 @@ const CustomDrawerContent = () => {
 
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Favorite')}>
           <Image source={require('../acssets/Favorite.png')} style={styles.menuIcon} />
-          <Text style={styles.menuText}>Wishlist</Text>
+          <Text style={styles.menuText}>Favorite</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Delivery Address')}>
-          <Image source={require('../acssets/Deliceryaddress.png')} style={styles.menuIcon} />
-          <Text style={styles.menuText}>Delivery Address</Text>
+          <Image source={require('../acssets/Caricon.png')} style={styles.menuIcon} />
+          <Text style={styles.menuText}>Order status</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('PayScreen')}>
-          <Image source={require('../acssets/Vectoricon.png')} style={styles.menuIcon} />
-          <Text style={styles.menuText}>Payment Methods</Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Promo Cord')}>
-          <Image source={require('../acssets/PromoCordicon.png')} style={styles.menuIcon} />
-          <Text style={styles.menuText}>Promo Cord</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Notifications')}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('NotificationScreen')}>
           <Image source={require('../acssets/Bellicon.png')} style={styles.menuIcon} />
           <Text style={styles.menuText}>Notifications</Text>
         </TouchableOpacity>
@@ -51,10 +42,6 @@ const CustomDrawerContent = () => {
           <Text style={styles.menuText}>Help</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('About')}>
-          <Image source={require('../acssets/thongbao.png')} style={styles.menuIcon} />
-          <Text style={styles.menuText}>About</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Logout Button */}
