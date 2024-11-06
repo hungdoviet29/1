@@ -35,6 +35,7 @@ import ForgotPasswordScreen from './Screens/ForgotPasswordScreen';
 import OrderSuccesScreen from './Screens/OrderSuccesScreen';
 import OrderFailedScreen from './Screens/OrderFailedScreen';
 import ShippingScreen from './Screens/ShippingScreen';
+import FilterScreen from './Screens/FilterScreen';
 import NotificationScreen from './Screens/NotificationScreen';
 import OTPVerificationScreen from './Screens/OTPVerificationScreen';
 import ResetPasswordScreen from './Screens/ResetPasswordScreen';
@@ -115,7 +116,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="OrderManagement" component={OrderManagement} />
         <Stack.Screen name="ContactScreen" component={ContactScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-        
+        <Stack.Screen name="FilterScreen" component={FilterScreen} />
         <Stack.Screen name="Statistical" component={StatisticalScreen} />
       </Stack.Navigator>
 

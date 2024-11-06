@@ -41,7 +41,6 @@ const HomeScreen = () => {
         break;
       default:
         apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop'; // URL mặc định
-
     }
 
     axios
@@ -86,7 +85,7 @@ const HomeScreen = () => {
           style={styles.profileImage}
         />
         <View style={styles.headerIcons}>
-          <TouchableOpacity onPress={()=>navigation.navigate('NotificationScreen')}>
+          <TouchableOpacity onPress={() => navigation.navigate('NotificationScreen')}>
             <Image
               source={require('../acssets/bell.png')}
               style={styles.icon}
@@ -122,6 +121,14 @@ const HomeScreen = () => {
           </TouchableOpacity>
         ))}
       </View>
+
+      {/* Nút lọc */}
+      <TouchableOpacity onPress={() => navigation.navigate('FilterScreen')} style={styles.filterButton}>
+        <Image
+          source={require('../acssets/sorttool.png')}
+          style={styles.filterIcon}
+        />
+      </TouchableOpacity>
 
       {/* Product List */}
       {loading ? (
@@ -167,7 +174,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', padding: 16 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', padding: 16, alignItems: 'center' },
   profileImage: { width: 40, height: 40, borderRadius: 20 },
   headerIcons: { flexDirection: 'row' },
   icon: { width: 24, height: 24, marginLeft: 16 },
@@ -182,12 +189,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: '#6C63FF',
   },
+  filterButton: {
+    position: 'absolute',
+    top: 120, // Điều chỉnh vị trí của nút lọc
+    right: 16,
+  },
+  filterIcon: { width: 24, height: 24 },
   productScrollView: { paddingVertical: 16 },
   productList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
+    top:20
   },
   product: {
     alignItems: 'center',
