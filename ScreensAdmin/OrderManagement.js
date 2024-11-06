@@ -31,8 +31,11 @@ const OrderItem = ({ order }) => {
         <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Hủy đơn', 'Đơn hàng đã được hủy.')}>
           <Text style={styles.buttonText}>Hủy đơn</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Sửa đơn', 'Đơn hàng đã được hủy.')}>
+          <Text style={styles.buttonText}>Sửa đơn</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Xem chi tiết', 'Hiển thị chi tiết đơn hàng.')}>
-          <Text style={styles.buttonText}>Xem chi tiết</Text>
+          <Text style={styles.buttonText}>Chi tiết</Text>
         </TouchableOpacity>
       </View>
     </View>
