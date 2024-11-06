@@ -25,7 +25,9 @@ const FavoriteScreen = () => {
 
     const renderFavoriteItem = ({ item }) => (
         <View style={styles.favoriteItem}>
+            {/* <TouchableOpacity onPress={()=> navigation.navigate('Buy')}> */}
             <Image source={{ uri: item.hinhAnh }} style={styles.itemImage} />
+            {/* </TouchableOpacity > */}
             <View style={styles.itemDetails}>
                 <Text style={styles.itemName}>{item.ten}</Text>
                 <Text style={styles.itemPrice}>{item.gia.toLocaleString()} USD</Text>
@@ -56,21 +58,7 @@ const FavoriteScreen = () => {
                 ListEmptyComponent={<Text style={styles.emptyMessage}>Chưa có sản phẩm nào trong danh sách yêu thích!</Text>}
             />
 
-            {/* Thanh điều hướng dưới cùng */}
-            <View style={styles.bottomNavigation}>
-                <TouchableOpacity>
-                    <Image source={require('../acssets/home.png')} style={styles.iconNav} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Image source={require('../acssets/BasketIcon.png')} style={styles.iconNav} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Image source={require('../acssets/Vector.png')} style={styles.iconNav} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Image source={require('../acssets/profile.png')} style={styles.iconNav} />
-                </TouchableOpacity>
-            </View>
+
         </View>
     );
 };
