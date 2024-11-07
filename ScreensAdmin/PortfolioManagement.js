@@ -1,3 +1,4 @@
+// PortfolioManagement.js
 import React from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -7,7 +8,7 @@ const categories = [
     id: '1',
     name: 'ACER',
     status: 'HẾT HÀNG',
-    logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxMaWh99FF_Adpx6RAXXH48EUb295u90hNxA&s', 
+    logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxMaWh99FF_Adpx6RAXXH48EUb295u90hNxA&s',
   },
   {
     id: '2',
@@ -18,7 +19,8 @@ const categories = [
 ];
 
 const PortfolioManagement = () => {
-    const navigation = useNavigation();
+  const navigation = useNavigation();
+
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Image source={{ uri: item.logo }} style={styles.logo} />
@@ -29,14 +31,14 @@ const PortfolioManagement = () => {
         </Text>
       </View>
       <View style={styles.actions}>
-      <TouchableOpacity>
+        <TouchableOpacity>
           <Image source={require('../acssets/fix.png')} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity>
           <Image source={require('../acssets/bin.png')} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity>
-          <Image source={require('../acssets/NextButton.png')} style={styles.iconnext} />
+          <Image source={require('../acssets/NextButton.png')} style={styles.iconNext} />
         </TouchableOpacity>
       </View>
     </View>
@@ -44,7 +46,7 @@ const PortfolioManagement = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.navigate('ProductManagementScreen')} style={styles.backButton}>
+      <TouchableOpacity onPress={() => navigation.navigate('AdminHome')} style={styles.backButton}>
         <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
       </TouchableOpacity>
       <Text style={styles.title}>Quản lí danh mục</Text>
@@ -53,6 +55,10 @@ const PortfolioManagement = () => {
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
       />
+      {/* Thay đổi sự kiện onPress để điều hướng đến màn hình CatalogAdd */}
+      <TouchableOpacity onPress={() => navigation.navigate('CatalogAdd')} style={styles.addButton}>
+        <Image source={require('../acssets/them.png')} style={styles.addButtonImage} />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -129,6 +135,15 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
   },
+  addButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+  },
+  addButtonImage: {
+    width: 40,
+    height: 40,
+  }
 });
 
 export default PortfolioManagement;

@@ -1,14 +1,25 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Hook để lấy navigation
 
 export default function ProductAdd() {
+  const navigation = useNavigation(); // Sử dụng useNavigation hook để lấy đối tượng navigation
+
   return (
     <View style={styles.container}>
+      {/* Back Button */}
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
+      </TouchableOpacity>
+
+      {/* Header Text */}
       <Text style={styles.headerText}>PRODUCT ADD</Text>
+
       <ScrollView contentContainerStyle={styles.content}>
+        {/* Product Image */}
         <Image 
-          source={require('../acssets/acersp.png')}
-          style={styles.productImage}
+          source={require('../acssets/acersp.png')} 
+          style={styles.productImage} 
         />
         
         {/* Product Name Section */}
@@ -121,7 +132,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     borderRadius: 20,
-    marginTop: 20,
+    marginBottom: 250,
     alignSelf: 'center',
     width: '50%',
   },
@@ -129,5 +140,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFF',
     fontWeight: 'bold',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 10,
+  },
+  backIcon: {
+    width: 24,
+    height: 24,
   },
 });
