@@ -52,7 +52,7 @@ const ProductManagement = ({ navigation }) => {
         </Text>
       </View>
       <View style={styles.actions}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('UserDetails', { userId: item.id })}>
           <Image source={require('../acssets/fix.png')} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity>
@@ -76,6 +76,9 @@ const ProductManagement = ({ navigation }) => {
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
       />
+        <TouchableOpacity onPress={() => navigation.navigate('ProductAdd')} style={styles.addButton}>
+        <Image source={require('../acssets/them.png')} style={styles.addButtonImage} />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -157,6 +160,11 @@ const styles = StyleSheet.create({
   backIcon: {
     width: 24,
     height: 24,
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
   },
 });
 

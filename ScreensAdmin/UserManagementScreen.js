@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 
+// Danh sách người dùng
 const users = [
   {
     id: '1',
@@ -26,7 +27,7 @@ const users = [
   // Thêm các người dùng khác ở đây
 ];
 
-const UserManagementScreen = () => {
+const UserManagementScreen = ({ navigation }) => {
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Image source={{ uri: item.avatar }} style={styles.avatar} />
@@ -36,7 +37,7 @@ const UserManagementScreen = () => {
         <Text style={styles.email}>{item.email}</Text>
       </View>
       <View style={styles.actions}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('UserDetails', { userId: item.id })}>
           <Image source={require('../acssets/fix.png')} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity>
@@ -51,8 +52,8 @@ const UserManagementScreen = () => {
 
   return (
     <View style={styles.container}>
-              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} /> 
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
       </TouchableOpacity>
       <Text style={styles.title}>Quản lí người dùng</Text>
       <FlatList
@@ -71,10 +72,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 22, // Điều chỉnh kích thước giống hình
+    fontSize: 22,
     fontWeight: 'bold',
     textAlign: 'center',
-    color:'black',
+    color: 'black',
     marginBottom: 20,
   },
   card: {
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
   avatar: {
-    width: 70, // Điều chỉnh kích thước lớn hơn
+    width: 70,
     height: 70,
     borderRadius: 35,
     marginRight: 15,
@@ -111,19 +112,19 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   actions: {
-    flexDirection: 'column', // Thay đổi thành column để các icon xếp dọc
-    justifyContent: 'space-between', // Giãn đều khoảng cách giữa các icon
+    flexDirection: 'column',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   icon: {
-    width: 26, // Điều chỉnh kích thước icon
+    width: 26,
     height: 26,
-    marginVertical: 10, // Thêm khoảng cách giữa các icon
+    marginVertical: 10,
   },
   iconnext: {
-    width: 24, // Kích thước icon mũi tên
+    width: 24,
     height: 14,
-    marginVertical: 10, // Thêm khoảng cách giữa các icon
+    marginVertical: 10,
   },
 });
 
