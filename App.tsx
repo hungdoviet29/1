@@ -13,6 +13,12 @@ import OrderManagement from './ScreensAdmin/OrderManagement';
 import ContactScreen from './ScreensAdmin/ContactScreen';
 import ProfileScreen from './ScreensAdmin/ProfileScreen';
 import StatisticalScreen from './ScreensAdmin/Statistical';
+import OrderDetails from './ScreensAdmin/OrderDetails';
+import CatalogAdd from './ScreensAdmin/CatalogAdd';
+import ProductAdd from './ScreensAdmin/ProductAdd';
+import ProductDetails from './ScreensAdmin/ProductDetails';
+import UserDetails from './ScreensAdmin/UserDetails';
+
 
 // Import các màn hình chính
 import FindScreen from './Screens/Find';
@@ -118,6 +124,12 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="FilterScreen" component={FilterScreen} />
         <Stack.Screen name="Statistical" component={StatisticalScreen} />
+        <Stack.Screen name="CatalogAdd" component={CatalogAdd} />
+        <Stack.Screen name="OrderDetails" component={OrderDetails} />
+        <Stack.Screen name="ProductAdd" component={ProductAdd} />
+        <Stack.Screen name="ProductDetails" component={ProductDetails} />
+        <Stack.Screen name="UserDetails" component={UserDetails} />
+
       </Stack.Navigator>
 
       {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}
