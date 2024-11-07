@@ -1,48 +1,55 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Hook để lấy navigation
 
 const OrderItem = ({ order }) => {
+  const navigation = useNavigation(); // Hook để lấy navigation
+
   return (
-    <View style={styles.card}>
-      <Text style={styles.storeName}>{order.storeName}</Text>
+    <View>
+      <View style={styles.card}>
+        <Text style={styles.storeName}>{order.storeName}</Text>
 
-      <View style={styles.productRow}>
-        <Image
-          source={order.productImage}
-          style={styles.productImage}
-        />
-        <View style={styles.productInfo}>
-          <Text style={styles.productName}>{order.productName}</Text>
-          <Text style={styles.productPrice}>{order.productPrice}</Text>
-          <Text style={styles.productQuantity}>SL: {order.productQuantity}</Text>
+        <View style={styles.productRow}>
+          <Image
+            source={order.productImage}
+            style={styles.productImage}
+          />
+          <View style={styles.productInfo}>
+            <Text style={styles.productName}>{order.productName}</Text>
+            <Text style={styles.productPrice}>{order.productPrice}</Text>
+            <Text style={styles.productQuantity}>SL: {order.productQuantity}</Text>
+          </View>
         </View>
-      </View>
 
-      <View style={styles.orderInfo}>
-        <Text style={styles.orderText}>Mã đơn hàng: {order.orderId}</Text>
-        <Text style={styles.orderText}>Tên khách hàng: {order.customerName}</Text>
-        <Text style={styles.orderText}>SDT: {order.customerPhone}</Text>
-        <Text style={styles.orderText}>Tiền thanh toán: {order.totalPrice}</Text>
-        <Text style={styles.orderText}>Trạng thái: {order.status}</Text>
-        <Text style={styles.orderText}>Ngày đặt: {order.orderDate}</Text>
-      </View>
+        <View style={styles.orderInfo}>
+          <Text style={styles.orderText}>Mã đơn hàng: {order.orderId}</Text>
+          <Text style={styles.orderText}>Tên khách hàng: {order.customerName}</Text>
+          <Text style={styles.orderText}>SDT: {order.customerPhone}</Text>
+          <Text style={styles.orderText}>Tiền thanh toán: {order.totalPrice}</Text>
+          <Text style={styles.orderText}>Trạng thái: {order.status}</Text>
+          <Text style={styles.orderText}>Ngày đặt: {order.orderDate}</Text>
+        </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Hủy đơn', 'Đơn hàng đã được hủy.')}>
-          <Text style={styles.buttonText}>Hủy đơn</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Sửa đơn', 'Đơn hàng đã được hủy.')}>
-          <Text style={styles.buttonText}>Sửa đơn</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Xem chi tiết', 'Hiển thị chi tiết đơn hàng.')}>
-          <Text style={styles.buttonText}>Chi tiết</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Hủy đơn', 'Đơn hàng đã được hủy.')}>
+            <Text style={styles.buttonText}>Hủy đơn</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Sửa đơn', 'Đơn hàng đã được sửa.')}>
+            <Text style={styles.buttonText}>Sửa đơn</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('OrderDetails', { userId: order.orderId })}>
+            <Text style={styles.buttonText}>Chi tiết</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 };
 
 const OrderManagement = () => {
+  const navigation = useNavigation(); // Thêm useNavigation hook để lấy đối tượng navigation
+
   const orders = [
     {
       storeName: 'LapStore',
@@ -73,18 +80,17 @@ const OrderManagement = () => {
   ];
 
   const handleBackPress = () => {
-    Alert.alert('Quay lại', 'Bạn đã quay lại trang trước.');
+    navigation.goBack(); // Dùng navigation.goBack() để quay lại màn hình trước
   };
 
   return (
     <ScrollView style={styles.container}>
+      {/* Back Button */}
+      <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
+      </TouchableOpacity>
+
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-          <Image
-            source={require('../acssets/back.png')}
-            style={styles.backIcon}
-          />
-        </TouchableOpacity>
         <View style={styles.titleContainer}>
           <Text style={styles.headerTitle}>Đơn hàng</Text>
         </View>

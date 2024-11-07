@@ -1,9 +1,20 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Import the hook
 
 export default function OrderDetails() {
+  const navigation = useNavigation(); // Initialize the navigation hook
+
+  const handleBackPress = () => {
+    navigation.goBack(); // Dùng navigation.goBack() để quay lại màn hình trước
+  };
+
   return (
     <View style={styles.container}>
+      {/* Back Button */}
+      <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
+      </TouchableOpacity>
       <Text style={styles.headerText}>Order details</Text>
       <ScrollView contentContainerStyle={styles.content}>
         <Image 

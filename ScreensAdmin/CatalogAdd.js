@@ -1,51 +1,58 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons'; // Icon bút chỉnh sửa
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-export default function CatalogAdd() {
+export default function CatalogAddScreen() {
+  const navigation = useNavigation(); // Sử dụng useNavigation để lấy đối tượng navigation
+
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>CATALOG ADD</Text>
-      
-      <View style={styles.card}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
+      </TouchableOpacity>
+      <Text style={styles.title}>CATALOG ADD</Text>
+      <View style={styles.content}>
+        {/* Logo */}
         <Image
-          source={require('../acssets/nhanhang.png')} // Link ảnh logo của nhãn hàng
+          source={require('../acssets/nhanhang.png')}
           style={styles.logo}
         />
-        
-        <View style={styles.inputRow}>
-          <Text style={styles.label}>Tên nhãn hàng</Text>
-          <MaterialIcons name="edit" size={20} color="black" />
+
+        {/* Form fields with edit icons */}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabelActive}>Tên nhãn hàng</Text>
+          <Image source={require('../acssets/fix.png')} style={styles.icon} />
         </View>
 
-        <View style={styles.inputRow}>
-          <Text style={styles.label}>Mô tả nhãn hàng</Text>
-          <MaterialIcons name="edit" size={20} color="black" />
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabel}>Mô tả nhãn hàng</Text>
+          <Image source={require('../acssets/fix.png')} style={styles.icon} />
         </View>
 
-        <View style={styles.inputRow}>
-          <Text style={styles.label}>Nhà phân phối</Text>
-          <MaterialIcons name="edit" size={20} color="black" />
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabelBold}>Nhà phân phối</Text>
+          <Image source={require('../acssets/fix.png')} style={styles.icon} />
         </View>
 
-        <View style={styles.inputRow}>
-          <Text style={styles.label}>Giá bán</Text>
-          <MaterialIcons name="edit" size={20} color="black" />
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabel}>Giá bán</Text>
+          <Image source={require('../acssets/fix.png')} style={styles.icon} />
         </View>
 
-        <View style={styles.inputRow}>
-          <Text style={styles.label}>Địa chỉ</Text>
-          <MaterialIcons name="edit" size={20} color="black" />
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabelSmall}>Địa chỉ</Text>
+          <Image source={require('../acssets/fix.png')} style={styles.icon} />
         </View>
 
-        <View style={styles.inputRow}>
-          <Text style={styles.label}>Tình trạng hàng hóa</Text>
-          <MaterialIcons name="edit" size={20} color="black" />
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabelBold}>Tình trạng hàng hóa</Text>
+          <Image source={require('../acssets/fix.png')} style={styles.icon} />
         </View>
       </View>
-      
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>ok</Text>
+
+      {/* OK button */}
+      <TouchableOpacity style={styles.okButton}>
+        <Text style={styles.okButtonText}>Ok</Text>
       </TouchableOpacity>
     </View>
   );
@@ -54,52 +61,68 @@ export default function CatalogAdd() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
-    padding: 20,
+    backgroundColor: '#F9F5F4',
+    paddingHorizontal: 20,
+    paddingTop: 40,
   },
-  header: {
-    fontSize: 24,
+  title: {
+    fontSize: 20,
     fontWeight: 'bold',
-    alignSelf: 'center',
+    textAlign: 'center',
     marginBottom: 20,
   },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
+  content: {
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
     padding: 20,
-    alignItems: 'flex-start',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 5 },
-    shadowRadius: 10,
   },
   logo: {
     width: 100,
     height: 100,
-    alignSelf: 'center',
     marginBottom: 20,
   },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
+  fieldContainer: {
     width: '100%',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  label: {
+  fieldLabel: {
+    fontSize: 16,
+    color: '#A1A1A1',
+  },
+  fieldLabelActive: {
+    fontSize: 16,
+    color: '#7A57D1',
+  },
+  fieldLabelBold: {
     fontSize: 16,
     color: '#000',
+    fontWeight: 'bold',
   },
-  button: {
-    backgroundColor: '#66cdaa',
-    paddingVertical: 12,
-    borderRadius: 10,
+  fieldLabelSmall: {
+    fontSize: 12,
+    color: '#000',
+  },
+  icon: {
+    width: 20,
+    height: 20,
+  },
+  okButton: {
+    backgroundColor: '#85B9C9',
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    alignSelf: 'center',
     marginTop: 20,
-    alignItems: 'center',
   },
-  buttonText: {
+  okButtonText: {
     fontSize: 16,
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: 'bold',
   },
 });
