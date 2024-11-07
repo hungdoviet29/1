@@ -1,9 +1,15 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';  // Import useNavigation
 
 export default function ProductDetails() {
+  const navigation = useNavigation();  // Khai báo navigation
+
   return (
     <View style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
+      </TouchableOpacity>
       <Text style={styles.headerText}>PRODUCT DETAILS</Text>
       <ScrollView contentContainerStyle={styles.content}>
         <Image 
