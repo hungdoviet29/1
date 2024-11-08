@@ -1,14 +1,20 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Import the hook
 
 const ContactScreen = () => {
+  const navigation = useNavigation(); // Sử dụng useNavigation để lấy đối tượng navigation
+
+  const handleBackPress = () => {
+    navigation.goBack(); // Dùng navigation.goBack() để quay lại màn hình trước
+  };
   return (
     <View style={styles.container}>
       {/* Back Arrow Icon and Title */}
       <View style={styles.headerRow}>
-        <TouchableOpacity style={styles.backButton}>
-          <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
-        </TouchableOpacity>
+      <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
+      </TouchableOpacity>
         <Text style={styles.title}>Quản lí liên hệ</Text>
         {/* Placeholder for spacing */}
         <View style={{ width: 20 }} />

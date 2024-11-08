@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Import the hook
 
 const ProfileScreen = () => {
   // States to control the values and edit modes of each field
+  const navigation = useNavigation(); // Sử dụng useNavigation để lấy đối tượng navigation
+
+  const handleBackPress = () => {
+    navigation.goBack(); // Dùng navigation.goBack() để quay lại màn hình trước
+  };
   const [email, setEmail] = useState("Admin28043@gmail.com");
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   
@@ -17,9 +23,9 @@ const ProfileScreen = () => {
       
       {/* Header with Back Arrow and Title */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Image source={require('../acssets/back.png')} style={styles.backIcon} />
-        </TouchableOpacity>
+      <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
+      </TouchableOpacity>
         <Text style={styles.headerTitle}>Chi tiết hồ sơ</Text>
       </View>
 
@@ -202,6 +208,10 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  backButton: {
+    width: 20,
+    height: 20,
   },
 });
 

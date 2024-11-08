@@ -1,8 +1,15 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Image } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
+import { useNavigation } from '@react-navigation/native'; // Import the hook
 
 const StatisticalScreen = () => {
+
+    const navigation = useNavigation(); // Sử dụng useNavigation để lấy đối tượng navigation
+
+    const handleBackPress = () => {
+        navigation.goBack(); // Dùng navigation.goBack() để quay lại màn hình trước
+    };
     // Dữ liệu cho biểu đồ
     const chartData = {
         labels: ['12/4', '13/4', '14/4', '15/4', '16/4', '17/4', '18/4', '19/4', '20/4', '21/4', '22/4', '23/4', '24/4', '25/4'],
@@ -18,8 +25,8 @@ const StatisticalScreen = () => {
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => { /* Logic quay lại màn hình trước */ }}>
-                    <Image source={require('../acssets/BackButton.png')} style={styles.icon} />
+                <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+                    <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
                 </TouchableOpacity>
                 <Text style={styles.headerText}>Statistical</Text>
             </View>
