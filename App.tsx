@@ -20,6 +20,7 @@ import ProductDetails from './ScreensAdmin/ProductDetails';
 import UserDetails from './ScreensAdmin/UserDetails';
 
 
+
 // Import các màn hình chính
 import FindScreen from './Screens/Find';
 import Favorite from './Screens/Favorite';
@@ -49,6 +50,8 @@ import ReturnPolicyScreen from './Screens/ReturnPolicyScreen';
 import MembershipPolicy from './Screens/Membershippolicy';
 import EditInfo from './Screens/EditInfo';
 import DirectMessaging from './Screens/DirectMessaging';
+import WarrantyPolicyScreen from './Screens/WarrantyPolicyScreen';
+import PaymentPolicyScreen from './Screens/PaymentPolicyScreen';
 // Import component Bottom Navigation
 import BottomNavigation from './components/bottomnavigation';
 import ProductScreen from './Screens/Buy';
@@ -129,6 +132,11 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="ProductAdd" component={ProductAdd} />
         <Stack.Screen name="ProductDetails" component={ProductDetails} />
         <Stack.Screen name="UserDetails" component={UserDetails} />
+        <Stack.Screen name="Membershippolicy" component={MembershipPolicy} />
+        <Stack.Screen name="ReturnPolicyScreen" component={ReturnPolicyScreen} />
+        <Stack.Screen name="WarrantyPolicyScreen" component={WarrantyPolicyScreen} />
+        <Stack.Screen name="PaymentPolicyScreen" component={PaymentPolicyScreen} />
+        
 
       </Stack.Navigator>
 
