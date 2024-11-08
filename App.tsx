@@ -113,7 +113,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="Accountmanagement" component={AccountManagement} />
         <Stack.Screen name="PictureScreen" component={PictureScreen} />
         <Stack.Screen name="CommentScreen" component={CommentScreen} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
         <Stack.Screen name="ProductScreen" component={ProductScreen} />
         <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
         <Stack.Screen name="OTPVerificationScreen" component={OTPVerificationScreen} />
@@ -136,6 +136,8 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="ReturnPolicyScreen" component={ReturnPolicyScreen} />
         <Stack.Screen name="WarrantyPolicyScreen" component={WarrantyPolicyScreen} />
         <Stack.Screen name="PaymentPolicyScreen" component={PaymentPolicyScreen} />
+        
+        
         
 
       </Stack.Navigator>

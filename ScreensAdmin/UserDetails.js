@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 export default function UserDetails() {
   const navigation = useNavigation();
-  const [showHistory, setShowHistory] = useState(false);
+  const route = useRoute();
+  const { user } = route.params; // Nhận thông tin người dùng từ route
 
-  const purchaseHistory = [
-    { id: '1', item: 'Sản phẩm 1', date: '01/10/2024' },
-    { id: '2', item: 'Sản phẩm 2', date: '15/10/2024' },
-    { id: '3', item: 'Sản phẩm 3', date: '25/10/2024' },
-  ];
+  const [showHistory, setShowHistory] = useState(false);
 
   return (
     <View style={styles.container}>
-      {/* Header với nút Back và tiêu đề */}
       <View style={styles.headerContainer}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
@@ -24,17 +20,17 @@ export default function UserDetails() {
 
       <View style={styles.card}>
         <Image
-          source={require('../acssets/hinhcute.png')}
+          source={{ uri: user.avatar }}
           style={styles.avatar}
         />
         
-        <Text style={styles.name}>Nguyễn Văn A</Text>
+        <Text style={styles.name}>{user.name}</Text>
         
-        <Text style={styles.info}>0357103658</Text>
-        <Text style={styles.email}>linhdtoph35049@fpt.edu.vn</Text>
+        <Text style={styles.info}>{user.phone}</Text>
+        <Text style={styles.email}>{user.email}</Text>
         
         <Text style={styles.info}>VIET NAM</Text>
-        <Text style={styles.address}>Số 10C Hoàng Diệu, Q. Ba Đình, TP. Hà Nội</Text>
+        <Text style={styles.address}>{user.address}</Text>
         
         <TouchableOpacity onPress={() => setShowHistory(!showHistory)}>
           <Text style={styles.historyLink}>LỊCH SỬ MUA HÀNG</Text>
@@ -42,7 +38,7 @@ export default function UserDetails() {
 
         {showHistory && (
           <FlatList
-            data={purchaseHistory}
+            data={user.purchaseHistory}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <View style={styles.historyItem}>

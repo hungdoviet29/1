@@ -1,53 +1,82 @@
-import React from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
-// Danh sách người dùng
-const users = [
+
+const initialUsers = [
   {
     id: '1',
     name: 'Bảy cỏ',
     phone: '0357103658',
     email: 'linhdtqph35049@fpt.edu.vn',
     avatar: 'https://images-cdn.9gag.com/photo/aD1b0Q7_700b.jpg',
+    address: 'Số 10C Hoàng Diệu, Q. Ba Đình, TP. Hà Nội',
+    purchaseHistory: [
+      { id: '1', item: 'Sản phẩm 1', date: '01/10/2024' },
+      { id: '2', item: 'Sản phẩm 2', date: '15/10/2024' },
+    ],
   },
   {
     id: '2',
     name: 'Nguyễn Văn A',
     phone: '0357103658',
     email: 'linhdtqph35049@fpt.edu.vn',
-    avatar: 'https://images-cdn.9gag.com/photo/aD1b0Q7_700b.jpg',
+    avatar: 'https://artena.vn/wp-content/uploads/2024/09/31f162ad19d8ccafcb2989d39628f55d.jpg',
+    address: 'Số 20 Lê Lợi, Q. 1, TP. Hồ Chí Minh',
+    purchaseHistory: [
+      { id: '1', item: 'Sản phẩm 1', date: '10/11/2024' },
+      { id: '2', item: 'Sản phẩm 3', date: '20/11/2024' },
+    ],
   },
   {
     id: '3',
-    name: 'Nguyễn Văn A',
+    name: 'Nguyễn Văn B',
     phone: '0357103658',
     email: 'linhdtqph35049@fpt.edu.vn',
     avatar: 'https://images-cdn.9gag.com/photo/aD1b0Q7_700b.jpg',
+    address: 'Số 30 Nguyễn Huệ, TP. Đà Nẵng',
+    purchaseHistory: [
+      { id: '1', item: 'Sản phẩm 3', date: '05/11/2024' },
+      { id: '2', item: 'Sản phẩm 2', date: '15/11/2024' },
+    ],
   },
-  // Thêm các người dùng khác ở đây
 ];
 
 const UserManagementScreen = ({ navigation }) => {
+  const [users, setUsers] = useState(initialUsers);
+
+  // Hàm xóa người dùng
+  const deleteUser = (userId) => {
+    Alert.alert(
+      "Xóa người dùng",
+      "Bạn có chắc chắn muốn xóa người dùng này?",
+      [
+        { text: "Hủy", style: "cancel" },
+        { text: "Xóa", onPress: () => {
+            // Thực hiện xóa
+            setUsers(users.filter(user => user.id !== userId));
+            // Gọi API xóa nếu có
+            // fetch(`https://example.com/api/users/${userId}`, { method: 'DELETE' })
+          }
+        }
+      ]
+    );
+  };
+
   const renderItem = ({ item }) => (
-    <View style={styles.card}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate('UserDetails', { user: item })}
+      style={styles.card}
+    >
       <Image source={{ uri: item.avatar }} style={styles.avatar} />
       <View style={styles.userInfo}>
         <Text style={styles.name}>{item.name}</Text>
         <Text style={styles.phone}>{item.phone}</Text>
         <Text style={styles.email}>{item.email}</Text>
       </View>
-      <View style={styles.actions}>
-        <TouchableOpacity onPress={() => navigation.navigate('UserDetails', { userId: item.id })}>
-          <Image source={require('../acssets/fix.png')} style={styles.icon} />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Image source={require('../acssets/bin.png')} style={styles.icon} />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Image source={require('../acssets/NextButton.png')} style={styles.iconnext} />
-        </TouchableOpacity>
-      </View>
-    </View>
+      <TouchableOpacity onPress={() => deleteUser(item.id)}>
+        <Image source={require('../acssets/bin.png')} style={styles.icon} />
+      </TouchableOpacity>
+    </TouchableOpacity>
   );
 
   return (
@@ -110,11 +139,6 @@ const styles = StyleSheet.create({
   email: {
     fontSize: 14,
     color: '#666',
-  },
-  actions: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   },
   icon: {
     width: 26,
