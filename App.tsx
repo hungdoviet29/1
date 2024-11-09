@@ -79,7 +79,12 @@ const AppNavigator = ({ navigationRef }) => {
     'OrderManagement',
     'ContactScreen',
     'ProfileScreen',
-    'Statistical'
+    'Statistical',
+    'OrderDetails',
+    'CatalogAdd',
+    'ProductAdd',
+    'ProductDetails',
+    'UserDetails'
   ];
 
   useEffect(() => {
