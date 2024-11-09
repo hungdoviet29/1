@@ -52,7 +52,7 @@ const ProductManagement = ({ navigation }) => {
         </Text>
       </View>
       <View style={styles.actions}>
-      <TouchableOpacity onPress={() => navigation.navigate('UserDetails', { userId: item.id })}>
+      <TouchableOpacity onPress={() => navigation.navigate('ProductDetails', { userId: item.id })}>
           <Image source={require('../acssets/fix.png')} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity>
