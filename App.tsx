@@ -54,6 +54,9 @@ import WarrantyPolicyScreen from './Screens/WarrantyPolicyScreen';
 import PaymentPolicyScreen from './Screens/PaymentPolicyScreen';
 import RenameScreen from './Screens/RenameScreen';
 import CountrySelectScreen from './Screens/CountrySelectScreen';
+import ChangePhoneNumberScreen from './Screens/ChangePhoneNumberScreen';
+import FixPasswordScreen from './Screens/FixPasswordScreen';
+
 // Import component Bottom Navigation
 import BottomNavigation from './components/bottomnavigation';
 import ProductScreen from './Screens/Buy';
@@ -84,7 +87,9 @@ const AppNavigator = ({ navigationRef }) => {
     'CatalogAdd',
     'ProductAdd',
     'ProductDetails',
-    'UserDetails'
+    'UserDetails',
+    'ChangePhoneNumberScreen',
+    'FixPasswordScreen'
   ];
 
   useEffect(() => {
@@ -147,6 +152,9 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="EditPersonalInformation" component={EditPersonalInformation} />
         <Stack.Screen name="RenameScreen" component={RenameScreen} />
         <Stack.Screen name="CountrySelectScreen" component={CountrySelectScreen} />
+        <Stack.Screen name="ChangePhoneNumberScreen" component={ChangePhoneNumberScreen} />
+        <Stack.Screen name="FixPasswordScreen" component={FixPasswordScreen} />
+        
       </Stack.Navigator>
 
       {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}
