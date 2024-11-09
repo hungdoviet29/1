@@ -35,6 +35,10 @@ const cartSlice = createSlice({
                 saveCartItems(state.items);
             }
         },
+        resetCart: (state) => {
+            state.items = []; // Reset giỏ hàng
+            saveCartItems(state.items); // Lưu trạng thái trống vào AsyncStorage
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(loadCart.fulfilled, (state, action) => {
@@ -43,5 +47,5 @@ const cartSlice = createSlice({
     },
 });
 
-export const { addToCart, removeFromCart, updateQuantity } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateQuantity, resetCart } = cartSlice.actions;
 export default cartSlice.reducer;

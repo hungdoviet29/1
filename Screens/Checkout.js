@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addNotification } from '../redux/notificationSlice';
 import { loadCart } from '../redux/cartSlice';
 import { addOrder } from '../redux/orderSlice'; // Đảm bảo đường dẫn đúng
+import { resetCart } from '../redux/cartSlice';
 
 const CheckoutScreen = () => {
     const navigation = useNavigation();
@@ -96,7 +97,7 @@ const CheckoutScreen = () => {
             status: 'Chờ xử lý', // Trạng thái mặc định
             hinhAnh: cartItems[0]?.hinhAnh || '', // Ví dụ: hình ảnh từ sản phẩm đầu tiên
         };
-    
+      
         Alert.alert(
             'Confirm Order',
             `Total Cost: ${totalCost.toLocaleString()} VND\n` +
@@ -111,11 +112,16 @@ const CheckoutScreen = () => {
                     onPress: () => {
                         // Thêm đơn hàng mới vào Redux
                         dispatch(addOrder(newOrder));
+    
                         // Thêm thông báo mới vào Redux
                         dispatch(addNotification({
                             message: `Bạn đã thanh toán đơn hàng thành công lúc ${new Date().toLocaleTimeString()}`,
                             timestamp: new Date().toLocaleString(),
                         }));
+    
+                        // Reset giỏ hàng
+                        dispatch(resetCart()); // Giỏ hàng sẽ được xóa hết
+    
                         // Chuyển đến màn hình OrderScreen và truyền thông tin giao hàng và tổng tiền
                         navigation.navigate('ShippingScreen', { totalCost });
                     }
@@ -123,6 +129,7 @@ const CheckoutScreen = () => {
             ]
         );
     };
+    
     
     
     
