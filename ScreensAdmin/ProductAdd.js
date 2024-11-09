@@ -1,80 +1,114 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Hook để lấy navigation
+import React, { useState } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ProductAdd() {
-  const navigation = useNavigation(); // Sử dụng useNavigation hook để lấy đối tượng navigation
+  const navigation = useNavigation();
+
+  // State để lưu dữ liệu đầu vào của sản phẩm
+  const [productName, setProductName] = useState('');
+  const [productDescription, setProductDescription] = useState('');
+  const [distributor, setDistributor] = useState('');
+  const [price, setPrice] = useState('');
+  const [stockStatus, setStockStatus] = useState('');
+  const [productCode, setProductCode] = useState('');
+
+  // Hàm xử lý khi nhấn nút OK
+  const handleSaveProduct = () => {
+    // Hiển thị thông báo thành công và điều hướng về màn hình ProductManagement
+    Alert.alert("Thành công", "Sản phẩm đã được thêm thành công!", [
+      {
+        text: "OK",
+        onPress: () => navigation.navigate('ProductManagementScreen'),
+      },
+    ]);
+  };
 
   return (
     <View style={styles.container}>
-      {/* Back Button */}
+      {/* Nút Quay Lại */}
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
       </TouchableOpacity>
 
-      {/* Header Text */}
+      {/* Tiêu đề */}
       <Text style={styles.headerText}>PRODUCT ADD</Text>
 
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Product Image */}
-        <Image 
-          source={require('../acssets/acersp.png')} 
-          style={styles.productImage} 
-        />
-        
-        {/* Product Name Section */}
+        {/* Hình ảnh sản phẩm */}
+        <Image source={require('../acssets/acersp.png')} style={styles.productImage} />
+
+        {/* Tên sản phẩm */}
         <View style={styles.infoSection}>
           <Text style={styles.label}>Tên sản phẩm</Text>
-          <TouchableOpacity style={styles.editIcon}>
-            <Text>✏️</Text>
-          </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="Nhập tên sản phẩm"
+            value={productName}
+            onChangeText={setProductName}
+          />
         </View>
 
-        {/* Product Description Section */}
+        {/* Mô tả sản phẩm */}
         <View style={styles.infoSection}>
-          <Text style={styles.fieldLabel}>MÔ TẢ SẢN PHẨM</Text>
-          <TouchableOpacity style={styles.editIcon}>
-            <Text>✏️</Text>
-          </TouchableOpacity>
+          <Text style={styles.label}>Mô tả sản phẩm</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nhập mô tả sản phẩm"
+            value={productDescription}
+            onChangeText={setProductDescription}
+          />
         </View>
 
-        {/* Distributor Section */}
+        {/* Nhà phân phối */}
         <View style={styles.infoSection}>
-          <Text style={styles.fieldLabel}>NHÀ PHÂN PHỐI</Text>
-          <TouchableOpacity style={styles.editIcon}>
-            <Text>✏️</Text>
-          </TouchableOpacity>
+          <Text style={styles.label}>Nhà phân phối</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nhập tên nhà phân phối"
+            value={distributor}
+            onChangeText={setDistributor}
+          />
         </View>
 
-        {/* Price Section */}
+        {/* Giá bán */}
         <View style={styles.infoSection}>
-          <Text style={styles.fieldLabel}>GIÁ BÁN</Text>
-          <Text style={styles.infoText}>50 Tô Hiệu, Q. Ba Đình, TP. Hà Nội</Text>
-          <TouchableOpacity style={styles.editIcon}>
-            <Text>✏️</Text>
-          </TouchableOpacity>
+          <Text style={styles.label}>Giá bán</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nhập giá bán"
+            value={price}
+            onChangeText={setPrice}
+            keyboardType="numeric"
+          />
         </View>
 
-        {/* Stock Status Section */}
+        {/* Tình trạng hàng hóa */}
         <View style={styles.infoSection}>
-          <Text style={styles.fieldLabel}>TÌNH TRẠNG HÀNG HÓA</Text>
-          <TouchableOpacity style={styles.editIcon}>
-            <Text>✏️</Text>
-          </TouchableOpacity>
+          <Text style={styles.label}>Tình trạng hàng hóa</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nhập tình trạng hàng hóa"
+            value={stockStatus}
+            onChangeText={setStockStatus}
+          />
         </View>
 
-        {/* Product Code Section */}
+        {/* Mã sản phẩm */}
         <View style={styles.infoSection}>
-          <Text style={styles.fieldLabel}>Mã sản phẩm</Text>
-          <TouchableOpacity style={styles.editIcon}>
-            <Text>✏️</Text>
-          </TouchableOpacity>
+          <Text style={styles.label}>Mã sản phẩm</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nhập mã sản phẩm"
+            value={productCode}
+            onChangeText={setProductCode}
+          />
         </View>
       </ScrollView>
       
-      {/* OK Button */}
-      <TouchableOpacity style={styles.okButton}>
-        <Text style={styles.okButtonText}>ok</Text>
+      {/* Nút OK */}
+      <TouchableOpacity onPress={handleSaveProduct} style={styles.okButton}>
+        <Text style={styles.okButtonText}>OK</Text>
       </TouchableOpacity>
     </View>
   );
@@ -101,38 +135,29 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   infoSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
     width: '100%',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
+    marginBottom: 15,
   },
   label: {
     fontSize: 16,
     color: '#8A2BE2',
     fontWeight: 'bold',
-    flex: 1,
+    marginBottom: 5,
   },
-  fieldLabel: {
-    fontSize: 14,
-    color: '#999',
-    flex: 1,
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#000',
-    flex: 2,
-  },
-  editIcon: {
-    marginLeft: 10,
+  input: {
+    height: 40,
+    borderColor: '#CCC',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    backgroundColor: '#FFF',
   },
   okButton: {
     backgroundColor: '#8DC9C1',
     paddingVertical: 10,
     alignItems: 'center',
     borderRadius: 20,
-    marginBottom: 250,
+    marginBottom: 20,
     alignSelf: 'center',
     width: '50%',
   },
@@ -151,3 +176,4 @@ const styles = StyleSheet.create({
     height: 24,
   },
 });
+
