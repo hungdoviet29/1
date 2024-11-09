@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNotification } from '../redux/notificationSlice';
-import { loadCart } from '../redux/cartSlice';
-import { addOrder } from '../redux/orderSlice'; // Đảm bảo đường dẫn đúng
-import { resetCart } from '../redux/cartSlice';
+import { loadCart, resetCart } from '../redux/cartSlice';
+import { addOrder, setPaymentMethod, selectPaymentMethod } from '../redux/orderSlice';
 
 const CheckoutScreen = () => {
     const navigation = useNavigation();
@@ -13,41 +12,36 @@ const CheckoutScreen = () => {
     const route = useRoute();
 
     const cartItems = useSelector(state => state.cart.items);
-    const { shippingInfo } = route.params || {}; // Lấy thông tin giao hàng từ route params
-    const [deliveryMethod, setDeliveryMethod] = React.useState('Select Method');
-    const [paymentMethod, setPaymentMethod] = React.useState('None');
-    const [promoCode, setPromoCode] = React.useState('');
-    const [totalCost, setTotalCost] = React.useState(0);
-    const [deliveryCost, setDeliveryCost] = React.useState(0); // Phí giao hàng
+    const selectedPaymentMethod = useSelector(selectPaymentMethod); // Lấy phương thức thanh toán đã chọn từ Redux
+    const { shippingInfo } = route.params || {}; // Thông tin giao hàng từ route params
+    const [deliveryMethod, setDeliveryMethod] = useState('Select Method');
+    const [promoCode, setPromoCode] = useState('');
+    const [totalCost, setTotalCost] = useState(0);
+    const [deliveryCost, setDeliveryCost] = useState(0); // Phí giao hàng
 
     useEffect(() => {
         dispatch(loadCart());
     }, [dispatch]);
 
     useEffect(() => {
-        calculateTotalCost(cartItems); // Tính toán tổng chi phí mỗi khi giỏ hàng hoặc phí giao hàng thay đổi
+        calculateTotalCost(cartItems);
     }, [cartItems, deliveryCost]);
 
     const calculateTotalCost = (items) => {
         if (!Array.isArray(items)) return;
 
-        // Tính toán tổng tiền sản phẩm trong giỏ hàng
         const productTotal = items.reduce((sum, item) => {
-            const price = item.gia || 0; // Lấy giá sản phẩm
-            const quantity = item.quantity || 0; // Lấy số lượng sản phẩm
-            return sum + (price * quantity); // Tính tổng tiền cho sản phẩm
+            const price = item.gia || 0;
+            const quantity = item.quantity || 0;
+            return sum + (price * quantity);
         }, 0);
 
-        // Tính tổng chi phí bao gồm phí giao hàng
-        const total = productTotal + deliveryCost; // Tổng chi phí
-
-        // Giảm giá nếu có
-        let finalTotal = total;
+        let total = productTotal + deliveryCost;
         if (promoCode === 'DISCOUNT10') {
-            finalTotal *= 0.9; // Giảm giá 10%
+            total *= 0.9; // Giảm giá 10%
         }
 
-        setTotalCost(finalTotal); // Cập nhật tổng chi phí
+        setTotalCost(total);
     };
 
     const handleSelectDelivery = () => {
@@ -57,11 +51,11 @@ const CheckoutScreen = () => {
             [
                 { text: 'Standard Shipping', onPress: () => { 
                     setDeliveryMethod('Standard Shipping'); 
-                    setDeliveryCost(20000); // Phí giao hàng tiêu chuẩn
+                    setDeliveryCost(20000);
                 }},
                 { text: 'Express Shipping', onPress: () => { 
                     setDeliveryMethod('Express Shipping'); 
-                    setDeliveryCost(50000); // Phí giao hàng nhanh
+                    setDeliveryCost(50000);
                 }},
                 { text: 'Cancel', style: 'cancel' },
             ]
@@ -73,15 +67,15 @@ const CheckoutScreen = () => {
             'Select Payment Method',
             '',
             [
-                { text: 'Credit Card', onPress: () => setPaymentMethod('Credit Card') },
-                { text: 'PayPal', onPress: () => setPaymentMethod('PayPal') },
+                { text: 'Cash', onPress: () => dispatch(setPaymentMethod('Cash')) },
+                { text: 'Banking', onPress: () => dispatch(setPaymentMethod('Banking')) },
                 { text: 'Cancel', style: 'cancel' },
             ]
         );
     };
 
     const handleApplyPromoCode = () => {
-        calculateTotalCost(cartItems); // Tính toán lại tổng chi phí khi áp dụng mã giảm giá
+        calculateTotalCost(cartItems);
         if (promoCode === 'DISCOUNT10') {
             Alert.alert('Promo Applied', 'You received a 10% discount!');
         } else {
@@ -91,18 +85,18 @@ const CheckoutScreen = () => {
 
     const confirmOrder = () => {
         const newOrder = {
-            id: new Date().getTime(), // Tạo ID cho đơn hàng mới
-            shippingInfo, // Lấy thông tin giao hàng
-            totalAmount: totalCost, // Lấy tổng chi phí
-            status: 'Chờ xử lý', // Trạng thái mặc định
-            hinhAnh: cartItems[0]?.hinhAnh || '', // Ví dụ: hình ảnh từ sản phẩm đầu tiên
+            id: new Date().getTime(),
+            shippingInfo,
+            totalAmount: totalCost,
+            status: selectedPaymentMethod === 'Banking' ? 'Chờ vận chuyển' : 'Chưa thanh toán',
+            hinhAnh: cartItems[0]?.hinhAnh || '',
         };
-      
+
         Alert.alert(
             'Confirm Order',
             `Total Cost: ${totalCost.toLocaleString()} VND\n` +
             `Delivery Method: ${deliveryMethod}\n` +
-            `Payment Method: ${paymentMethod}\n` +
+            `Payment Method: ${selectedPaymentMethod}\n` +
             (promoCode ? `Promo Code: ${promoCode}\n` : '') +
             'Proceed with placing the order?',
             [
@@ -110,31 +104,23 @@ const CheckoutScreen = () => {
                 { 
                     text: 'Confirm', 
                     onPress: () => {
-                        // Thêm đơn hàng mới vào Redux
                         dispatch(addOrder(newOrder));
-    
-                        // Thêm thông báo mới vào Redux
                         dispatch(addNotification({
                             message: `Bạn đã thanh toán đơn hàng thành công lúc ${new Date().toLocaleTimeString()}`,
                             timestamp: new Date().toLocaleString(),
                         }));
-    
-                        // Reset giỏ hàng
-                        dispatch(resetCart()); // Giỏ hàng sẽ được xóa hết
-    
-                        // Chuyển đến màn hình OrderScreen và truyền thông tin giao hàng và tổng tiền
-                        navigation.navigate('ShippingScreen', { totalCost });
+                        dispatch(resetCart());
+                        navigation.navigate('ShippingScreen', {
+                            shippingInfo,
+                            totalCost,
+                            paymentMethod: selectedPaymentMethod,
+                        });
                     }
                 },
             ]
         );
     };
-    
-    
-    
-    
-    
-    
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -172,7 +158,7 @@ const CheckoutScreen = () => {
                 <TouchableOpacity style={styles.row} onPress={handleSelectPayment}>
                     <Text style={styles.rowLabel}>Payment</Text>
                     <View style={styles.rowAction}>
-                        <Text style={styles.actionText}>{paymentMethod}</Text>
+                        <Text style={styles.actionText}>{selectedPaymentMethod || 'None'}</Text>
                         <Image source={require('../acssets/backarrow.png')} style={styles.arrowIcon} />
                     </View>
                 </TouchableOpacity>
