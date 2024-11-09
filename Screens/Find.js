@@ -46,8 +46,8 @@ const FindScreen = () => {
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
-                    <Image source={require('../acssets/BackButton.png')} />
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Image source={require('../acssets/BackButton.png')} style={styles.icon} />
                 </TouchableOpacity>
                 <Text style={styles.headerText}>Find Products</Text>
             </View>

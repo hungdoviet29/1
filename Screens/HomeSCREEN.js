@@ -20,19 +20,19 @@ const HomeScreen = () => {
    // Xác định link API cho từng danh mục
 switch (category) {
   case 'Popular':
-    apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
+    apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
     break;
   case 'Trending':
-    apiUrl = 'http://192.168.101.9:3000/LapTop/getTrendingLapTop';
+    apiUrl = 'http://172.20.10.6:3000/LapTop/getTrendingLapTop';
     break;
   case 'News':
-    apiUrl = 'http://192.168.101.9:3000/LapTop/getNewsLapTop';
+    apiUrl = 'http://172.20.10.6:3000/LapTop/getNewsLapTop';
     break;
   case 'Sale':
-    apiUrl = 'http://192.168.101.9:3000/LapTop/getSaleLapTop';
+    apiUrl = 'http://172.20.10.6:3000/LapTop/getSaleLapTop';
     break;
   default:
-    apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
+    apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
 }
 
 

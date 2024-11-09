@@ -149,12 +149,11 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="ReturnPolicyScreen" component={ReturnPolicyScreen} />
         <Stack.Screen name="WarrantyPolicyScreen" component={WarrantyPolicyScreen} />
         <Stack.Screen name="PaymentPolicyScreen" component={PaymentPolicyScreen} />
-        {/* <Stack.Screen name="EditPersonalInformation" component={EditPersonalInformation} />
-        <Stack.Screen name="RenameScreen" component={RenameScreen} /> */}
+        <Stack.Screen name="EditPersonalInformation" component={EditPersonalInformation} />
+        <Stack.Screen name="RenameScreen" component={RenameScreen} />
         <Stack.Screen name="CountrySelectScreen" component={CountrySelectScreen} />
         <Stack.Screen name="ChangePhoneNumberScreen" component={ChangePhoneNumberScreen} />
         <Stack.Screen name="FixPasswordScreen" component={FixPasswordScreen} />
-        
       </Stack.Navigator>
 
       {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}
