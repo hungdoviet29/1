@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, FlatList }
 import { useSelector, useDispatch } from 'react-redux';
 import { addToCart } from '../redux/actions/cartActions'; // Đảm bảo đường dẫn chính xác
 import { useNavigation } from '@react-navigation/native';
+import { removeFromFavorites } from '../redux/favoriteSlice';
 
 const FavoriteScreen = () => {
     const navigation = useNavigation();
@@ -24,20 +25,19 @@ const FavoriteScreen = () => {
     };
 
     const renderFavoriteItem = ({ item }) => (
-        <View style={styles.favoriteItem}>
-            {/* <TouchableOpacity onPress={()=> navigation.navigate('Buy')}> */}
+        <TouchableOpacity style={styles.favoriteItem} onPress={() =>
+            navigation.navigate('ProductScreen', { product: item })}>
             <Image source={{ uri: item.hinhAnh }} style={styles.itemImage} />
-            {/* </TouchableOpacity > */}
             <View style={styles.itemDetails}>
                 <Text style={styles.itemName}>{item.ten}</Text>
                 <Text style={styles.itemPrice}>{item.gia.toLocaleString()} USD</Text>
-            </View>
-            <TouchableOpacity style={styles.deleteButton}>
+            </View> 
+            {/* Nút xóa sản phẩm */}
+            <TouchableOpacity style={styles.deleteButton} onPress={() => dispatch(removeFromFavorites(item._id))}>
                 <Text style={styles.deleteText}>✕</Text>
             </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
     );
-
     return (
         <View style={styles.container}>
             {/* Header */}

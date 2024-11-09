@@ -1,5 +1,24 @@
 const { laptopModel } = require('../models/laptop_model');
 
+// Lấy danh sách sản phẩm theo danh mục
+exports.getCategoryLaptop = async (req, res, next) => {
+    const category = req.params.category; // Nhận danh mục từ URL
+
+    try {
+        // Lọc sản phẩm theo danh mục
+        let categoryLaptop = await laptopModel.find({ danhMuc: category });
+
+        if (categoryLaptop.length === 0) {
+            return res.status(404).json({ message: 'Không có sản phẩm trong danh mục này' });
+        }
+
+        res.status(200).json({ status: 200, data: categoryLaptop });
+    } catch (error) {
+        res.status(500).json({ status: "lỗi", result: error.message });
+    }
+};
+
+// Các API khác (getListLaptop, addLaptop, updateLaptop, deleteLaptop, etc.)
 exports.getListlaptop = async (req, res, next) => {
     try {
         let listlaptop = await laptopModel.find({});
@@ -8,6 +27,45 @@ exports.getListlaptop = async (req, res, next) => {
         res.status(500).json({ status: "lỗi", result: error.message });
     }
 };
+
+// Thêm các hàm xử lý API cho từng danh mục
+exports.getPopularLapTop = async (req, res) => {
+    try {
+      // Giả sử bạn muốn lấy các sản phẩm nổi bật (Popular) từ MongoDB
+      let popularLaptops = await laptopModel.find({ danhMuc: 'Popular' });
+      res.status(200).json({ status: 200, data: popularLaptops });
+    } catch (error) {
+      res.status(500).json({ status: "lỗi", result: error.message });
+    }
+  };
+  
+  exports.getTrendingLapTop = async (req, res) => {
+    try {
+      let trendingLaptops = await laptopModel.find({ danhMuc: 'Trending' });
+      res.status(200).json({ status: 200, data: trendingLaptops });
+    } catch (error) {
+      res.status(500).json({ status: "lỗi", result: error.message });
+    }
+  };
+  
+  exports.getNewsLapTop = async (req, res) => {
+    try {
+      let newsLaptops = await laptopModel.find({ danhMuc: 'News' });
+      res.status(200).json({ status: 200, data: newsLaptops });
+    } catch (error) {
+      res.status(500).json({ status: "lỗi", result: error.message });
+    }
+  };
+  
+  exports.getSaleLapTop = async (req, res) => {
+    try {
+      let saleLaptops = await laptopModel.find({ danhMuc: 'Sale' });
+      res.status(200).json({ status: 200, data: saleLaptops });
+    } catch (error) {
+      res.status(500).json({ status: "lỗi", result: error.message });
+    }
+  };
+  
 
 exports.addlaptop = async (req, res, next) => {
     try {

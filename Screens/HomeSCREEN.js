@@ -1,22 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToFavorites, removeFromFavorites } from '../redux/favoriteSlice'; // Thêm import cho Redux
+import { addToFavorites, removeFromFavorites } from '../redux/favoriteSlice';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const favorites = useSelector(state => state.favorites.favorites); // Lấy danh sách yêu thích từ Redux
+  const favorites = useSelector(state => state.favorites.favorites);
   const [laptops, setLaptops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('Popular');
@@ -26,32 +18,35 @@ const HomeScreen = () => {
     let apiUrl = '';
 
     // Xác định link API cho từng danh mục
-    switch (category) {
-      case 'Popular':
-        apiUrl = 'http://172.16.0.2:3000/LapTop/getListLapTop';
-        break;
-      case 'Trending':
-        apiUrl = 'http://172.16.0.2:3000/LapTop/getListLapTop';
-        break;
-      case 'News':
-        apiUrl = 'http://172.16.0.2:3000/LapTop/getListLapTop';
-        break;
-      case 'Sale':
-        apiUrl = 'http://172.16.0.2:3000/LapTop/getListLapTop';
-        break;
-      default:
-        apiUrl = 'http://172.16.0.2:3000/LapTop/getListLapTop'; // URL mặc định
-    }
+   // Xác định link API cho từng danh mục
+switch (category) {
+  case 'Popular':
+    apiUrl = 'http://172.20.10.6:3000/LapTop/getPopularLapTop';
+    break;
+  case 'Trending':
+    apiUrl = 'http://172.20.10.6:3000/LapTop/getTrendingLapTop';
+    break;
+  case 'News':
+    apiUrl = 'http://172.20.10.6:3000/LapTop/getNewsLapTop';
+    break;
+  case 'Sale':
+    apiUrl = 'http://172.20.10.6:3000/LapTop/getSaleLapTop';
+    break;
+  default:
+    apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
+}
+
 
     axios
       .get(apiUrl)
       .then(response => {
         setLaptops(response.data.data);
-        setLoading(false);
       })
       .catch(error => {
         console.error('Error fetching laptop data:', error);
         setLaptops([]);
+      })
+      .finally(() => {
         setLoading(false);
       });
   };
@@ -62,15 +57,14 @@ const HomeScreen = () => {
 
   const handleCategoryPress = category => {
     setActiveCategory(category);
-    fetchData(category);
   };
 
   const handleAddToFavorites = laptop => {
     const isFavorite = favorites.some(item => item._id === laptop._id);
     if (isFavorite) {
-      dispatch(removeFromFavorites(laptop._id)); // Xóa sản phẩm khỏi yêu thích
+      dispatch(removeFromFavorites(laptop._id));
     } else {
-      dispatch(addToFavorites(laptop)); // Thêm sản phẩm vào danh sách yêu thích
+      dispatch(addToFavorites(laptop));
     }
   };
 
@@ -191,7 +185,7 @@ const styles = StyleSheet.create({
   },
   filterButton: {
     position: 'absolute',
-    top: 120, // Điều chỉnh vị trí của nút lọc
+    top: 120,
     right: 16,
   },
   filterIcon: { width: 24, height: 24 },
@@ -201,7 +195,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    top:20
+    top: 20,
   },
   product: {
     alignItems: 'center',

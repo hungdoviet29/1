@@ -18,7 +18,7 @@ const Login = () => {
   const handleLogin = async () => {
    
     try {
-      const response = await fetch('http://172.16.0.2:3000/users');
+      const response = await fetch('http://172.20.10.6:3000/users');
       const users = await response.json();
 
       const user = users.find(

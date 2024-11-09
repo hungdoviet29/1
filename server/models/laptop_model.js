@@ -7,7 +7,11 @@ const laptopSchema = new mongoose.Schema(
     moTa: { type: String, required: true },
     gia: { type: Number, required: true },
     hinhAnh: { type: String, required: true },
-    danhMuc: { type: String, required: true },
+    danhMuc: { 
+      type: String, 
+      required: true,
+      enum: ['Popular', 'Trending', 'News', 'Sale'], // Giới hạn các giá trị của danh mục
+    },
     soLuongTonKho: { type: Number, required: true },
     danhGia: { type: Number, required: true },
     cpu: { type: String, required: true },
@@ -18,7 +22,7 @@ const laptopSchema = new mongoose.Schema(
     khoangGia: { type: String, required: true },
   },
   {
-    collection: "laptops",
+    collection: "laptops", // Tên collection trong MongoDB
     timestamps: true,
   }
 );

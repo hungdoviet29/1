@@ -136,10 +136,6 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="ReturnPolicyScreen" component={ReturnPolicyScreen} />
         <Stack.Screen name="WarrantyPolicyScreen" component={WarrantyPolicyScreen} />
         <Stack.Screen name="PaymentPolicyScreen" component={PaymentPolicyScreen} />
-        
-        
-        
-
       </Stack.Navigator>
 
       {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}

@@ -1,15 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, ScrollView, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
 const FindScreen = () => {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    // Hàm gọi API dựa trên từ khóa tìm kiếm
+    const fetchProducts = async (query) => {
+        if (!query) {
+            setProducts([]); // Nếu không có từ khóa, reset sản phẩm
+            return; // Không gọi API khi không có từ khóa
+        }
+
+        setLoading(true);
+        let apiUrl = `http://172.20.10.6:3000/LapTop/getListLapTop?search=${query}`; // API tìm kiếm sản phẩm
+
+        try {
+            const response = await fetch(apiUrl);
+            const result = await response.json();
+            // Lọc sản phẩm từ dữ liệu trả về theo từ khóa
+            const filteredProducts = result.data.filter(product =>
+                product.ten.toLowerCase().includes(query.toLowerCase()) // Lọc sản phẩm có tên trùng với từ khóa
+            );
+            setProducts(filteredProducts); // Cập nhật danh sách sản phẩm đã lọc
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Cập nhật kết quả tìm kiếm khi người dùng nhập từ khóa
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            fetchProducts(searchQuery);
+        }, 500); // Delay 500ms khi người dùng gõ
+
+        return () => clearTimeout(delayDebounceFn); // Hủy debounce nếu người dùng gõ tiếp
+    }, [searchQuery]);
+
     return (
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => { /* navigation logic */ }} activeOpacity={0.7}>
-                    <Image source={require('../acssets/BackButton.png')}  />
-
-
+                    <Image source={require('../acssets/BackButton.png')} />
                 </TouchableOpacity>
                 <Text style={styles.headerText}>Find Products</Text>
             </View>
@@ -19,66 +55,42 @@ const FindScreen = () => {
                 <Image source={require('../acssets/SearchIcon.png')} style={styles.findicon} />
                 <TextInput
                     style={styles.searchInput}
-                    placeholder="Asus..."
+                    placeholder="Search for products..."
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
                 />
             </View>
 
+            {/* Loading Indicator */}
+            {loading && <Text>Loading...</Text>}
+
             {/* Results Info */}
-            <Text style={styles.resultInfo}>139 Items found for "Hoodies"</Text>
+            <Text style={styles.resultInfo}>
+                {searchQuery ? `${products.length} Items found for "${searchQuery}"` : 'No search results yet'}
+            </Text>
 
             {/* Products List */}
             <ScrollView contentContainerStyle={styles.productList}>
-                <View style={styles.row}>
-                    {/* Product 1 */}
-                    <TouchableOpacity style={styles.productItem} activeOpacity={0.7}>
-                        <Image
-                            source={require('../acssets/acer2.png')} // Ảnh sản phẩm 1
-                            style={styles.productImage}
-                        />
-                        <Text style={styles.productName}>Pink Hoodie</Text>
-                        <Text style={styles.productPrice}>$668.00 USD</Text>
-                        <Image source={require('../acssets/Vector.png')} style={styles.iconHeart} />
-                    </TouchableOpacity>
-
-                    {/* Product 2 */}
-                    <TouchableOpacity style={styles.productItem} activeOpacity={0.7}>
-                        <Image
-                            source={require('../acssets/Asus1.png')} // Ảnh sản phẩm 2
-                            style={styles.productImage}
-                        />
-                        <Text style={styles.productName}>Light Purple Hoodie</Text>
-                        <Text style={styles.productPrice}>$584.00 USD</Text>
-                        <Image source={require('../acssets/Vector.png')} style={styles.iconHeart} />
-                    </TouchableOpacity>
-                </View>
-
-                <View style={styles.row}>
-                    {/* Product 3 */}
-                    <TouchableOpacity style={styles.productItem} activeOpacity={0.7}>
-                        <Image
-                            source={require('../acssets/Asus1.png')} // Ảnh sản phẩm 3
-                            style={styles.productImage}
-                        />
-                        <Text style={styles.productName}>Dark Green Hoodie</Text>
-                        <Text style={styles.productPrice}>$980.00 USD</Text>
-                        <Image source={require('../acssets/Vector.png')} style={styles.iconHeart} />
-                    </TouchableOpacity>
-
-                    {/* Product 4 */}
-                    <TouchableOpacity style={styles.productItem} activeOpacity={0.7}>
-                        <Image
-                            source={require('../acssets/acer2.png')} // Ảnh sản phẩm 4
-                            style={styles.productImage}
-                        />
-                        <Text style={styles.productName}>Turquoise Hoodie</Text>
-                        <Text style={styles.productPrice}>$668.00 USD</Text>
-                        <Image source={require('../acssets/Vector.png')} style={styles.iconHeart} />
-                    </TouchableOpacity>
-                </View>
+                {products.length === 0 && searchQuery ? (
+                    <Text style={styles.noResultsText}>No products found</Text>
+                ) : (
+                    <View style={styles.row}>
+                        {products.map((product, index) => (
+                            <TouchableOpacity key={index} style={styles.productItem} activeOpacity={0.7}>
+                                <Image
+                                    source={{ uri: product.hinhAnh }} // Sử dụng hình ảnh từ API
+                                    style={styles.productImage}
+                                />
+                                <Text style={styles.productName}>{product.ten}</Text>
+                                <Text style={styles.productPrice}>{product.gia} VND</Text>
+                                <Image source={require('../acssets/Vector.png')} style={styles.iconHeart} />
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                )}
             </ScrollView>
 
             {/* Bottom Navigation */}
-
         </View>
     );
 };
@@ -156,18 +168,15 @@ const styles = StyleSheet.create({
         top: 10,
         right: 10,
     },
-
-    icon: {
-        width: 24,
-        height: 24,
-    },
     findicon: {
         width: 14,
         height: 14,
     },
-    Backicon: {
-        width: 20,
-        height: 20,
+    noResultsText: {
+        fontSize: 18,
+        color: '#888',
+        textAlign: 'center',
+        marginTop: 20,
     },
 });
 

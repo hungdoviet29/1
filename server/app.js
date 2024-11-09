@@ -33,9 +33,6 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/laptop', laptopRouter);
 app.use('/donhang', donHangRouter); // Sử dụng route đơn hàng
-// app.use('/giohang', gioHangRouter); // Sử dụng route giỏ hàng
-
-// Xử lý lỗi 404 và chuyển tiếp đến error handler
 app.use(function(req, res, next) {
     next(createError(404));
 });
@@ -53,27 +50,5 @@ app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
-
-// Cải thiện route giỏ hàng với kiểm tra và phản hồi tốt hơn
-// gioHangRouter.put('/:id', async (req, res) => {
-//     const { quantity } = req.body;
-//     const { id } = req.params;
-
-//     // Kiểm tra xem quantity có hợp lệ không
-//     if (typeof quantity !== 'number' || quantity <= 0) {
-//         return res.status(400).json({ message: 'Invalid quantity value.' });
-//     }
-
-//     try {
-//         const updatedItem = await ItemModel.findByIdAndUpdate(id, { quantity }, { new: true });
-//         if (!updatedItem) {
-//             return res.status(404).json({ message: 'Item not found' });
-//         }
-//         res.status(200).json(updatedItem);
-//     } catch (error) {
-//         console.error('Error updating item:', error);
-//         res.status(500).json({ message: 'Internal Server Error', error: error.message });
-//     }
-// });
 
 module.exports = app;
