@@ -1,56 +1,63 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import RNRestart from 'react-native-restart';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
-const AccountManagement = () => {
-  const navigation = useNavigation();
-
-  const handleLogout = () => {
-    Alert.alert(
-      "Đăng xuất",
-      "Bạn có chắc chắn muốn đăng xuất?",
-      [
-        { text: "Hủy", style: "cancel" },
-        { text: "Đăng xuất", onPress: () => RNRestart.Restart() }
-      ]
-    );
+const AccountManagement = ({ navigation }) => {
+  const userData = {
+    avatar: 'https://via.placeholder.com/100', // Thay bằng URL thật
+    name: 'NGUYỄN VĂN A',
+    id: '0336394568',
+    phone: '0357103658',
+    email: 'linhdtqph35049@gmail.com',
+    nationality: 'Việt Nam',
+    gender: 'Nữ',
+    birthDate: '29/12/2004',
+    password: '********',
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.profileContainer}>
-        <View style={styles.avatar}></View>
-        <Text style={styles.name}>NGUYỄN VĂN A</Text>
-        <Text style={styles.id}>ID: 0336394558</Text>
-      </View>
-
-      <View style={styles.optionsContainer}>
-        <TouchableOpacity 
-          style={styles.option} 
-          onPress={() => navigation.navigate('EditInfo')}  // Navigate to EditInfo screen
-        >
-          <Image source={require('../acssets/tt.png')} style={styles.icon} />
-          <Text style={styles.optionText}>Chỉnh sửa thông tin</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.option}>
-          <Image source={require('../acssets/ct.png')} style={styles.icon} />
-          <Text style={styles.optionText}>Thông tin liên hệ</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.option} 
-          onPress={() => navigation.navigate('DirectMessaging')}  // Navigate to Direct Messaging screen
-        >
-          <Image source={require('../acssets/tb.png')} style={styles.icon} />
-          <Text style={styles.optionText}>Nhắn tin trực tiếp</Text>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Đăng xuất</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Text style={styles.backIcon}>←</Text>
       </TouchableOpacity>
+      
+      <Text style={styles.header}>Account Management</Text>
+      
+      <View style={styles.profileSection}>
+        <Image source={{ uri: userData.avatar }} style={styles.avatar} />
+        <Text style={styles.username}>{userData.name}</Text>
+        <Text style={styles.userId}>ID: {userData.id}</Text>
+      </View>
+      
+      <View style={styles.optionList}>
+        <TouchableOpacity 
+          style={styles.optionItem} 
+          onPress={() => navigation.navigate('EditPersonalInformation', { userData })}
+        >
+          <Text style={styles.optionIcon}>👤</Text>
+          <Text style={styles.optionText}>Chỉnh sửa thông tin</Text>
+          <Text style={styles.arrow}>›</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.optionList}>
+        <TouchableOpacity 
+          style={styles.optionItem} 
+          onPress={() => navigation.navigate('EditPersonalInformation', { userData })}
+        >
+          <Text style={styles.optionIcon}>👤</Text>
+          <Text style={styles.optionText}>Chỉnh sửa thông tin</Text>
+          <Text style={styles.arrow}>›</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.optionList}>
+        <TouchableOpacity 
+          style={styles.optionItem} 
+          onPress={() => navigation.navigate('EditPersonalInformation', { userData })}
+        >
+          <Text style={styles.optionIcon}>👤</Text>
+          <Text style={styles.optionText}>Chỉnh sửa thông tin</Text>
+          <Text style={styles.arrow}>›</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -58,68 +65,64 @@ const AccountManagement = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    padding: 20,
   },
-  profileContainer: {
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 10,
+  },
+  backIcon: {
+    fontSize: 24,
+  },
+  header: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 20,
+  },
+  profileSection: {
     alignItems: 'center',
-    marginBottom: 60,
+    marginBottom: 30,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#000',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
   },
-  name: {
+  username: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 10,
   },
-  id: {
+  userId: {
     fontSize: 14,
-    color: 'gray',
-    marginTop: 5,
+    color: '#666',
   },
-  optionsContainer: {
-    width: '100%',
-    alignItems: 'center',
+  optionList: {
+    backgroundColor: '#EDEDED',
+    borderRadius: 10,
+    paddingVertical: 10,
   },
-  option: {
+  optionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
-    padding: 25,
-    marginTop: 15,
-    width: '90%',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#D0D0D0',
   },
-  icon: {
-    width: 24,
-    height: 24,
-    marginRight: 20,
+  optionIcon: {
+    fontSize: 24,
+    marginRight: 10,
   },
   optionText: {
+    flex: 1,
     fontSize: 16,
   },
-  logoutButton: {
-    marginTop: 30,
-    backgroundColor: '#FF3B30',
-    padding: 15,
-    borderRadius: 10,
-    width: '90%',
-    alignItems: 'center',
-  },
-  logoutText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
+  arrow: {
+    fontSize: 18,
+    color: '#888',
   },
 });
 

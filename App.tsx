@@ -52,12 +52,15 @@ import EditInfo from './Screens/EditInfo';
 import DirectMessaging from './Screens/DirectMessaging';
 import WarrantyPolicyScreen from './Screens/WarrantyPolicyScreen';
 import PaymentPolicyScreen from './Screens/PaymentPolicyScreen';
+import RenameScreen from './Screens/RenameScreen';
+import CountrySelectScreen from './Screens/CountrySelectScreen';
 // Import component Bottom Navigation
 import BottomNavigation from './components/bottomnavigation';
 import ProductScreen from './Screens/Buy';
 import { getCartItems } from './redux/AsyncStorage';
 import { loadCart } from './redux/cartSlice';
 import { store } from './redux/store';
+import EditPersonalInformation from './Screens/EditPersonalInformation';
 
 const Stack = createStackNavigator();
 
@@ -136,6 +139,9 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="ReturnPolicyScreen" component={ReturnPolicyScreen} />
         <Stack.Screen name="WarrantyPolicyScreen" component={WarrantyPolicyScreen} />
         <Stack.Screen name="PaymentPolicyScreen" component={PaymentPolicyScreen} />
+        <Stack.Screen name="EditPersonalInformation" component={EditPersonalInformation} />
+        <Stack.Screen name="RenameScreen" component={RenameScreen} />
+        <Stack.Screen name="CountrySelectScreen" component={CountrySelectScreen} />
       </Stack.Navigator>
 
       {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}

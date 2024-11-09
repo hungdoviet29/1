@@ -17,25 +17,22 @@ const HomeScreen = () => {
     setLoading(true);
     let apiUrl = '';
 
-    // Xác định link API cho từng danh mục
-   // Xác định link API cho từng danh mục
-switch (category) {
-  case 'Popular':
-    apiUrl = 'http://172.20.10.6:3000/LapTop/getPopularLapTop';
-    break;
-  case 'Trending':
-    apiUrl = 'http://172.20.10.6:3000/LapTop/getTrendingLapTop';
-    break;
-  case 'News':
-    apiUrl = 'http://172.20.10.6:3000/LapTop/getNewsLapTop';
-    break;
-  case 'Sale':
-    apiUrl = 'http://172.20.10.6:3000/LapTop/getSaleLapTop';
-    break;
-  default:
-    apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
-}
-
+    switch (category) {
+      case 'Popular':
+        apiUrl = 'http://192.168.1.78:3000/LapTop/getPopularLapTop';
+        break;
+      case 'Trending':
+        apiUrl = 'http://192.168.1.78:3000/LapTop/getTrendingLapTop';
+        break;
+      case 'News':
+        apiUrl = 'http://192.168.1.78:3000/LapTop/getNewsLapTop';
+        break;
+      case 'Sale':
+        apiUrl = 'http://192.168.1.78:3000/LapTop/getSaleLapTop';
+        break;
+      default:
+        apiUrl = 'http://192.168.1.78:3000/LapTop/getListLapTop';
+    }
 
     axios
       .get(apiUrl)
@@ -72,7 +69,6 @@ switch (category) {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Image
           source={require('../acssets/profile1.png')}
@@ -91,8 +87,7 @@ switch (category) {
               style={styles.icon}
             />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('CustomDrawerContent')}>
+          <TouchableOpacity onPress={() => navigation.navigate('CustomDrawerContent')}>
             <Image
               source={require('../acssets/Menu.png')}
               style={styles.icon}
@@ -101,7 +96,6 @@ switch (category) {
         </View>
       </View>
 
-      {/* Categories */}
       <View style={styles.categories}>
         {['Popular', 'Trending', 'News', 'Sale'].map(category => (
           <TouchableOpacity key={category} onPress={() => handleCategoryPress(category)}>
@@ -116,7 +110,6 @@ switch (category) {
         ))}
       </View>
 
-      {/* Nút lọc */}
       <TouchableOpacity onPress={() => navigation.navigate('FilterScreen')} style={styles.filterButton}>
         <Image
           source={require('../acssets/sorttool.png')}
@@ -124,13 +117,12 @@ switch (category) {
         />
       </TouchableOpacity>
 
-      {/* Product List */}
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#6C63FF" />
         </View>
       ) : (
-        <ScrollView style={styles.productScrollView}>
+        <ScrollView contentContainerStyle={styles.productScrollView}>
           <View style={styles.productList}>
             {Array.isArray(laptops) &&
               laptops.map(laptop => (
@@ -189,13 +181,12 @@ const styles = StyleSheet.create({
     right: 16,
   },
   filterIcon: { width: 24, height: 24 },
-  productScrollView: { paddingVertical: 16 },
+  productScrollView: { paddingBottom: 100 }, // Thêm khoảng trống cuối để cuộn dễ dàng
   productList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    top: 20,
   },
   product: {
     alignItems: 'center',
