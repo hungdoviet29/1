@@ -1,155 +1,184 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Button, CheckBox } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import React from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 
-const CommentScreen = () => {
-  const [isAnonymous, setIsAnonymous] = useState(false);
+const CommentScreen = () => (
+  <View style={styles.container}>
+    <TouchableOpacity style={styles.backButton}>
+      <Text style={styles.backButtonText}>←</Text>
+    </TouchableOpacity>
 
-  return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Icon name="arrow-left" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Comment</Text>
-      </View>
-
-      {/* Product Info */}
-      <View style={styles.productInfo}>
-        <Image
-          style={styles.productImage}
-          source={{ uri: 'https://via.placeholder.com/80' }} // Hình mẫu sản phẩm
-        />
-        <View style={styles.productDetails}>
-          <Text style={styles.productName}>Printed Shirt</Text>
-          <Text style={styles.productCategory}>GEETA COLLECTION</Text>
-
-          {/* Star Rating */}
-          <View style={styles.starContainer}>
+    <View style={styles.productContainer}>
+      <Image
+        source={require('../acssets/acer2.png')}
+        style={styles.productImage}
+      />
+      <View style={styles.productInfoContainer}>
+        <Text style={styles.productTitle}>Printed Shirt</Text>
+        <Text style={styles.productSubtitle}>GEETA COLLECTION</Text>
+        <View style={styles.ratingContainer}>
+          <Text style={styles.ratingText}>ĐÁNH GIÁ SẢN PHẨM NÀY</Text>
+          <View style={styles.starsContainer}>
             {[...Array(5)].map((_, index) => (
-              <Icon key={index} name="star-o" size={24} color="#000" />
+              <Image
+                key={index}
+                source={require('../acssets/Star1.png')}
+                style={styles.starIcon}
+              />
             ))}
           </View>
-          <Text style={styles.ratingLabel}>ĐÁNH GIÁ SẢN PHẨM NÀY</Text>
         </View>
       </View>
-
-      {/* Comment Input */}
-      <TextInput
-        style={styles.commentInput}
-        placeholder="Suy nghĩ của bạn về sản phẩm"
-        multiline
-      />
-
-      {/* Add Image or Video */}
-      <TouchableOpacity style={styles.addMediaButton}>
-        <Icon name="camera" size={24} color="#000" />
-        <Text style={styles.addMediaText}>Thêm ảnh hoặc video</Text>
-      </TouchableOpacity>
-
-      {/* Anonymous Option */}
-      <View style={styles.anonymousOption}>
-        <CheckBox value={isAnonymous} onValueChange={setIsAnonymous} />
-        <Text>Đánh giá ẩn danh</Text>
-      </View>
-
-      {/* Submit Button */}
-      <TouchableOpacity style={styles.submitButton}>
-        <Text style={styles.submitButtonText}>GỬI</Text>
-      </TouchableOpacity>
     </View>
-  );
-};
+
+    <Text style={styles.sectionTitle}>Viết Đánh Giá</Text>
+    <TextInput
+      style={styles.input}
+      placeholder="Suy nghĩ của bạn về sản phẩm"
+      placeholderTextColor="#A9A9A9"
+      multiline
+    />
+
+    <Text style={styles.sectionTitle}>Thêm ảnh hoặc video</Text>
+    <TouchableOpacity style={styles.uploadContainer}>
+      <Image
+        source={require('../acssets/Pictures.png')}
+        style={styles.uploadIcon}
+      />
+      <Text style={styles.uploadText}>Thêm ảnh hoặc video</Text>
+    </TouchableOpacity>
+
+    <View style={styles.checkboxContainer}>
+      <View style={styles.radioButton} />
+      <Text style={styles.checkboxText}>Đánh giá ẩn danh</Text>
+    </View>
+
+    <TouchableOpacity style={styles.submitButton}>
+      <Text style={styles.submitButtonText}>GỬI</Text>
+    </TouchableOpacity>
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
     padding: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
+    backgroundColor: '#fff',
   },
   backButton: {
-    marginRight: 10,
+    marginBottom: 20,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    flex: 1,
-    textAlign: 'center',
+  backButtonText: {
+    fontSize: 24,
+    color: '#000',
   },
-  productInfo: {
+  productContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
   },
   productImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    marginRight: 20,
+    width: 120,
+    height: 120,
+    marginRight: 10,
   },
-  productDetails: {
+  productInfoContainer: {
     flex: 1,
+    justifyContent: 'center',
   },
-  productName: {
+  productTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#5B5B5B',
+    textAlign: 'center',
   },
-  productCategory: {
-    color: '#A9A9A9',
-    marginBottom: 5,
-  },
-  starContainer: {
-    flexDirection: 'row',
-    marginBottom: 5,
-  },
-  ratingLabel: {
+  productSubtitle: {
     fontSize: 12,
-    color: '#A9A9A9',
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 10,
   },
-  commentInput: {
-    height: 80,
-    borderWidth: 1,
+  ratingContainer: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  ratingText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#666',
+    marginBottom: 5,
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  starIcon: {
+    width: 24,
+    height: 24,
+    margin: 2,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#666',
+    marginBottom: 5,
+  },
+  input: {
+    height: 100,
     borderColor: '#ddd',
-    borderRadius: 10,
+    borderWidth: 1,
     paddingHorizontal: 10,
     marginBottom: 20,
-    backgroundColor: '#F0F0F0',
+    textAlignVertical: 'top',
   },
-  addMediaButton: {
-    flexDirection: 'row',
+  uploadContainer: {
+    flexDirection: 'column',
     alignItems: 'center',
-    borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 10,
-    padding: 10,
+    borderWidth: 1,
+    padding: 20,
     marginBottom: 20,
   },
-  addMediaText: {
-    marginLeft: 10,
-    color: '#A9A9A9',
+  uploadIcon: {
+    width: 30,
+    height: 30,
+    marginBottom: 10,
   },
-  anonymousOption: {
+  uploadText: {
+    color: '#888',
+    fontSize: 14,
+  },
+  checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
+  },
+  radioButton: {
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#000',
+    marginRight: 10,
+  },
+  checkboxText: {
+    fontSize: 14,
   },
   submitButton: {
-    backgroundColor: '#FF3D00',
-    paddingVertical: 15,
-    borderRadius: 10,
+    backgroundColor: 'red',
     alignItems: 'center',
+    padding: 15,
+    borderRadius: 5,
   },
   submitButtonText: {
-    color: '#FFF',
-    fontWeight: 'bold',
+    color: '#fff',
     fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

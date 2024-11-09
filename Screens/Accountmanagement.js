@@ -51,10 +51,10 @@ const AccountManagement = ({ navigation }) => {
       <View style={styles.optionList}>
         <TouchableOpacity 
           style={styles.optionItem} 
-          onPress={() => navigation.navigate('EditPersonalInformation', { userData })}
+          onPress={() => navigation.navigate('DirectMessaging', { userData })}
         >
           <Text style={styles.optionIcon}>👤</Text>
-          <Text style={styles.optionText}>Chỉnh sửa thông tin</Text>
+          <Text style={styles.optionText}>Nhắn tin trực tiếp</Text>
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
       </View>

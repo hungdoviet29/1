@@ -24,7 +24,7 @@ const ShippingScreen = () => {
         };
 
         // Navigate to OrderScreen and pass shipping info along with total cost
-        navigation.navigate('OrderScreen', { shippingInfo, totalCost: route.params?.totalCost });
+        navigation.navigate('OderScreen', { shippingInfo, totalCost: route.params?.totalCost });
     };
 
     return (
