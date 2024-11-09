@@ -71,7 +71,6 @@ switch (category) {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Image
           source={require('../acssets/profile1.png')}
@@ -90,8 +89,7 @@ switch (category) {
               style={styles.icon}
             />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('CustomDrawerContent')}>
+          <TouchableOpacity onPress={() => navigation.navigate('CustomDrawerContent')}>
             <Image
               source={require('../acssets/Menu.png')}
               style={styles.icon}
@@ -100,7 +98,6 @@ switch (category) {
         </View>
       </View>
 
-      {/* Categories */}
       <View style={styles.categories}>
         {['Popular', 'Trending', 'News', 'Sale'].map(category => (
           <TouchableOpacity key={category} onPress={() => handleCategoryPress(category)}>
@@ -115,7 +112,6 @@ switch (category) {
         ))}
       </View>
 
-      {/* Nút lọc */}
       <TouchableOpacity onPress={() => navigation.navigate('FilterScreen')} style={styles.filterButton}>
         <Image
           source={require('../acssets/sorttool.png')}
@@ -123,13 +119,12 @@ switch (category) {
         />
       </TouchableOpacity>
 
-      {/* Product List */}
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#6C63FF" />
         </View>
       ) : (
-        <ScrollView style={styles.productScrollView}>
+        <ScrollView contentContainerStyle={styles.productScrollView}>
           <View style={styles.productList}>
             {Array.isArray(laptops) &&
               laptops.map(laptop => (
@@ -188,13 +183,12 @@ const styles = StyleSheet.create({
     right: 16,
   },
   filterIcon: { width: 24, height: 24 },
-  productScrollView: { paddingVertical: 16 },
+  productScrollView: { paddingBottom: 100 }, // Thêm khoảng trống cuối để cuộn dễ dàng
   productList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    top: 20,
   },
   product: {
     alignItems: 'center',

@@ -1,13 +1,14 @@
-import React from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const products = [
+const initialProducts = [
   {
     id: '1',
     name: 'ACER',
     price: '1800$',
     quantity: '100',
-    image: 'https://example.com/acer-laptop.png', // Cập nhật URL đúng cho ảnh sản phẩm
+    image: 'https://example.com/acer-laptop.png',
   },
   {
     id: '2',
@@ -37,10 +38,34 @@ const products = [
     quantity: '100',
     image: 'https://example.com/asus-laptop.png',
   },
-  // Thêm các sản phẩm khác nếu cần
 ];
 
-const ProductManagement = ({ navigation }) => {
+const ProductManagement = () => {
+  const navigation = useNavigation();
+  const [products, setProducts] = useState(initialProducts);
+
+  const handleDelete = (productId) => {
+    // Xác nhận trước khi xóa sản phẩm
+    Alert.alert(
+      "Xác nhận xóa",
+      "Bạn có chắc chắn muốn xóa sản phẩm này?",
+      [
+        {
+          text: "Hủy",
+          style: "cancel"
+        },
+        {
+          text: "OK",
+          onPress: () => {
+            // Xóa sản phẩm khỏi danh sách
+            const updatedProducts = products.filter((item) => item.id !== productId);
+            setProducts(updatedProducts);
+          }
+        }
+      ]
+    );
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Image source={{ uri: item.image }} style={styles.productImage} />
@@ -52,14 +77,14 @@ const ProductManagement = ({ navigation }) => {
         </Text>
       </View>
       <View style={styles.actions}>
-      <TouchableOpacity onPress={() => navigation.navigate('UserDetails', { userId: item.id })}>
+        <TouchableOpacity onPress={() => navigation.navigate('ProductDetails', { userId: item.id })}>
           <Image source={require('../acssets/fix.png')} style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => handleDelete(item.id)}>
           <Image source={require('../acssets/bin.png')} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity>
-          <Image source={require('../acssets/NextButton.png')} style={styles.iconnext} />
+          <Image source={require('../acssets/NextButton.png')} style={styles.iconNext} />
         </TouchableOpacity>
       </View>
     </View>
@@ -76,7 +101,7 @@ const ProductManagement = ({ navigation }) => {
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
       />
-        <TouchableOpacity onPress={() => navigation.navigate('ProductAdd')} style={styles.addButton}>
+      <TouchableOpacity onPress={() => navigation.navigate('ProductAdd')} style={styles.addButton}>
         <Image source={require('../acssets/them.png')} style={styles.addButtonImage} />
       </TouchableOpacity>
     </View>
@@ -165,6 +190,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
+  },
+  addButtonImage: {
+    width: 50,
+    height: 50,
   },
 });
 

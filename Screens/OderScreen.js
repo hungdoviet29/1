@@ -66,7 +66,7 @@ const OrderScreen = ({ navigation }) => {
                                 <Text style={styles.actionButtonText}>Mua lại</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.reviewButton}>
-                                <Text style={styles.reviewButtonText}>Viết đánh giá</Text>
+                                <Text style={styles.reviewButtonText} onPress={()=>navigation.navigate('CommentScreen')}>Viết đánh giá</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
