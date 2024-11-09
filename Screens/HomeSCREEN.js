@@ -1,9 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { addToFavorites, removeFromFavorites } from '../redux/favoriteSlice';
+import {useDispatch, useSelector} from 'react-redux';
+import {addToFavorites, removeFromFavorites} from '../redux/favoriteSlice';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -17,24 +25,23 @@ const HomeScreen = () => {
     setLoading(true);
     let apiUrl = '';
 
-   // Xác định link API cho từng danh mục
-switch (category) {
-  case 'Popular':
-    apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
-    break;
-  case 'Trending':
-    apiUrl = 'http://192.168.101.9:3000/LapTop/getTrendingLapTop';
-    break;
-  case 'News':
-    apiUrl = 'http://192.168.101.9:3000/LapTop/getNewsLapTop';
-    break;
-  case 'Sale':
-    apiUrl = 'http://192.168.101.9:3000/LapTop/getSaleLapTop';
-    break;
-  default:
-    apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
-}
-
+    // Xác định link API cho từng danh mục
+    switch (category) {
+      case 'Popular':
+        apiUrl = 'http://192.168.0.3:3000/LapTop/getListLapTop';
+        break;
+      case 'Trending':
+        apiUrl = 'http://192.168.0.3:3000/LapTop/getTrendingLapTop';
+        break;
+      case 'News':
+        apiUrl = 'http://192.168.0.3:3000/LapTop/getNewsLapTop';
+        break;
+      case 'Sale':
+        apiUrl = 'http://192.168.0.3:3000/LapTop/getSaleLapTop';
+        break;
+      default:
+        apiUrl = 'http://192.168.0.3:3000/LapTop/getListLapTop';
+    }
 
     axios
       .get(apiUrl)
@@ -67,7 +74,8 @@ switch (category) {
     }
   };
 
-  const isFavorite = laptop => Array.isArray(favorites) && favorites.some(item => item._id === laptop._id);
+  const isFavorite = laptop =>
+    Array.isArray(favorites) && favorites.some(item => item._id === laptop._id);
 
   return (
     <View style={styles.container}>
@@ -77,7 +85,8 @@ switch (category) {
           style={styles.profileImage}
         />
         <View style={styles.headerIcons}>
-          <TouchableOpacity onPress={() => navigation.navigate('NotificationScreen')}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('NotificationScreen')}>
             <Image
               source={require('../acssets/bell.png')}
               style={styles.icon}
@@ -89,7 +98,8 @@ switch (category) {
               style={styles.icon}
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('CustomDrawerContent')}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('CustomDrawerContent')}>
             <Image
               source={require('../acssets/Menu.png')}
               style={styles.icon}
@@ -97,10 +107,12 @@ switch (category) {
           </TouchableOpacity>
         </View>
       </View>
-  
+
       <View style={styles.categories}>
         {['Popular', 'Trending', 'News', 'Sale'].map(category => (
-          <TouchableOpacity key={category} onPress={() => handleCategoryPress(category)}>
+          <TouchableOpacity
+            key={category}
+            onPress={() => handleCategoryPress(category)}>
             <Text
               style={[
                 styles.category,
@@ -111,19 +123,19 @@ switch (category) {
           </TouchableOpacity>
         ))}
       </View>
-  
+
       {/* Nút lọc */}
       <View style={styles.filterContainer}>
         <TouchableOpacity
-            onPress={() => navigation.navigate('FilterScreen')}
-            style={styles.filterButton}>
-            <Image
-                source={require('../acssets/sorttool.png')}
-                style={styles.filterIcon}
-            />
+          onPress={() => navigation.navigate('FilterScreen')}
+          style={styles.filterButton}>
+          <Image
+            source={require('../acssets/sorttool.png')}
+            style={styles.filterIcon}
+          />
         </TouchableOpacity>
       </View>
-  
+
       {/* Danh sách sản phẩm */}
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -137,10 +149,10 @@ switch (category) {
                 <View style={styles.product} key={laptop._id}>
                   <TouchableOpacity
                     onPress={() =>
-                      navigation.navigate('ProductScreen', { product: laptop })
+                      navigation.navigate('ProductScreen', {product: laptop})
                     }>
                     <Image
-                      source={{ uri: laptop.hinhAnh }}
+                      source={{uri: laptop.hinhAnh}}
                       style={styles.productImage}
                     />
                     <Text style={styles.productName}>{laptop.ten}</Text>
@@ -152,7 +164,11 @@ switch (category) {
                     style={styles.heartIconContainer}
                     onPress={() => handleAddToFavorites(laptop)}>
                     <Image
-                      source={isFavorite(laptop) ? require('../acssets/VectorRed.png') : require('../acssets/Vector.png')}
+                      source={
+                        isFavorite(laptop)
+                          ? require('../acssets/VectorRed.png')
+                          : require('../acssets/Vector.png')
+                      }
                       style={styles.heartIcon}
                     />
                   </TouchableOpacity>
@@ -163,22 +179,26 @@ switch (category) {
       )}
     </View>
   );
-  
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', padding: 16, alignItems: 'center' },
-  profileImage: { width: 40, height: 40, borderRadius: 20 },
-  headerIcons: { flexDirection: 'row' },
-  icon: { width: 24, height: 24, marginLeft: 16 },
+  container: {flex: 1, backgroundColor: '#fff'},
+  loadingContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+    alignItems: 'center',
+  },
+  profileImage: {width: 40, height: 40, borderRadius: 20},
+  headerIcons: {flexDirection: 'row'},
+  icon: {width: 24, height: 24, marginLeft: 16},
   categories: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 16,
   },
-  category: { fontSize: 16, fontWeight: 'bold', color: '#999' },
+  category: {fontSize: 16, fontWeight: 'bold', color: '#999'},
   categoryActive: {
     color: '#6C63FF',
     borderBottomWidth: 2,
@@ -186,14 +206,12 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     alignItems: 'flex-end',
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
-  filterButton: {
-
-  },
+  filterButton: {},
   filterIcon: {
-    width: 24, 
-    height: 24
+    width: 24,
+    height: 24,
   },
   productScrollView: {
     paddingBottom: 100,
@@ -213,17 +231,16 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
-  productImage: { width: 100, height: 100, resizeMode: 'contain' },
+  productImage: {width: 100, height: 100, resizeMode: 'contain'},
   productName: {
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 10,
     textAlign: 'center',
   },
-  productPrice: { fontSize: 14, color: '#888', marginTop: 5 },
-  heartIconContainer: { position: 'absolute', top: 10, right: 10 },
-  heartIcon: { width: 20, height: 20 },
+  productPrice: {fontSize: 14, color: '#888', marginTop: 5},
+  heartIconContainer: {position: 'absolute', top: 10, right: 10},
+  heartIcon: {width: 20, height: 20},
 });
-
 
 export default HomeScreen;

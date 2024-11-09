@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   ImageBackground,
   StyleSheet,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
 const Login = () => {
   const navigation = useNavigation();
@@ -16,17 +16,16 @@ const Login = () => {
   const [error, setError] = useState(null);
 
   const handleLogin = async () => {
-   
     try {
-      const response = await fetch('http://172.20.10.6:3000/users');
+      const response = await fetch('http://192.168.0.3:3000/users');
       const users = await response.json();
 
       const user = users.find(
         user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau,
       );
-  
+
       console.log('User found:', user);
-  
+
       if (user) {
         console.log('Roll:', user.roll);
         navigation.navigate(user.roll === 1 ? 'AdminHome' : 'Home');
@@ -38,7 +37,6 @@ const Login = () => {
       console.error('Lỗi trong quá trình đăng nhập:', error);
     }
   };
-  
 
   return (
     <View style={styles.container}>
@@ -76,7 +74,8 @@ const Login = () => {
 
         <View style={styles.optionsContainer}>
           <Text style={styles.rememberMe}>Remember me</Text>
-          <TouchableOpacity  onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ForgotPasswordScreen')}>
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>

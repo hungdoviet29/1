@@ -1,5 +1,31 @@
 const {UserModel} = require('../models/user.model'); // Đảm bảo import đúng model User
 
+// Hàm xóa người dùng theo ID
+exports.deleteUser = async (req, res) => {
+  try {
+    const {id} = req.params; // Lấy ID từ URL
+    console.log('Received User ID:', id); // Log ID
+
+    if (!id || id.length !== 24) {
+      return res.status(400).json({message: 'ID không hợp lệ'});
+    }
+
+    // Kiểm tra người dùng có tồn tại không
+    const user = await UserModel.findById(id);
+    if (!user) {
+      console.log('Không tìm thấy người dùng với ID:', id);
+      return res.status(404).json({message: 'Không tìm thấy người dùng'});
+    }
+
+    // Nếu người dùng tồn tại, thực hiện xóa
+    await UserModel.findByIdAndDelete(id);
+    return res.json({message: 'Xóa người dùng thành công'});
+  } catch (error) {
+    console.error('Lỗi khi xóa người dùng:', error);
+    return res.status(500).json({message: 'Lỗi khi xóa người dùng', error});
+  }
+};
+
 // Hàm đăng ký
 exports.register = async (req, res) => {
   const {
@@ -10,19 +36,18 @@ exports.register = async (req, res) => {
     hoSo = {},
     lichSuDonHang = [],
     sanPhamYeuThich = [],
+    avatar = 'https://img.myloview.com/stickers/default-avatar-profile-icon-vector-social-media-user-photo-700-205577532.jpg', // URL ảnh mặc định
   } = req.body;
 
   try {
-    // Kiểm tra nếu người dùng đã tồn tại
     const existingUser = await UserModel.findOne({tenDangNhap});
     if (existingUser) {
       return res.status(400).json({message: 'Tên đăng nhập đã tồn tại'});
     }
 
-    // Tạo người dùng mới
     const newUser = new UserModel({
       tenDangNhap,
-      matKhau, // Để mật khẩu trong dạng text, không mã hóa
+      matKhau,
       vaiTro,
       roll,
       hoSo,
@@ -42,14 +67,8 @@ exports.login = async (req, res) => {
   const {tenDangNhap, matKhau} = req.body;
 
   try {
-    // Kiểm tra thông tin người dùng
     const user = await UserModel.findOne({tenDangNhap});
-    if (!user) {
-      return res.status(401).json({message: 'Sai tên đăng nhập hoặc mật khẩu'});
-    }
-
-    // Kiểm tra mật khẩu (không mã hóa mật khẩu trong thực tế)
-    if (user.matKhau !== matKhau) {
+    if (!user || user.matKhau !== matKhau) {
       return res.status(401).json({message: 'Sai tên đăng nhập hoặc mật khẩu'});
     }
 
