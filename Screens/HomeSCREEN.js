@@ -20,19 +20,19 @@ const HomeScreen = () => {
    // Xác định link API cho từng danh mục
 switch (category) {
   case 'Popular':
-    apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
+    apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
     break;
   case 'Trending':
-    apiUrl = 'http://172.20.10.6:3000/LapTop/getTrendingLapTop';
+    apiUrl = 'http://192.168.101.9:3000/LapTop/getTrendingLapTop';
     break;
   case 'News':
-    apiUrl = 'http://172.20.10.6:3000/LapTop/getNewsLapTop';
+    apiUrl = 'http://192.168.101.9:3000/LapTop/getNewsLapTop';
     break;
   case 'Sale':
-    apiUrl = 'http://172.20.10.6:3000/LapTop/getSaleLapTop';
+    apiUrl = 'http://192.168.101.9:3000/LapTop/getSaleLapTop';
     break;
   default:
-    apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
+    apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
 }
 
 
@@ -97,7 +97,7 @@ switch (category) {
           </TouchableOpacity>
         </View>
       </View>
-
+  
       <View style={styles.categories}>
         {['Popular', 'Trending', 'News', 'Sale'].map(category => (
           <TouchableOpacity key={category} onPress={() => handleCategoryPress(category)}>
@@ -111,14 +111,20 @@ switch (category) {
           </TouchableOpacity>
         ))}
       </View>
-
-      <TouchableOpacity onPress={() => navigation.navigate('FilterScreen')} style={styles.filterButton}>
-        <Image
-          source={require('../acssets/sorttool.png')}
-          style={styles.filterIcon}
-        />
-      </TouchableOpacity>
-
+  
+      {/* Nút lọc */}
+      <View style={styles.filterContainer}>
+        <TouchableOpacity
+            onPress={() => navigation.navigate('FilterScreen')}
+            style={styles.filterButton}>
+            <Image
+                source={require('../acssets/sorttool.png')}
+                style={styles.filterIcon}
+            />
+        </TouchableOpacity>
+      </View>
+  
+      {/* Danh sách sản phẩm */}
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#6C63FF" />
@@ -157,6 +163,7 @@ switch (category) {
       )}
     </View>
   );
+  
 };
 
 const styles = StyleSheet.create({
@@ -177,19 +184,26 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: '#6C63FF',
   },
-  filterButton: {
-    position: 'absolute',
-    top: 120,
-    right: 16,
+  filterContainer: {
+    alignItems: 'flex-end',
+    paddingHorizontal: 20
   },
-  filterIcon: { width: 24, height: 24 },
-  productScrollView: { paddingBottom: 100 }, // Thêm khoảng trống cuối để cuộn dễ dàng
+  filterButton: {
+
+  },
+  filterIcon: {
+    width: 24, 
+    height: 24
+  },
+  productScrollView: {
+    paddingBottom: 100,
+    marginTop: 10, // Thêm khoảng cách phía trên để tránh nút lọc
+  },
   productList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    top:15
   },
   product: {
     alignItems: 'center',
@@ -210,5 +224,6 @@ const styles = StyleSheet.create({
   heartIconContainer: { position: 'absolute', top: 10, right: 10 },
   heartIcon: { width: 20, height: 20 },
 });
+
 
 export default HomeScreen;
