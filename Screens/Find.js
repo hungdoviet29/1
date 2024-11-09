@@ -1,29 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, ScrollView, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Dùng hook cho navigation
 
 const FindScreen = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
+    const navigation = useNavigation(); // Sử dụng useNavigation
 
     // Hàm gọi API dựa trên từ khóa tìm kiếm
     const fetchProducts = async (query) => {
         if (!query) {
-            setProducts([]); // Nếu không có từ khóa, reset sản phẩm
-            return; // Không gọi API khi không có từ khóa
+            setProducts([]);
+            return;
         }
 
         setLoading(true);
-        let apiUrl = `http://172.20.10.6:3000/LapTop/getListLapTop?search=${query}`; // API tìm kiếm sản phẩm
+        let apiUrl = `http://172.20.10.6:3000/LapTop/getListLapTop?search=${query}`;
 
         try {
             const response = await fetch(apiUrl);
             const result = await response.json();
-            // Lọc sản phẩm từ dữ liệu trả về theo từ khóa
+
             const filteredProducts = result.data.filter(product =>
-                product.ten.toLowerCase().includes(query.toLowerCase()) // Lọc sản phẩm có tên trùng với từ khóa
+                product.ten.toLowerCase().includes(query.toLowerCase())
             );
-            setProducts(filteredProducts); // Cập nhật danh sách sản phẩm đã lọc
+            setProducts(filteredProducts);
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
@@ -35,16 +37,16 @@ const FindScreen = () => {
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             fetchProducts(searchQuery);
-        }, 500); // Delay 500ms khi người dùng gõ
+        }, 500);
 
-        return () => clearTimeout(delayDebounceFn); // Hủy debounce nếu người dùng gõ tiếp
+        return () => clearTimeout(delayDebounceFn);
     }, [searchQuery]);
 
     return (
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => { /* navigation logic */ }} activeOpacity={0.7}>
+                <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
                     <Image source={require('../acssets/BackButton.png')} />
                 </TouchableOpacity>
                 <Text style={styles.headerText}>Find Products</Text>
@@ -76,21 +78,27 @@ const FindScreen = () => {
                 ) : (
                     <View style={styles.row}>
                         {products.map((product, index) => (
-                            <TouchableOpacity key={index} style={styles.productItem} activeOpacity={0.7}>
+                            <TouchableOpacity
+                                key={index}
+                                style={styles.productItem}
+                                activeOpacity={0.7}
+                                onPress={() => navigation.navigate('ProductScreen', { product })}
+                            >
                                 <Image
-                                    source={{ uri: product.hinhAnh }} // Sử dụng hình ảnh từ API
+                                    source={{ uri: product.hinhAnh }}
                                     style={styles.productImage}
                                 />
                                 <Text style={styles.productName}>{product.ten}</Text>
                                 <Text style={styles.productPrice}>{product.gia} VND</Text>
-                                <Image source={require('../acssets/Vector.png')} style={styles.iconHeart} />
+                                <Image
+                                    source={require('../acssets/Vector.png')}
+                                    style={styles.iconHeart}
+                                />
                             </TouchableOpacity>
                         ))}
                     </View>
                 )}
             </ScrollView>
-
-            {/* Bottom Navigation */}
         </View>
     );
 };
@@ -135,6 +143,8 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        flexWrap: 'wrap', // Để sản phẩm tự xuống dòng nếu không đủ chỗ
+        gap: 10, // Khoảng cách giữa các item
         marginBottom: 20,
     },
     productItem: {

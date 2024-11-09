@@ -17,11 +17,10 @@ const HomeScreen = () => {
     setLoading(true);
     let apiUrl = '';
 
-    // Xác định link API cho từng danh mục
    // Xác định link API cho từng danh mục
 switch (category) {
   case 'Popular':
-    apiUrl = 'http://172.20.10.6:3000/LapTop/getPopularLapTop';
+    apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
     break;
   case 'Trending':
     apiUrl = 'http://172.20.10.6:3000/LapTop/getTrendingLapTop';
