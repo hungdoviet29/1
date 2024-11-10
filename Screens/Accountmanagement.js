@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-
+import {useNavigation} from '@react-navigation/native';
 const AccountManagement = ({ navigation }) => {
   const userData = {
     avatar: 'https://via.placeholder.com/100', // Thay bằng URL thật
@@ -13,6 +13,7 @@ const AccountManagement = ({ navigation }) => {
     birthDate: '29/12/2004',
     password: '********',
   };
+ 
 
   return (
     <View style={styles.container}>
@@ -58,6 +59,19 @@ const AccountManagement = ({ navigation }) => {
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity
+  style={styles.logoutButton}
+  onPress={() => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login', params: { clearInputs: true } }],
+    });
+  }}
+>
+  <Text style={styles.logoutButtonText}>Đăng xuất</Text>
+</TouchableOpacity>
+
+
     </View>
   );
 };
@@ -123,6 +137,19 @@ const styles = StyleSheet.create({
   arrow: {
     fontSize: 18,
     color: '#888',
+  },
+  logoutButton: {
+    backgroundColor: '#FF4B4B',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  logoutButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
