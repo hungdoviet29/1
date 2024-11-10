@@ -56,6 +56,7 @@ import RenameScreen from './Screens/RenameScreen';
 import CountrySelectScreen from './Screens/CountrySelectScreen';
 import ChangePhoneNumberScreen from './Screens/ChangePhoneNumberScreen';
 import FixPasswordScreen from './Screens/FixPasswordScreen';
+import OrderHistoryScreen from './Screens/OderHistoryScreen';
 
 // Import component Bottom Navigation
 import BottomNavigation from './components/bottomnavigation';
@@ -154,6 +155,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="CountrySelectScreen" component={CountrySelectScreen} />
         <Stack.Screen name="ChangePhoneNumberScreen" component={ChangePhoneNumberScreen} />
         <Stack.Screen name="FixPasswordScreen" component={FixPasswordScreen} />
+        <Stack.Screen name="OrderHistoryScreen" component={OrderHistoryScreen} />
       </Stack.Navigator>
 
       {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}

@@ -25,9 +25,11 @@ const orderSlice = createSlice({
             }
         },
         removeOrder(state, action) {
-            const idToRemove = action.payload;
-            state.orders = state.orders.filter(order => order.id !== idToRemove);
-        },
+            const idToRemove = String(action.payload); // Ép kiểu về string
+            console.log('Đang xóa đơn hàng với ID:', idToRemove);
+            state.orders = state.orders.filter(order => String(order.id) !== idToRemove);
+        }
+,        
         setPaymentMethod(state, action) {
             state.selectedPaymentMethod = action.payload; // Cập nhật phương thức thanh toán đã chọn
         },

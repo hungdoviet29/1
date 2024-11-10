@@ -42,7 +42,7 @@ const CustomDrawerContent = () => {
           <Text style={styles.menuText}>Help</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('OderHistoryScreen')}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('OrderHistoryScreen')}>
           <Image source={require('../acssets/orderhistory.png')} style={styles.menuIcon} />
           <Text style={styles.menuText}>Order History</Text>
         </TouchableOpacity>
