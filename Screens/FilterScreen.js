@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
 const FilterScreen = () => {
+    const navigation = useNavigation();
     const [promotion, setPromotion] = useState(false);
     const [selectedSort, setSelectedSort] = useState(null);
     const [selectedRating, setSelectedRating] = useState(null);
@@ -75,7 +77,7 @@ const FilterScreen = () => {
                     </TouchableOpacity>
                 ))}
             </View>
-            <TouchableOpacity style={styles.submitButton}>
+            <TouchableOpacity style={styles.submitButton} >
     <Text style={styles.submitButtonText}>Submit</Text>
 </TouchableOpacity>
 
