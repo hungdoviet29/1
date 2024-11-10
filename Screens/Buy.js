@@ -47,7 +47,7 @@ const ProductScreen = () => {
 
                 {/* Thông tin sản phẩm */}
                 <View style={styles.productInfo}>
-                    <Text style={styles.productTitle}>{product.danhMuc}</Text>
+                    <Text style={styles.productTitle}>{product.hang}</Text>
                     <Text style={styles.productName}>{product.ten}</Text>
                     <Text style={styles.productPrice}>{product.gia.toLocaleString()} VND</Text>
 
