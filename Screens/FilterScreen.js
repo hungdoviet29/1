@@ -77,9 +77,10 @@ const FilterScreen = () => {
                     </TouchableOpacity>
                 ))}
             </View>
-            <TouchableOpacity style={styles.submitButton} >
-    <Text style={styles.submitButtonText}>Submit</Text>
-</TouchableOpacity>
+            <TouchableOpacity
+                style={styles.submitButton}onPress={() => {navigation.navigate('Home', {}); }}>
+                <Text style={styles.submitButtonText}>Submit</Text>
+            </TouchableOpacity>
 
         </View>
     );
