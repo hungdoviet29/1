@@ -26,7 +26,7 @@ const CustomDrawerContent = () => {
           <Text style={styles.menuText}>Favorite</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Delivery Address')}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('OderScreen')}>
           <Image source={require('../acssets/Caricon.png')} style={styles.menuIcon} />
           <Text style={styles.menuText}>Order status</Text>
         </TouchableOpacity>
