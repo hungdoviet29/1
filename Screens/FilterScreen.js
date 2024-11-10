@@ -75,6 +75,10 @@ const FilterScreen = () => {
                     </TouchableOpacity>
                 ))}
             </View>
+            <TouchableOpacity style={styles.submitButton}>
+    <Text style={styles.submitButtonText}>Submit</Text>
+</TouchableOpacity>
+
         </View>
     );
 };
@@ -192,6 +196,21 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         alignItems: 'center',
         marginHorizontal: 4,
+    },
+    submitButton: {
+        backgroundColor: '#6C63FF',
+        padding: 15,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginHorizontal: 16,
+        marginTop: 20,
+        marginBottom: 30,
+    },
+    submitButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 
