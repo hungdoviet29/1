@@ -12,14 +12,8 @@ const laptopSchema = new mongoose.Schema(
       required: true,
       enum: ['Popular', 'Trending', 'News', 'Sale'], // Giới hạn các giá trị của danh mục
     },
-    soLuongTonKho: { type: Number, required: true },
-    danhGia: { type: Number, required: true },
-    cpu: { type: String, required: true },
-    ram: { type: String, required: true },
-    cardDoHoa: { type: String, required: true },
-    trongLuong: { type: String, required: true },
-    thoiLuongPin: { type: String, required: true },
-    khoangGia: { type: String, required: true },
+    soLuong: { type: Number, required: true },
+    hang: { type: String, required: true },
   },
   {
     collection: "laptops", // Tên collection trong MongoDB

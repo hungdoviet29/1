@@ -80,16 +80,9 @@ exports.addlaptop = async (req, res, next) => {
             gia: data.gia,
             hinhAnh: imageUrl,
             danhMuc: data.danhMuc,
-            soLuongTonKho: data.soLuongTonKho,
-            danhGia: data.danhGia,
-            cpu: data.cpu,
-            ram: data.ram,
-            cardDoHoa: data.cardDoHoa,
-            trongLuong: data.trongLuong,
-            thoiLuongPin: data.thoiLuongPin,
-            khoangGia: data.khoangGia,
+            soLuong: data.soLuong,
+            hang: data.hang,
         });
-        
         const savelaptop = await newlaptop.save();
         res.status(201).json(savelaptop);
     } catch (error) {
@@ -101,14 +94,11 @@ exports.updatelaptop = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { file } = req;
-        
         if (!file) {
             return res.status(400).json({ message: 'Không có tệp được gửi' });
         }
-        
         const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
         const data = req.body;
-
         const updatelaptop = {
             id: data.id,
             ten: data.ten,
@@ -116,14 +106,8 @@ exports.updatelaptop = async (req, res, next) => {
             gia: data.gia,
             hinhAnh: imageUrl,
             danhMuc: data.danhMuc,
-            soLuongTonKho: data.soLuongTonKho,
-            danhGia: data.danhGia,
-            cpu: data.cpu,
-            ram: data.ram,
-            cardDoHoa: data.cardDoHoa,
-            trongLuong: data.trongLuong,
-            thoiLuongPin: data.thoiLuongPin,
-            khoangGia: data.khoangGia,
+            soLuong: data.soLuong,
+            hang: data.hang,
         };
 
         let result = await laptopModel.findByIdAndUpdate(id, updatelaptop, { new: true });
