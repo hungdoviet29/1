@@ -44,9 +44,10 @@ const OrderScreen = ({ navigation }) => {
     const filteredOrders = orders.filter(order => {
       if (order.status && order.shippingInfo && order.totalAmount) {
         if (selectedTab === 'Tất cả') return true;
-        if (selectedTab === 'Chưa thanh toán') return order.status === 'Chưa thanh toán';
+        if (selectedTab === 'Chờ xác nhận') return order.status === 'Chờ xác nhận';
         if (selectedTab === 'Chờ vận chuyển') return order.status === 'Chờ vận chuyển';
         if (selectedTab === 'Đã vận chuyển') return order.status === 'Đã vận chuyển';
+        if (selectedTab === 'Đã hủy') return order.status === 'Đã hủy';
       }
       return false;
     });
@@ -69,7 +70,7 @@ const OrderScreen = ({ navigation }) => {
       </View>
 
         <View style={styles.tabs}>
-          {['Tất cả', 'Chưa thanh toán', 'Chờ vận chuyển', 'Đã vận chuyển'].map(
+          {['Tất cả', 'Chờ xác nhận', 'Chờ vận chuyển', 'Đã vận chuyển', 'Đã hủy'].map(
             tab => (
               <Text
                 key={tab}
