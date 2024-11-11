@@ -1,64 +1,55 @@
-// PortfolioManagement.js
 import React from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const categories = [
-  {
-    id: '1',
-    name: 'ACER',
-    status: 'HẾT HÀNG',
-    logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxMaWh99FF_Adpx6RAXXH48EUb295u90hNxA&s',
-  },
-  {
-    id: '2',
-    name: 'Apple',
-    status: 'SẮP HẾT',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/800px-Apple_logo_black.svg.png',
-  }
-];
 
 const PortfolioManagement = () => {
   const navigation = useNavigation();
 
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <Image source={{ uri: item.logo }} style={styles.logo} />
-      <View style={styles.categoryInfo}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.status}>
-          Trạng thái: <Text style={styles.statusText}>{item.status}</Text>
-        </Text>
-      </View>
-      <View style={styles.actions}>
-        <TouchableOpacity>
-          <Image source={require('../acssets/fix.png')} style={styles.icon} />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Image source={require('../acssets/bin.png')} style={styles.icon} />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Image source={require('../acssets/NextButton.png')} style={styles.iconNext} />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  // Dữ liệu giả để hiển thị danh mục và số lượng sản phẩm
+  const categories = [
+    { name: 'ALL', count: 34 },
+    { name: 'Popular', count: 12 },
+    { name: 'Sale', count: 11 },
+    { name: 'Student', count: 11 },
+  ];
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.navigate('AdminHome')} style={styles.backButton}>
+        {/* Nút Quay Lại */}
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
       </TouchableOpacity>
-      <Text style={styles.title}>Quản lí danh mục</Text>
-      <FlatList
-        data={categories}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-      />
-      {/* Thay đổi sự kiện onPress để điều hướng đến màn hình CatalogAdd */}
-      <TouchableOpacity onPress={() => navigation.navigate('CatalogAdd')} style={styles.addButton}>
-        <Image source={require('../acssets/them.png')} style={styles.addButtonImage} />
-      </TouchableOpacity>
+      <Text style={styles.header}>Quản lí danh mục</Text>
+      <View style={styles.content}>
+        <ScrollView style={styles.scrollView}>
+          {categories.map((category, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.categoryContainer}
+              onPress={() => navigation.navigate('PortfolioDetails', { category: category.name })}
+            >
+              <Text style={styles.categoryName}>{category.name}</Text>
+              <Text style={styles.productCount}>{category.count} Product</Text>
+              <TouchableOpacity style={styles.deleteButton}>
+                <Image
+                  source={require('../acssets/bin.png')} // Đường dẫn tới ảnh icon thùng rác
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        <TouchableOpacity 
+        style={styles.addButton}
+        onPress={() => navigation.navigate('PortfolioAdd')}
+        >
+          <Image
+            source={require('../acssets/them.png')} // Đường dẫn tới ảnh icon nút thêm
+            style={styles.addIcon}
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -66,72 +57,61 @@ const PortfolioManagement = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#E5E5E5',
+    paddingTop: 20,
+  },
+  header: {
+    textAlign:'center',
+    fontSize: 18,
+    color:'black',
+    fontWeight: 'bold',
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+  },
+  content: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
     padding: 20,
+    marginHorizontal: 20,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: 'black',
-    marginBottom: 20,
-  },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f8f8',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
-  },
-  logo: {
-    width: 75,
-    height: 90,
-    borderRadius: 10,
-    marginRight: 15,
-  },
-  categoryInfo: {
-    flex: 1,
-  },
-  name: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#4A00E0',
+    marginBottom: 20,
   },
-  status: {
-    fontSize: 14,
-    color: '#666',
+  scrollView: {
+    flex: 1,
   },
-  statusText: {
-    color: '#E53935',
-    fontWeight: 'bold',
-  },
-  actions: {
+  buttonsContainer: {
     flexDirection: 'column',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  categoryContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  categoryName: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#6C4AB6',
+  },
+  productCount: {
+    fontSize: 14,
+    color: '#333',
+    marginRight: 10,
+  },
+  deleteButton: {
+    padding: 5,
   },
   icon: {
-    width: 24,
-    height: 24,
-    marginVertical: 5,
-  },
-  iconNext: {
-    width: 24,
-    height: 14,
-    marginVertical: 5,
-  },
-  backButton: {
-    position: 'absolute',
-    top: 20,
-    left: 10,
-    zIndex: 1,
-  },
-  backIcon: {
     width: 24,
     height: 24,
   },
@@ -139,11 +119,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  addButtonImage: {
-    width: 40,
-    height: 40,
-  }
+  addIcon: {
+    width: 50,
+    height: 50,
+  },
 });
 
 export default PortfolioManagement;
