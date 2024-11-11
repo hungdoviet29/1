@@ -93,7 +93,11 @@ const AppNavigator = ({ navigationRef }) => {
     'ProductDetails',
     'UserDetails',
     'ChangePhoneNumberScreen',
-    'FixPasswordScreen'
+    'FixPasswordScreen',
+    'PortfolioAdd',
+    'ProductBrandScreen',
+    'ProductCategoryScreen',
+    ,'PortfolioDetails'
     
   ];
 
