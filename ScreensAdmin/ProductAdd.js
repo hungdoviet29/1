@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   headerText: {
+    color: 'black',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: '#8A2BE2',
+    color: 'black',
     fontWeight: 'bold',
     marginBottom: 5,
   },

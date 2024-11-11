@@ -18,6 +18,9 @@ import CatalogAdd from './ScreensAdmin/CatalogAdd';
 import ProductAdd from './ScreensAdmin/ProductAdd';
 import ProductDetails from './ScreensAdmin/ProductDetails';
 import UserDetails from './ScreensAdmin/UserDetails';
+import PortfolioDetails from './ScreensAdmin/PortfolioDetails';
+import PortfolioAdd from './ScreensAdmin/PortfolioAdd';
+import ProductBrandScreen from './ScreensAdmin/ProductBrandScreen';
 
 
 
@@ -91,6 +94,7 @@ const AppNavigator = ({ navigationRef }) => {
     'UserDetails',
     'ChangePhoneNumberScreen',
     'FixPasswordScreen'
+    
   ];
 
   useEffect(() => {
@@ -156,6 +160,9 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="ChangePhoneNumberScreen" component={ChangePhoneNumberScreen} />
         <Stack.Screen name="FixPasswordScreen" component={FixPasswordScreen} />
         <Stack.Screen name="OrderHistoryScreen" component={OrderHistoryScreen} />
+        <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
+        <Stack.Screen name="PortfolioAdd" component={PortfolioAdd} />
+        <Stack.Screen name="ProductBrandScreen" component={ProductBrandScreen} />
       </Stack.Navigator>
 
       {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}

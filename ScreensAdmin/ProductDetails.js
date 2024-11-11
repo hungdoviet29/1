@@ -1,152 +1,50 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-export default function ProductDetails() {
+const ProductDetailsScreen = () => {
   const navigation = useNavigation();
 
-  // State quản lý các trường dữ liệu và chế độ chỉnh sửa
-  const [isEditing, setIsEditing] = useState({
-    label: false,
-    description: false,
-    distributor: false,
-    price: false,
-    status: false,
-    productCode: false,
-  });
-  
-  const [productDetails, setProductDetails] = useState({
-    label: 'ACER',
-    description: 'Mô tả sản phẩm',
-    distributor: 'Nhà phân phối',
-    price: '50 Tô Hiệu, Quận Hoàn Kiếm, Hà Nội',
-    status: 'Tình trạng hàng hóa',
-    productCode: 'Mã sản phẩm',
-  });
-
-  const handleEdit = (field) => {
-    setIsEditing((prevState) => ({ ...prevState, [field]: !prevState[field] }));
-  };
-
-  const handleChangeText = (field, value) => {
-    setProductDetails((prevState) => ({ ...prevState, [field]: value }));
-  };
-
-  const handleSave = () => {
-    Alert.alert(
-      "Cập nhật thành công",
-      "Thông tin sản phẩm đã được cập nhật.",
-      [
-        {
-          text: "OK",
-          onPress: () => navigation.navigate('ProductManagementScreen', { updatedProduct: productDetails }),
-        },
-      ]
-    );
-  };
+  const [brandName, setBrandName] = useState("ACER"); // State để lưu tên thương hiệu có thể chỉnh sửa
 
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
       </TouchableOpacity>
-      <Text style={styles.headerText}>PRODUCT DETAILS</Text>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Image 
-          source={require('../acssets/acersp.png')}
-          style={styles.productImage}
+      <Text style={styles.title}>PRODUCT DETAILS</Text>
+      <Image source={require('../acssets/logo_acer.png')} style={styles.logo} />
+      <View style={styles.nameContainer}>
+        <Text style={styles.nameLabel}>Name: </Text>
+        <TextInput
+          style={styles.brandNameInput}
+          value={brandName}
+          onChangeText={(text) => setBrandName(text)}
         />
-        
-        {/* Các trường thông tin */}
-        {Object.keys(productDetails).map((field, index) => (
-          <View style={styles.infoSection} key={index}>
-            {isEditing[field] ? (
-              <TextInput
-                style={styles.input}
-                value={productDetails[field]}
-                onChangeText={(text) => handleChangeText(field, text)}
-              />
-            ) : (
-              <Text style={styles.fieldLabel}>{productDetails[field]}</Text>
-            )}
-            <TouchableOpacity onPress={() => handleEdit(field)} style={styles.editIcon}>
-              <Text>✏️</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </ScrollView>
-      <TouchableOpacity onPress={handleSave} style={styles.okButton}>
-        <Text style={styles.okButtonText}>OK</Text>
+      </View>
+      <TouchableOpacity style={styles.editButton}>
+        <Image source={require('../acssets/image_hang.png')} style={styles.editIcon} />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.okButton}>
+        <Text style={styles.okText}>Ok</Text>
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F6EDED',
-    padding: 20,
-  },
-  headerText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  content: {
-    alignItems: 'center',
-  },
-  productImage: {
-    width: 150,
-    height: 100,
-    marginBottom: 20,
-  },
-  infoSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
-  },
-  label: {
-    fontSize: 16,
-    color: '#8A2BE2',
-    fontWeight: 'bold',
-    flex: 1,
-  },
-  fieldLabel: {
-    fontSize: 14,
-    color: '#999',
-    flex: 1,
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#000',
-    flex: 2,
-  },
-  editIcon: {
-    marginLeft: 10,
-  },
-  okButton: {
-    backgroundColor: '#8DC9C1',
-    paddingVertical: 10,
-    alignItems: 'center',
-    borderRadius: 20,
-    marginTop: 20,
-    alignSelf: 'center',
-    width: '50%',
-  },
-  okButtonText: {
-    fontSize: 16,
-    color: '#FFF',
-    fontWeight: 'bold',
-  },
-  input: {
-    flex: 1,
-    fontSize: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#CCC',
-  },
+  container: { flex: 1, padding: 20, alignItems: 'center', backgroundColor: '#F0F0F0' },
+  backButton: { alignSelf: 'flex-start' },
+  backText: { fontSize: 24 },
+  title: { fontSize: 24, fontWeight: 'bold', marginVertical: 20 },
+  logo: { width: 100, height: 100, resizeMode: 'contain', marginBottom: 20 },
+  nameContainer: { flexDirection: 'row', alignItems: 'center' },
+  nameLabel: { fontSize: 18 },
+  brandNameInput: { fontSize: 18, color: '#6C63FF', borderBottomWidth: 1, borderBottomColor: '#6C63FF', minWidth: 70, textAlign: 'center' },
+  editButton: { position: 'absolute', right: 120, top: 190 },
+  editIcon: { width: 24, height: 24, resizeMode: 'contain' },
+  okButton: { marginTop: 30, backgroundColor: '#68C3A3', paddingHorizontal: 30, paddingVertical: 10, borderRadius: 10 },
+  okText: { color: '#FFF', fontSize: 20 }
 });
+
+export default ProductDetailsScreen;

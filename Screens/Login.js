@@ -29,7 +29,7 @@ const Login = ({ route }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://192.168.101.9:3000/users');
+      const response = await fetch('http://192.168.0.245:3000/users');
       const users = await response.json();
       const user = users.find(
         user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau
