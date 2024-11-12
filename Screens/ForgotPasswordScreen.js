@@ -1,14 +1,31 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ImageBackground,
+} from 'react-native';
+import axios from 'axios'; // Cài axios nếu chưa cài: npm install axios
 
-const ForgotPasswordScreen = ({ navigation }) => {
+const ForgotPasswordScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
 
-  const handlePasswordReset = () => {
+  const handlePasswordReset = async () => {
     if (email) {
-      // Gọi API gửi yêu cầu đặt lại mật khẩu
-      setMessage('An email has been sent to reset your password');
+      try {
+        // Gọi API gửi yêu cầu đặt lại mật khẩu
+        const response = await axios.post(
+          'http://192.168.0.6:3000/users/forgotPassword',
+          {email},
+        );
+        setMessage(response.data.message); // Hiển thị thông báo từ server
+      } catch (error) {
+        console.error('Error sending password reset email:', error.message);
+        setMessage(`Error: ${error.message}`);
+      }
     } else {
       setMessage('Please enter your email');
     }
@@ -16,11 +33,9 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground 
+      <ImageBackground
         source={require('../acssets/pass.png')} // Đảm bảo đường dẫn hình ảnh là chính xác
-        style={styles.background}
-      >
-      </ImageBackground>
+        style={styles.background}></ImageBackground>
 
       <Text style={styles.title}>FORGOT PASSWORD</Text>
 
@@ -38,7 +53,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
       {message ? <Text style={styles.message}>{message}</Text> : null}
 
       <TouchableOpacity style={styles.button} onPress={handlePasswordReset}>
-        <Text style={styles.buttonText}>SIGN IN</Text>
+        <Text style={styles.buttonText}>SEND RESET LINK</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
@@ -61,19 +76,6 @@ const styles = StyleSheet.create({
     height: 300,
     width: '100%',
     marginBottom: 40,
-  },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 40,
-    color: '#FFF',
-    paddingLeft: 20,
-  },
-  subText: {
-    fontSize: 14,
-    color: '#FFF',
-    paddingLeft: 20,
-    paddingBottom: 10,
   },
   title: {
     fontSize: 22,

@@ -1,33 +1,69 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 
-const FixPasswordScreen = ({ navigation }) => {
+const FixPasswordScreen = ({navigation}) => {
+  const [username, setUsername] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
-  const handleSubmit = () => {
-    // Logic for submitting the password change
+  const handleSubmit = async () => {
     if (newPassword !== confirmNewPassword) {
       alert('Mật khẩu mới và xác nhận mật khẩu không khớp.');
       return;
     }
-    console.log('Changing password with the provided information');
-    // Add logic for updating the password here
+    try {
+      const response = await fetch(
+        'http://192.168.0.6:3000/users/changePassword',
+        {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            tenDangNhap: username,
+            oldPassword,
+            newPassword,
+          }),
+        },
+      );
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+        navigation.goBack();
+      } else {
+        alert(data.message || 'Có lỗi xảy ra');
+      }
+    } catch (error) {
+      alert('Lỗi kết nối');
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}>
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
         <Text style={styles.header}>Fix Password</Text>
       </View>
 
-      <Text style={styles.infoText}>
-        Nhập số điện thoại di động để nhận mã xác nhận miễn phí
-      </Text>
+      {/* Username Input */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Nhập tên đăng nhập"
+          value={username}
+          onChangeText={setUsername}
+        />
+        <Text style={styles.icon}>👤</Text>
+      </View>
 
       {/* Old Password Input */}
       <View style={styles.inputContainer}>
@@ -74,31 +110,15 @@ const FixPasswordScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9F9F9',
-    padding: 20,
-  },
+  container: {flex: 1, backgroundColor: '#F9F9F9', padding: 20},
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
   },
-  backButton: {
-    marginRight: 10,
-  },
-  backIcon: {
-    fontSize: 24,
-  },
-  header: {
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 20,
-  },
+  backButton: {marginRight: 10},
+  backIcon: {fontSize: 24},
+  header: {fontSize: 22, fontWeight: 'bold'},
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -109,26 +129,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: '#FFFFFF',
   },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    paddingVertical: 10,
-  },
-  icon: {
-    fontSize: 18,
-    color: '#999',
-  },
+  input: {flex: 1, fontSize: 16, paddingVertical: 10},
+  icon: {fontSize: 18, color: '#999'},
   submitButton: {
     backgroundColor: '#6C63FF',
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',
   },
-  submitButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  submitButtonText: {color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'},
 });
 
 export default FixPasswordScreen;

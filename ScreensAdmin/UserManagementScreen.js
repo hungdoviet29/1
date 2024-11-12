@@ -16,7 +16,7 @@ const UserManagementScreen = ({navigation}) => {
   // Hàm gọi API lấy danh sách người dùng
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://192.168.0.3:3000/users'); // Đặt URL đúng
+      const response = await axios.get('http://192.168.0.6:3000/users'); // Đặt URL đúng
       setUsers(response.data);
     } catch (error) {
       console.error('Lỗi khi lấy dữ liệu người dùng:', error);
@@ -37,7 +37,7 @@ const UserManagementScreen = ({navigation}) => {
           try {
             // Gọi API xóa người dùng
             console.log('User ID:', userId); // Kiểm tra giá trị của userId
-            axios.delete(`http://192.168.0.3:3000/users/${userId}`);
+            axios.delete(`http://192.168.0.6:3000/users/${userId}`);
 
             setUsers(users.filter(user => user._id !== userId)); // Cập nhật danh sách người dùng
           } catch (error) {

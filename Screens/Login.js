@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,9 @@ import {
   ImageBackground,
   StyleSheet,
 } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 
-const Login = ({ route }) => {
+const Login = ({route}) => {
   const navigation = useNavigation();
   const [tenDangNhap, setTenDangNhap] = useState('');
   const [matKhau, setMatKhau] = useState('');
@@ -24,17 +24,16 @@ const Login = ({ route }) => {
         setMatKhau('');
         setError(null);
       }
-    }, [route.params?.clearInputs])
+    }, [route.params?.clearInputs]),
   );
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://192.168.0.245:3000/users');
+      const response = await fetch('http://192.168.0.6:3000/users');
       const users = await response.json();
       const user = users.find(
-        user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau
+        user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau,
       );
-
       if (user) {
         navigation.navigate(user.roll === 1 ? 'AdminHome' : 'Home');
       } else {
@@ -80,23 +79,25 @@ const Login = ({ route }) => {
         {error && <Text style={styles.errorText}>{error}</Text>}
 
         <View style={styles.optionsContainer}>
-  <TouchableOpacity onPress={() => setRememberMe(!rememberMe)} style={styles.checkboxContainer}>
-    <Text style={styles.rememberMeText}>Remember me</Text>
-    <Image
-      source={
-        rememberMe
-          ? require('../acssets/checkbox-checked.png')
-          : require('../acssets/checkbox-unchecked.png')
-      }
-      style={styles.checkbox}
-    />
-  </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setRememberMe(!rememberMe)}
+            style={styles.checkboxContainer}>
+            <Text style={styles.rememberMeText}>Remember me</Text>
+            <Image
+              source={
+                rememberMe
+                  ? require('../acssets/checkbox-checked.png')
+                  : require('../acssets/checkbox-unchecked.png')
+              }
+              style={styles.checkbox}
+            />
+          </TouchableOpacity>
 
-  <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
-    <Text style={styles.forgotPassword}>Forgot Password?</Text>
-  </TouchableOpacity>
-</View>
-
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+            <Text style={styles.forgotPassword}>Forgot Password?</Text>
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>SIGN IN</Text>
@@ -168,8 +169,8 @@ const styles = StyleSheet.create({
   checkbox: {
     width: 24,
     height: 24,
-    left:12,
-    top:3
+    left: 12,
+    top: 3,
   },
   rememberMeText: {
     fontSize: 14,

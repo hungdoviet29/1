@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-//const bcrypt = require('bcryptjs'); // Import bcryptjs để mã hóa mật khẩu
 const db = require('./db');
 
 const userSchema = new mongoose.Schema(
@@ -24,28 +23,9 @@ const userSchema = new mongoose.Schema(
   },
 );
 
-// ================ Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu ==================
-// userSchema.pre('save', async function (next) {
-//   if (this.isModified('matKhau') || this.isNew) {
-//     try {
-//       const salt = await bcrypt.genSalt(10); // Tạo salt
-//       this.matKhau = await bcrypt.hash(this.matKhau, salt); // Mã hóa mật khẩu
-//       next();
-//     } catch (error) {
-//       next(error);
-//     }
-//   } else {
-//     return next();
-//   }
-// });
-
-// Kiểm tra mật khẩu khi đăng nhập
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  try {
-    return await bcrypt.compare(candidatePassword, this.matKhau); // So sánh mật khẩu
-  } catch (error) {
-    throw error;
-  }
+// So sánh mật khẩu trực tiếp (không sử dụng bcrypt)
+userSchema.methods.comparePassword = function (candidatePassword) {
+  return this.matKhau === candidatePassword; // So sánh trực tiếp mật khẩu
 };
 
 const UserModel = mongoose.model('User', userSchema);

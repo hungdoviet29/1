@@ -5,8 +5,11 @@ const {
   login,
   getAllUsers,
   deleteUser,
+  changePassword,
+  forgotPassword, // Thêm forgotPassword vào
 } = require('../controllers/auth.controller');
 const {UserModel} = require('../models/user.model');
+
 // Route lấy danh sách người dùng
 router.get('/', async function (req, res, next) {
   try {
@@ -18,9 +21,6 @@ router.get('/', async function (req, res, next) {
   }
 });
 
-// Route lấy danh sách người dùng
-//router.get('/', getAllUsers);
-
 // Xử lý xóa người dùng
 router.delete('/:id', deleteUser); // Đảm bảo rằng bạn đang sử dụng đường dẫn đúng
 
@@ -29,5 +29,11 @@ router.post('/register', register);
 
 // Route đăng nhập
 router.post('/login', login);
+
+// Route thay đổi mật khẩu
+router.put('/changePassword', changePassword);
+
+// Route quên mật khẩu
+router.post('/forgotPassword', forgotPassword); // Thêm route forgotPassword
 
 module.exports = router;

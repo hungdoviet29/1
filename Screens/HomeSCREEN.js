@@ -28,22 +28,22 @@ const HomeScreen = () => {
     // Xác định link API cho từng danh mục
     switch (category) {
       case 'Popular':
-        apiUrl = 'http://192.168.0.245:3000/LapTop/getPopularLapTop';
+        apiUrl = 'http://192.168.0.6:3000/LapTop/getPopularLapTop';
         break;
       case 'Trending':
-        apiUrl = 'http://192.168.0.245:3000/LapTop/getTrendingLapTop';
+        apiUrl = 'http://192.168.0.6:3000/LapTop/getTrendingLapTop';
         break;
       case 'News':
-        apiUrl = 'http://192.168.0.245:3000/LapTop/getNewsLapTop';
+        apiUrl = 'http://192.168.0.6:3000/LapTop/getNewsLapTop';
         break;
       case 'Sale':
-        apiUrl = 'http://192.168.0.245:3000/LapTop/getSaleLapTop';
+        apiUrl = 'http://192.168.0.6:3000/LapTop/getSaleLapTop';
         break;
       case 'All':
-        apiUrl = 'http://192.168.0.245:3000/LapTop/getListLapTop';
+        apiUrl = 'http://192.168.0.6:3000/LapTop/getListLapTop';
         break;
       default:
-        apiUrl = 'http://192.168.0.245:3000/LapTop/getListLapTop';
+        apiUrl = 'http://192.168.0.6:3000/LapTop/getListLapTop';
     }
 
     axios
@@ -112,7 +112,7 @@ const HomeScreen = () => {
       </View>
 
       <View style={styles.categories}>
-        {['All','Popular', 'Trending', 'News', 'Sale'].map(category => (
+        {['All', 'Popular', 'Trending', 'News', 'Sale'].map(category => (
           <TouchableOpacity
             key={category}
             onPress={() => handleCategoryPress(category)}>
