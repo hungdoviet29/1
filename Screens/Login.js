@@ -29,13 +29,13 @@ const Login = ({route}) => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://192.168.0.6:3000/users');
+      const response = await fetch('http://192.168.101.9:3000/users');
       const users = await response.json();
       const user = users.find(
         user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau,
       );
       if (user) {
-        navigation.navigate(user.roll === 1 ? 'AdminHome' : 'Home');
+        navigation.navigate(user.roll === 1 ? 'AdminHome' : 'MainHomeScreen');
       } else {
         setError('Thông tin đăng nhập không đúng.');
       }
