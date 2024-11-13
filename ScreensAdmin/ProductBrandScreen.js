@@ -5,6 +5,10 @@ import { useNavigation } from '@react-navigation/native';
 const ProductBrandScreen = () => {
   const navigation = useNavigation();
 
+  const handleAdd = () => {
+    navigation.navigate('ProductAdd');
+  };
+
   // Dữ liệu giả để hiển thị danh sách sản phẩm
   const products = [
     { id: '1', name: 'Asus vivobook', price: 120, originalPrice: 240, discount: 50, rating: 4.5 },
@@ -55,7 +59,7 @@ const ProductBrandScreen = () => {
           numColumns={2}
           contentContainerStyle={styles.productList}
         />
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton}  onPress={handleAdd}>
           <Image
             source={require('../acssets/them.png')}
             style={styles.addIcon}

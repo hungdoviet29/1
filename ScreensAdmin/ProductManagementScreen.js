@@ -38,9 +38,8 @@ const ProductManagementScreen = () => {
   };
 
   const handleAdd = () => {
-    navigation.navigate('ProductAdd');
+    navigation.navigate('AddBrand');
   };
-
   const handleBrandPress = (id) => {
     navigation.navigate('ProductBrandScreen', { brandId: id });
   };

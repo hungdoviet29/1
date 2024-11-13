@@ -172,9 +172,6 @@ const styles = StyleSheet.create({
     top: 20,
     left: 10,
   },
-  backIcon: {
-    width: 24,
-    height: 24,
-  },
+  
 });
 

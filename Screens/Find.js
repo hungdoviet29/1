@@ -24,7 +24,7 @@ const FindScreen = () => {
     }
 
     setLoading(true);
-    let apiUrl = `http://192.168.101.9:3000/LapTop/getListLapTop?search=${query}`;
+    let apiUrl = `http://192.168.0.245:3000/LapTop/getListLapTop?search=${query}`;
 
     try {
       const response = await fetch(apiUrl);

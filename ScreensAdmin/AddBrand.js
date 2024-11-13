@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const ProductDetailsScreen = () => {
-  const navigation = useNavigation();
+const AddBrand = () => {
+const navigation = useNavigation();
   const [productName, setProductName] = useState('');
+
+
   return (
     <View style={styles.container}>
-        {/* Nút quay lại */}
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        
+      {/* Nút quay lại */}
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
       </TouchableOpacity>
 
       {/* Tiêu đề */}
-      <Text style={styles.title}>PRODUCT DETAILS</Text>
+      <Text style={styles.title}>PRODUCT ADD</Text>
 
       {/* Khu vực hình ảnh sản phẩm */}
       <View style={styles.imageContainer}>
         <Image
-          source={require('../acssets/logo_acer.png')} // Thay bằng tên file của ảnh sản phẩm
+          source={require('../acssets/logoNoBG.png')} // Thay bằng tên file của ảnh sản phẩm
           style={styles.image}
         />
         <TouchableOpacity style={styles.uploadButton}>
@@ -34,7 +37,7 @@ const ProductDetailsScreen = () => {
         <Text style={styles.label}>Name:</Text>
         <TextInput
           style={styles.input}
-          placeholder="ACER"
+          placeholder=""
           value={productName}
           onChangeText={setProductName}
         />
@@ -78,8 +81,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 200,
     resizeMode: 'contain',
   },
   uploadButton: {
@@ -123,4 +126,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductDetailsScreen;
+export default AddBrand;
