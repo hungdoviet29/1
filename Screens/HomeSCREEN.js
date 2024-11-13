@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState, useEffect } from 'react';
+
 import {
   View,
   Text,
@@ -10,6 +11,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
+
 import {useDispatch, useSelector} from 'react-redux';
 import {addToFavorites, removeFromFavorites} from '../redux/favoriteSlice';
 
@@ -28,22 +30,22 @@ const HomeScreen = () => {
     // Xác định link API cho từng danh mục
     switch (category) {
       case 'Popular':
-        apiUrl = 'http://192.168.0.6:3000/LapTop/getPopularLapTop';
+        apiUrl = 'http://192.168.101.9:3000/LapTop/getPopularLapTop';
         break;
       case 'Trending':
-        apiUrl = 'http://192.168.0.6:3000/LapTop/getTrendingLapTop';
+        apiUrl = 'http://192.168.101.9:3000/LapTop/getTrendingLapTop';
         break;
       case 'News':
-        apiUrl = 'http://192.168.0.6:3000/LapTop/getNewsLapTop';
+        apiUrl = 'http://192.168.101.9:3000/LapTop/getNewsLapTop';
         break;
       case 'Sale':
-        apiUrl = 'http://192.168.0.6:3000/LapTop/getSaleLapTop';
+        apiUrl = 'http://192.168.101.9:3000/LapTop/getSaleLapTop';
         break;
       case 'All':
-        apiUrl = 'http://192.168.0.6:3000/LapTop/getListLapTop';
+        apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
         break;
       default:
-        apiUrl = 'http://192.168.0.6:3000/LapTop/getListLapTop';
+        apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
     }
 
     axios
