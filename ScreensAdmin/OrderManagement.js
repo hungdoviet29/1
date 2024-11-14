@@ -1,102 +1,93 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Hook để lấy navigation
+import React, { useState } from 'react';
+import { View, Text, Image, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const OrderItem = ({ order }) => {
-  const navigation = useNavigation(); // Hook để lấy navigation
-
   return (
-    <View>
-      <View style={styles.card}>
-        <Text style={styles.storeName}>{order.storeName}</Text>
+    <View style={styles.card}>
+      {/* Store Logo and Name */}
+      <View style={styles.logoContainer}>
+        <Image source={require('../acssets/logoNoBG.png')} style={styles.logo} />
+        <Text style={styles.storeName}>LAPSTORE</Text>
+      </View>
 
-        <View style={styles.productRow}>
-          <Image
-            source={order.productImage}
-            style={styles.productImage}
-          />
-          <View style={styles.productInfo}>
-            <Text style={styles.productName}>{order.productName}</Text>
-            <Text style={styles.productPrice}>{order.productPrice}</Text>
-            <Text style={styles.productQuantity}>SL: {order.productQuantity}</Text>
+      <View style={styles.orderInfo}>
+        <Text style={styles.orderText}>Mã đơn hàng: {order.orderId}</Text>
+        <Text style={styles.orderText}>Tên khách hàng: {order.customerName}</Text>
+        <Text style={styles.orderText}>Ngày: {order.orderDate}</Text>
+
+        {/* Product Table */}
+        <View style={styles.table}>
+          <View style={styles.tableRowHeader}>
+            <Text style={styles.tableHeader}>Sản phẩm</Text>
+            <Text style={styles.tableHeader}>SL</Text>
+            <Text style={styles.tableHeader}>Giá</Text>
+            <Text style={styles.tableHeader}>Tổng tiền</Text>
           </View>
+          {order.products.map((product, index) => (
+            <View key={index} style={styles.tableRow}>
+              <Text style={styles.tableCell}>{product.name}</Text>
+              <Text style={styles.tableCell}>{product.quantity}</Text>
+              <Text style={styles.tableCell}>{product.price}</Text>
+              <Text style={styles.tableCell}>{product.total}</Text>
+            </View>
+          ))}
         </View>
 
-        <View style={styles.orderInfo}>
-          <Text style={styles.orderText}>Mã đơn hàng: {order.orderId}</Text>
-          <Text style={styles.orderText}>Tên khách hàng: {order.customerName}</Text>
-          <Text style={styles.orderText}>SDT: {order.customerPhone}</Text>
-          <Text style={styles.orderText}>Tiền thanh toán: {order.totalPrice}</Text>
-          <Text style={styles.orderText}>Trạng thái: {order.status}</Text>
-          <Text style={styles.orderText}>Ngày đặt: {order.orderDate}</Text>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Hủy đơn', 'Đơn hàng đã được hủy.')}>
-            <Text style={styles.buttonText}>Hủy đơn</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Sửa đơn', 'Đơn hàng đã được sửa.')}>
-            <Text style={styles.buttonText}>Sửa đơn</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('OrderDetails', { userId: order.orderId })}>
-            <Text style={styles.buttonText}>Chi tiết</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.totalText}>TỔNG: {order.totalPrice}</Text>
+        <Text style={styles.orderText}>Tình trạng: {order.paymentStatus}</Text>
+        <Text style={styles.orderText}>Trạng thái: {order.orderStatus}</Text>
       </View>
     </View>
   );
 };
 
 const OrderManagement = () => {
-  const navigation = useNavigation(); // Thêm useNavigation hook để lấy đối tượng navigation
+  const navigation = useNavigation();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const orders = [
     {
       storeName: 'LapStore',
-      productImage: require('../acssets/Asus1.png'),
-      productName: 'MacBook M1 Pro',
-      productPrice: '50.000.000 đ',
-      productQuantity: 1,
       orderId: '28242845',
       customerName: 'Nguyễn Đức Trọng',
-      customerPhone: '0987654321',
-      totalPrice: '50.000.000 đ',
-      status: 'Đặt hàng thành công',
-      orderDate: '08/01/2024',
+      orderDate: '14/11/2024',
+      products: [
+        { name: 'MacbookM2', quantity: 1, price: '20,000,000', total: '20,000,000' },
+        { name: 'MSI gaming', quantity: 1, price: '20,000,000', total: '20,000,000' },
+        { name: 'MSI gaming', quantity: 1, price: '20,000,000', total: '20,000,000' },
+      ],
+      totalPrice: '60,000,000',
+      paymentStatus: 'Chưa thanh toán',
+      orderStatus: 'Chờ xác nhận',
     },
-    {
-      storeName: 'LapStore',
-      productImage: require('../acssets/Asus1.png'),
-      productName: 'Dell XPS 13',
-      productPrice: '45.000.000 đ',
-      productQuantity: 1,
-      orderId: '28242846',
-      customerName: 'Trần Văn A',
-      customerPhone: '0123456789',
-      totalPrice: '45.000.000 đ',
-      status: 'Đặt hàng thành công',
-      orderDate: '09/01/2024',
-    },
+    // Additional orders can be added here
   ];
 
-  const handleBackPress = () => {
-    navigation.goBack(); // Dùng navigation.goBack() để quay lại màn hình trước
-  };
+  const filteredOrders = orders.filter(order =>
+    order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    order.orderId.includes(searchQuery)
+  );
 
   return (
     <ScrollView style={styles.container}>
       {/* Back Button */}
-      <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Image source={require('../acssets/Back_Button.png')} style={styles.backIcon} />
       </TouchableOpacity>
 
-      <View style={styles.headerContainer}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.headerTitle}>Đơn hàng</Text>
-        </View>
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Image source={require('../acssets/Search.png')} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Tìm kiếm "
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
       </View>
 
-      {orders.map((order, index) => (
+      {filteredOrders.map((order, index) => (
         <OrderItem key={index} order={order} />
       ))}
     </ScrollView>
@@ -108,25 +99,36 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#f9f9f9',
   },
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
   backButton: {
-    marginRight: 10,
+    position: 'absolute',
+    top: 20,
+    left: 16,
+    zIndex: 1,
   },
   backIcon: {
     width: 24,
     height: 24,
   },
-  titleContainer: {
-    flex: 1,
+  searchContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginTop: 50,
+    marginBottom: 16,
+    paddingHorizontal: 10,
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  searchIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 8,
+    tintColor: '#888',
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    fontSize: 16,
+    color: '#333',
   },
   card: {
     backgroundColor: '#fff',
@@ -139,69 +141,70 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginBottom: 16,
   },
-  storeName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  productRow: {
-    flexDirection: 'row',
+  logoContainer: {
     alignItems: 'center',
     marginBottom: 10,
   },
-  productImage: {
-    width: 100,
-    height: 100,
-    marginRight: 10,
+  logo: {
+    width: 40,
+    height: 40,
     resizeMode: 'contain',
   },
-  productInfo: {
-    flex: 1,
-    alignItems: 'flex-start',
-  },
-  productName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'left',
-  },
-  productPrice: {
-    fontSize: 16,
-    color: '#000',
-    textAlign: 'left',
-  },
-  productQuantity: {
+  storeName: {
     fontSize: 14,
-    color: '#888',
-    textAlign: 'left',
+    fontWeight: 'bold',
+    marginTop: 5,
+    textAlign: 'center',
   },
   orderInfo: {
     marginTop: 10,
-    alignItems: 'flex-start',
     width: '100%',
   },
   orderText: {
     fontSize: 14,
     marginVertical: 2,
-    textAlign: 'left',
   },
-  buttonContainer: {
+  table: {
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+  },
+  tableRowHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 20,
+    backgroundColor: '#f0f0f0',
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
   },
-  button: {
-    backgroundColor: '#87CEEB',
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    alignItems: 'center',
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
   },
-  buttonText: {
-    color: '#fff',
+  tableHeader: {
+    fontWeight: 'bold',
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 14,
+    paddingVertical: 8,
+    borderRightWidth: 1,
+    borderColor: '#ddd',
+  },
+  tableCell: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 14,
+    paddingVertical: 8,
+    borderRightWidth: 1,
+    borderColor: '#ddd',
+  },
+  totalText: {
     fontSize: 16,
     fontWeight: 'bold',
+    marginTop: 10,
+    textAlign: 'right',
   },
 });
 
