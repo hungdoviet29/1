@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,35 +7,31 @@ import {
   ImageBackground,
   StyleSheet,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 const Register = () => {
   const navigation = useNavigation();
 
-  // Khai báo các state để lưu thông tin đăng ký
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleRegister = async () => {
-    // Kiểm tra xem mật khẩu có khớp không
     if (password !== confirmPassword) {
       setError('Mật khẩu không khớp.');
       return;
     }
 
-    // Tạo đối tượng người dùng mới
     const newUser = {
       tenDangNhap: email,
       matKhau: password,
-      vaiTro: 'user', // Thêm vai trò mặc định
-      roll: 2, // Thêm giá trị roll mặc định
+      vaiTro: 'user',
+      roll: 2,
     };
 
     try {
-      // Gửi yêu cầu POST để thêm người dùng mới vào API
-      const response = await fetch('http://192.168.0.245:3000/users/register', {
+      const response = await fetch('http://192.168.0.104:3000/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,10 +40,8 @@ const Register = () => {
       });
 
       if (response.ok) {
-        // Nếu đăng ký thành công, chuyển đến màn hình đăng nhập
         navigation.navigate('Login');
       } else {
-        // Nếu có lỗi xảy ra
         setError('Đăng ký không thành công. Vui lòng thử lại.');
       }
     } catch (error) {
@@ -59,127 +53,148 @@ const Register = () => {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require('../acssets/danhky.png')} // Ensure the path is correct
-        style={styles.background}>
-        <Text style={styles.welcomeText}>Get’s started with LapStore!</Text>
-        <Text style={styles.subText}>
-          Yay! You're back. Thanks for shopping with us.
-        </Text>
-        <Text style={styles.subText}>
-          We have excited deals and promotions going on, grab your pick now!{' '}
-        </Text>
+        source={require('../acssets/dangky.png')}
+        style={styles.background}
+        imageStyle={{ borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}>
+        <Text style={styles.welcomeText}>Get's started with LapStore!</Text>
+        <Text style={styles.subText}>Create your account and start enjoying shopping</Text>
       </ImageBackground>
 
-      <Text style={styles.logintext}>Register</Text>
+      <View style={styles.content}>
+        <Text style={styles.title}>SIGN UP</Text>
 
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-      <View style={styles.khung}>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your email"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm your password"
-          secureTextEntry
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-        />
+        <View style={styles.formContainer}>
+          <Text style={styles.label}>Your Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Your Full Name"
+            placeholderTextColor="#C1C1C1"
+          />
+          <Text style={styles.label}>Email address</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+            placeholderTextColor="#C1C1C1"
+          />
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+            placeholderTextColor="#C1C1C1"
+          />
+          <Text style={styles.label}>Confirm Password</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm your password"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            placeholderTextColor="#C1C1C1"
+          />
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleRegister}>
-          <Text style={styles.loginButtonText}>Register</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+            <Text style={styles.registerButtonText}>SIGN UP</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.createAccount}>
-            Already have an account? Sign in{' '}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.signInText}>
+              Already have an account? <Text style={styles.signInLink}>Sign in</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  background: {
-    height: 220,
-    width: '100%',
-    marginBottom: 20,
-  },
   container: {
     flex: 1,
-    padding: 0,
-    margin: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 20,
+    backgroundColor: '#F4F1F1',
+  },
+  background: {
+    width: '100%',
+    height: 250,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   welcomeText: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
-    marginTop: 50,
     color: '#FFF',
-    paddingLeft: 20,
+    textAlign: 'center',
+    marginBottom: 5,
   },
   subText: {
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: 14,
     color: '#FFF',
-    paddingLeft: 20,
+    textAlign: 'center',
   },
-  khung: {
-    paddingHorizontal: 20,
-    alignItems: 'center',
+  content: {
     flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 25,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  formContainer: {
+    marginTop: 10,
+  },
+  label: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '600',
+    marginBottom: 5,
   },
   input: {
     height: 50,
-    borderColor: '#ccc',
+    borderColor: '#C1C1C1',
     borderWidth: 1,
-    width: '95%',
-    marginBottom: 40,
+    borderRadius: 8,
     paddingHorizontal: 10,
+    marginBottom: 10,
+    color: '#333',
   },
-  logintext: {
-    color: '#000',
-    fontSize: 30,
-    marginLeft: 20,
-    marginBottom: 20,
-    marginTop: 20,
+  registerButton: {
+    backgroundColor: '#4B4B8F',
+    paddingVertical: 15,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  registerButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  signInText: {
+    fontSize: 14,
+    color: '#333',
+    textAlign: 'center',
+  },
+  signInLink: {
+    color: '#4B4B8F',
+    textDecorationLine: 'underline',
   },
   errorText: {
     color: 'red',
-    marginBottom: 20,
     textAlign: 'center',
-  },
-  loginButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 10,
-    alignItems: 'center',
-    width: '95%',
-    height: 60,
-    borderRadius: 40,
-    marginBottom: 20,
-  },
-  loginButtonText: {
-    color: '#fff',
-    fontSize: 26,
-  },
-  createAccount: {
+    marginBottom: 10,
     fontSize: 14,
-    color: '#007BFF',
-    textAlign: 'center',
   },
 });
 

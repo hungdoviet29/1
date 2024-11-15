@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,10 @@ import {
   ImageBackground,
   StyleSheet,
 } from 'react-native';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Login = ({route}) => {
+const Login = ({ route }) => {
   const navigation = useNavigation();
   const [tenDangNhap, setTenDangNhap] = useState('');
   const [matKhau, setMatKhau] = useState('');
@@ -24,18 +25,50 @@ const Login = ({route}) => {
         setMatKhau('');
         setError(null);
       }
-    }, [route.params?.clearInputs]),
+    }, [route.params?.clearInputs])
   );
+
+  useEffect(() => {
+    // Load saved credentials on component mount
+    const loadCredentials = async () => {
+      const savedUsername = await AsyncStorage.getItem('username');
+      const savedPassword = await AsyncStorage.getItem('password');
+      const savedRememberMe = await AsyncStorage.getItem('rememberMe');
+
+      if (savedRememberMe === 'true') {
+        setTenDangNhap(savedUsername || '');
+        setMatKhau(savedPassword || '');
+        setRememberMe(true);
+      }
+    };
+
+    loadCredentials();
+  }, []);
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://192.168.0.245:3000/users');
+      const response = await fetch('http://192.168.0.104:3000/users');
       const users = await response.json();
       const user = users.find(
-        user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau,
+        user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau
       );
+
       if (user) {
-        navigation.navigate(user.roll === 1 ? 'AdminHome' : 'MainHomeScreen');
+        // Save credentials if "Remember Me" is checked
+        if (rememberMe) {
+          await AsyncStorage.setItem('username', tenDangNhap);
+          await AsyncStorage.setItem('password', matKhau);
+          await AsyncStorage.setItem('rememberMe', 'true');
+        } else {
+          // Clear saved credentials if "Remember Me" is unchecked
+          await AsyncStorage.removeItem('username');
+          await AsyncStorage.removeItem('password');
+          await AsyncStorage.setItem('rememberMe', 'false');
+        }
+
+        navigation.navigate(user.roll === 1 ? 'AdminHome' : 'MainHomeScreen', {
+          username: user.tenDangNhap,
+        });
       } else {
         setError('Thông tin đăng nhập không đúng.');
       }
@@ -46,81 +79,79 @@ const Login = ({route}) => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require('../acssets/laplogin.png')}
-        style={styles.background}>
-        <Text style={styles.welcomeText}>Welcome Back!</Text>
-        <Text style={styles.subText}>
-          Yay! You're back. Thanks for shopping with us.
-        </Text>
-        <Text style={styles.subText}>
-          We have exciting deals and promotions going on, grab your pick now!
-        </Text>
-      </ImageBackground>
-
-      <Text style={styles.loginText}>LOGIN</Text>
-
       <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          value={tenDangNhap}
-          onChangeText={setTenDangNhap}
-          placeholder="Enter your email"
-          keyboardType="email-address"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your password"
-          value={matKhau}
-          onChangeText={setMatKhau}
-          secureTextEntry
-        />
+        <ImageBackground
+          source={require('../acssets/laplogin.png')}
+          style={styles.background}
+          imageStyle={{ borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}
+        >
+          <Text style={styles.welcomeText}>Welcome Back!</Text>
+        </ImageBackground>
+        <Text style={styles.loginText}>LOG IN</Text>
+        
+        <Text style={styles.label}>Email address</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            value={tenDangNhap}
+            onChangeText={setTenDangNhap}
+            placeholder="Enter your email"
+            keyboardType="email-address"
+            placeholderTextColor="#C1C1C1"
+          />
+        </View>
+
+        <Text style={styles.label1}>Password</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your password"
+            value={matKhau}
+            onChangeText={setMatKhau}
+            secureTextEntry
+            placeholderTextColor="#C1C1C1"
+          />
+        </View>
 
         {error && <Text style={styles.errorText}>{error}</Text>}
 
         <View style={styles.optionsContainer}>
           <TouchableOpacity
             onPress={() => setRememberMe(!rememberMe)}
-            style={styles.checkboxContainer}>
+            style={styles.checkboxContainer}
+          >
+            <View style={[
+              styles.checkbox,
+              rememberMe && styles.checkboxChecked,
+            ]}>
+              {rememberMe && <View style={styles.checkboxTick} />}
+            </View>
             <Text style={styles.rememberMeText}>Remember me</Text>
-            <Image
-              source={
-                rememberMe
-                  ? require('../acssets/checkbox-checked.png')
-                  : require('../acssets/checkbox-unchecked.png')
-              }
-              style={styles.checkbox}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => navigation.navigate('ForgotPasswordScreen')}>
-            <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>SIGN IN</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-          <Text style={styles.createAccount}>
-            Not registered yet? Create an Account
-          </Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F4F1F1', // Màu nền tổng thể
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 0,
+    padding: 0,
   },
   background: {
     width: '100%',
-    height: 200,
+    height: 250,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -135,57 +166,111 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#FFF',
     textAlign: 'center',
+    paddingHorizontal: 20,
   },
   loginText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 30,
+    fontWeight: 'condensed',
     color: '#333',
-    textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 10,
+    marginLeft: 20,
+    marginVertical: 50,
   },
   form: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+    paddingBottom: 20,
   },
-  input: {
-    height: 45,
-    borderColor: '#ddd',
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 5,
+    marginTop: 0,
+    paddingLeft: 25,
+  },
+  label1: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 5,
+    marginTop: 5,
+    paddingLeft: 25,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 50,
+    borderColor: '#C1C1C1',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 15,
+    marginHorizontal: 20,
+  },
+  inputIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+    tintColor: '#6C63FF',
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
   },
   optionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 20,
+    paddingHorizontal: 25,
   },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   checkbox: {
-    width: 24,
-    height: 24,
-    left: 12,
-    top: 3,
+    width: 18,
+    height: 18,
+    borderRadius: 3,
+    borderColor: '#C1C1C1',
+    borderWidth: 1,
+    backgroundColor: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    borderColor: '#6C63FF',
+  },
+  checkboxTick: {
+    width: 10,
+    height: 10,
+    backgroundColor: '#6C63FF',
   },
   rememberMeText: {
     fontSize: 14,
     color: '#333',
+    marginLeft: 8,
   },
   forgotPassword: {
     fontSize: 14,
-    color: '#007BFF',
+    color: '#6C63FF',
+    textDecorationLine: 'underline',
   },
   loginButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 12,
+    backgroundColor: '#4B4B8F',
+    paddingVertical: 15,
     borderRadius: 25,
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 20,
+    marginHorizontal: 20,
   },
   loginButtonText: {
     color: '#FFFFFF',
@@ -194,14 +279,18 @@ const styles = StyleSheet.create({
   },
   createAccount: {
     fontSize: 14,
-    color: '#007BFF',
+    color: '#333',
     textAlign: 'center',
-    marginTop: 10,
+  },
+  createAccountLink: {
+    color: '#6C63FF',
+    textDecorationLine: 'underline',
   },
   errorText: {
     color: 'red',
     textAlign: 'center',
     marginBottom: 10,
+    fontSize: 14,
   },
 });
 
