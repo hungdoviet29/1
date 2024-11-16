@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-
 import {
   View,
   Text,
@@ -9,207 +8,136 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
-import {useDispatch, useSelector} from 'react-redux';
-import {addToFavorites, removeFromFavorites} from '../redux/favoriteSlice';
-const HomeScreen = () => {
+const MainHomeScreen = () => {
   const navigation = useNavigation();
-  const dispatch = useDispatch();
-  const favorites = useSelector(state => state.favorites.favorites);
-  const [laptops, setLaptops] = useState([]);
+  const [popularLaptops, setPopularLaptops] = useState([]);
+  const [saleLaptops, setSaleLaptops] = useState([]);
+  const [trendingLaptops, setTrendingLaptops] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('Popular');
-
-  const fetchData = category => {
-    setLoading(true);
-    let apiUrl = '';
-
-    // Xác định link API cho từng danh mục
-    switch (category) {
-      case 'Popular':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getPopularLapTop';
-        break;
-      case 'Trending':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getTrendingLapTop';
-        break;
-      case 'News':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getNewsLapTop';
-        break;
-      case 'Sale':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getSaleLapTop';
-        break;
-      case 'All':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
-        break;
-      default:
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
-    }
-
-    axios
-      .get(apiUrl)
-      .then(response => {
-        setLaptops(response.data.data);
-      })
-      .catch(error => {
-        console.error('Error fetching laptop data:', error);
-        setLaptops([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
 
   useEffect(() => {
-    fetchData(activeCategory);
-  }, [activeCategory]);
+    fetchAllData();
+  }, []);
 
-  const handleCategoryPress = category => {
-    setActiveCategory(category);
-  };
+  const fetchAllData = async () => {
+    setLoading(true);
+    try {
+      const [popularResponse, saleResponse, trendingResponse] = await Promise.all([
+        axios.get('http://192.168.3.110:3000/LapTop/getPopularLapTop'),
+        axios.get('http://192.168.3.110:3000/LapTop/getSaleLapTop'),
+        axios.get('http://192.168.3.110:3000/LapTop/getTrendingLapTop'),
+      ]);
 
-  const handleAddToFavorites = laptop => {
-    const isFavorite = favorites.some(item => item._id === laptop._id);
-    if (isFavorite) {
-      dispatch(removeFromFavorites(laptop._id));
-    } else {
-      dispatch(addToFavorites(laptop));
+      setPopularLaptops(popularResponse.data.data);
+      setSaleLaptops(saleResponse.data.data);
+      setTrendingLaptops(trendingResponse.data.data);
+    } catch (error) {
+      console.error('Error fetching laptop data:', error);
+      setPopularLaptops([]);
+      setSaleLaptops([]);
+      setTrendingLaptops([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const isFavorite = laptop =>
-    Array.isArray(favorites) && favorites.some(item => item._id === laptop._id);
+  const renderProducts = (laptops, isSale = false) =>
+    laptops.slice(0, 5).map(laptop => (
+      <View style={styles.product} key={laptop._id}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ProductScreen', { product: laptop })}
+        >
+          {isSale && <Text style={styles.productSale}>-50%</Text>}
+          <Image source={{ uri: laptop.hinhAnh }} style={styles.productImage} />
+          <Text style={styles.productName}>{laptop.ten}</Text>
+          <Text style={styles.productPrice}>{laptop.gia.toLocaleString()} VND</Text>
+          {isSale && (
+            <Text style={styles.productOldPrice}>
+              {(laptop.gia * 2).toLocaleString()} VND
+            </Text>
+          )}
+          <Text style={styles.productRating}>⭐️ 4.5</Text>
+        </TouchableOpacity>
+      </View>
+    ));
+
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Image source={require('../acssets/profile1.png')} style={styles.profileImage} />
-        <View style={styles.headerIcons}>
-          <TouchableOpacity onPress={() => navigation.navigate('NotificationScreen')}>
-          <Image source={require('../acssets/bell.png')} style={styles.icon} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Find')}>
-          <Image source={require('../acssets/SearchIcon.png')} style={styles.icon} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('CustomDrawerContent')}>
-          <Image source={require('../acssets/Menu.png')} style={styles.icon} />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <ScrollView style={styles.mainContent}>
-      {/* Banner */}
-      <Image source={require('../acssets/banner.png')} style={styles.banner} />
+      {loading ? (
+        <ActivityIndicator size="large" color="#6C63FF" style={styles.loader} />
+      ) : (
+        <ScrollView style={styles.mainContent}>
+          {/* Header */}
+          <View style={styles.header}>
+            <Image source={require('../acssets/profile1.png')} style={styles.profileImage} />
+            <View style={styles.headerIcons}>
+              <TouchableOpacity onPress={() => navigation.navigate('NotificationScreen')}>
+                <Image source={require('../acssets/bell.png')} style={styles.icon} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate('Find')}>
+                <Image source={require('../acssets/SearchIcon.png')} style={styles.icon} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate('CustomDrawerContent')}>
+                <Image source={require('../acssets/Menu.png')} style={styles.icon} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
-      {/* ScrollView bao quanh phần nội dung dưới banner */}
-      
-        {/* Brand Section */}
-        <Text style={styles.brandTitle}>Brand</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.brandScroll}>
-          <Image source={require('../acssets/logo_hp.png')} style={styles.brandIcon} />
-          <Image source={require('../acssets/logo_dell.png')} style={styles.brandIcon} />
-          <Image source={require('../acssets/logo_apple.png')} style={styles.brandIcon} />
-          <Image source={require('../acssets/logo_acer.png')} style={styles.brandIcon} />
-          <Image source={require('../acssets/logo_acer.png')} style={styles.brandIcon} />
-          <Image source={require('../acssets/logo_acer.png')} style={styles.brandIcon} />
-          <Image source={require('../acssets/logo_acer.png')} style={styles.brandIcon} />
-          <Image source={require('../acssets/logo_acer.png')} style={styles.brandIcon} />
-          <Image source={require('../acssets/logo_acer.png')} style={styles.brandIcon} />
-        </ScrollView>
+          {/* Banner */}
+          <Image source={require('../acssets/banner.png')} style={styles.banner} />
+          {/* Popular Section */}
+          <View style={styles.fixedCategories}>
+            <Text style={styles.category}>Popular ➞</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
+            {renderProducts(popularLaptops)}
+          </ScrollView>
 
-        {/* Danh mục sản phẩm cố định */}
-        <View style={styles.fixedCategories}>
-          <Text style={styles.category}>Popular ➞</Text>
-        </View>
+          {/* Sale Section */}
+          <View style={styles.fixedCategories}>
+            <Text style={styles.category}>Sale ➞</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
+            {renderProducts(saleLaptops, true)}
+          </ScrollView>
 
-        {/* Danh sách sản phẩm Popular */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
-          <View style={styles.product}>
-            <Image source={require('../acssets/laptop1.png')} style={styles.productImage} />
-            <Text style={styles.productName}>$120.00 USD</Text>
-            <Text style={styles.productRating}>⭐️ 4.5</Text>
+          {/* Trending Section */}
+          <View style={styles.fixedCategories}>
+            <Text style={styles.category}>Trending ➞</Text>
           </View>
-          <View style={styles.product}>
-            <Image source={require('../acssets/laptop1.png')} style={styles.productImage} />
-            <Text style={styles.productName}>$120.00 USD</Text>
-            <Text style={styles.productRating}>⭐️ 4.5</Text>
-          </View>
-          <View style={styles.product}>
-            <Image source={require('../acssets/laptop1.png')} style={styles.productImage} />
-            <Text style={styles.productName}>$120.00 USD</Text>
-            <Text style={styles.productRating}>⭐️ 4.5</Text>
-          </View>
-          <View style={styles.product}>
-            <Image source={require('../acssets/laptop1.png')} style={styles.productImage} />
-            <Text style={styles.productName}>$120.00 USD</Text>
-            <Text style={styles.productRating}>⭐️ 4.5</Text>
-          </View>
-          <View style={styles.product}>
-            <Image source={require('../acssets/laptop1.png')} style={styles.productImage} />
-            <Text style={styles.productName}>$120.00 USD</Text>
-            <Text style={styles.productRating}>⭐️ 4.5</Text>
-          </View>
-          <View style={styles.product}>
-            <Image source={require('../acssets/laptop1.png')} style={styles.productImage} />
-            <Text style={styles.productName}>$120.00 USD</Text>
-            <Text style={styles.productRating}>⭐️ 4.5</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
+            {renderProducts(trendingLaptops)}
+          </ScrollView>
+
+          <View style={styles.bottomSpacing} />
+
+          {/* Bottom Navigation */}
+          <View style={styles.bottomNavigation}>
+            <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+              <Image source={require('../acssets/home.png')} style={styles.iconNav} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('CartScreen')}>
+              <Image source={require('../acssets/BasketIcon.png')} style={styles.iconNav} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('FavoritesScreen')}>
+              <Image source={require('../acssets/Vector.png')} style={styles.iconNav} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
+              <Image source={require('../acssets/profile.png')} style={styles.iconNav} />
+            </TouchableOpacity>
           </View>
         </ScrollView>
-
-        {/* Danh mục sản phẩm Sale */}
-        <View style={styles.fixedCategories}>
-          <Text style={styles.category}>Sale ➞</Text>
-        </View>
-
-        {/* Danh sách sản phẩm Sale */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
-          <View style={styles.product}>
-            <Image source={require('../acssets/laptop1.png')} style={styles.productImage} />
-            <Text style={styles.productSale}>-50%</Text>
-            <Text style={styles.productName}>$120.00 USD</Text>
-            <Text style={styles.productOldPrice}>$240.00 USD</Text>
-            <Text style={styles.productRating}>⭐️ 4.5</Text>
-          </View>
-          <View style={styles.product}>
-            <Image source={require('../acssets/laptop1.png')} style={styles.productImage} />
-            <Text style={styles.productSale}>-50%</Text>
-            <Text style={styles.productName}>$120.00 USD</Text>
-            <Text style={styles.productOldPrice}>$240.00 USD</Text>
-            <Text style={styles.productRating}>⭐️ 4.5</Text>
-          </View>
-        </ScrollView>
-        <View style={styles.fixedCategories}>
-          <Text style={styles.category}>Trending ➞</Text>
-        </View>
-
-        {/* Danh sách sản phẩm Sale */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
-          <View style={styles.product}>
-            <Image source={require('../acssets/laptop1.png')} style={styles.productImage} />
-            <Text style={styles.productSale}>-50%</Text>
-            <Text style={styles.productName}>$120.00 USD</Text>
-            <Text style={styles.productOldPrice}>$240.00 USD</Text>
-            <Text style={styles.productRating}>⭐️ 4.5</Text>
-          </View>
-          <View style={styles.product}>
-            <Image source={require('../acssets/laptop1.png')} style={styles.productImage} />
-            <Text style={styles.productSale}>-50%</Text>
-            <Text style={styles.productName}>$120.00 USD</Text>
-            <Text style={styles.productOldPrice}>$240.00 USD</Text>
-            <Text style={styles.productRating}>⭐️ 4.5</Text>
-          </View>
-        </ScrollView>
-
-
-        <View style={styles.bottomSpacing} />
-      </ScrollView>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
+  loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -220,39 +148,20 @@ const styles = StyleSheet.create({
   headerIcons: { flexDirection: 'row' },
   icon: { width: 24, height: 24, marginLeft: 16 },
   banner: {
-    width: '80%',               // Giảm chiều rộng xuống còn 60% màn hình
-    height: 170,                // Điều chỉnh chiều cao phù hợp với tỷ lệ
+    width: '80%',
+    height: 170,
     resizeMode: 'cover',
     marginBottom: 20,
-    alignSelf: 'center',        // Căn giữa banner trong View cha
-    borderRadius: 10,           // Bo tròn nhẹ các góc với bán kính 10
+    alignSelf: 'center',
+    borderRadius: 10,
   },
-  
-  mainContent: {
-    flex: 1,
-  },
-  brandTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    paddingHorizontal: 16,
-    marginBottom: 10,
-  },
-  brandScroll: {
-    paddingHorizontal: 16,
-    marginBottom: 20,
-  },
-  brandIcon: { width: 60, height: 60, resizeMode: 'contain', marginRight: 15 },
   fixedCategories: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     paddingHorizontal: 16,
     marginBottom: 10,
   },
-  category: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#6C63FF',
-  },
+  category: { fontSize: 18, fontWeight: 'bold', color: '#6C63FF' },
   productScrollView: {
     paddingBottom: 20,
     paddingHorizontal: 16,
@@ -267,24 +176,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   productImage: { width: 100, height: 100, resizeMode: 'contain' },
-  productName: { fontSize: 16, fontWeight: 'bold', textAlign: 'center', marginTop: 5 },
+  productName: { fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginTop: 5 },
+  productPrice: { fontSize: 14, color: '#000', marginTop: 5 },
   productSale: {
     fontSize: 14,
     fontWeight: 'bold',
     color: 'red',
     textAlign: 'center',
-    marginTop: 5,
+    position: 'absolute',
+    top: 5,
+    left: 5,
   },
-  productOldPrice: {
-    fontSize: 14,
-    textDecorationLine: 'line-through',
-    color: '#888',
-    marginTop: 2,
-  },
+  productOldPrice: { fontSize: 12, textDecorationLine: 'line-through', color: '#888', marginTop: 2 },
   productRating: { fontSize: 12, color: '#888', marginTop: 5 },
-  bottomSpacing: {
-    height: 80, // Chiều cao của khoảng trống, tùy chỉnh theo nhu cầu của bạn
+  bottomSpacing: { height: 80 },
+  bottomNavigation: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingVertical: 10,
+    backgroundColor: '#f1f1f1',
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
   },
+  iconNav: { width: 24, height: 24 },
 });
 
-export default HomeScreen;
+export default MainHomeScreen;

@@ -175,7 +175,6 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="MainHomeScreen" component={MainHomeScreen} />
         <Stack.Screen name="AddBrand" component={AddBrand} />
         <Stack.Screen name="ShopContactInfo" component={ShopContactInfo} />
-      
       </Stack.Navigator>
 
       {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}

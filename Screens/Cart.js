@@ -102,12 +102,9 @@ const CartScreen = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, productId }),
             });
-
             const data = await response.json();
-
             if (response.ok) {
-                setCartItems(data.cart.items || []);
-                calculateTotal(data.cart.items || []);
+                fetchCartItems(userId); // Gọi lại API để làm mới dữ liệu
             } else {
                 Alert.alert('Error', data.message || 'Failed to remove item.');
             }
@@ -116,6 +113,7 @@ const CartScreen = () => {
             Alert.alert('Error', 'Unable to connect to the server. Please try again later.');
         }
     };
+    
 
     return (
         <View style={styles.container}>
