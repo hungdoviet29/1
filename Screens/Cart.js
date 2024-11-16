@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 const CartScreen = () => {
     const [userId, setUserId] = useState(null);
@@ -11,8 +12,8 @@ const CartScreen = () => {
         const fetchUserId = async () => {
             try {
                 const id = await AsyncStorage.getItem('userId');
-                console.log('Retrieved userId:', id);
                 if (id) {
+                    console.log('Retrieved userId:', id);
                     setUserId(id);
                     fetchCartItems(id);
                 } else {
@@ -23,8 +24,19 @@ const CartScreen = () => {
                 Alert.alert('Error', 'Failed to retrieve user ID.');
             }
         };
-        fetchUserId();
-    }, []);
+
+        fetchUserId(); // Chỉ gọi một lần khi màn hình được lần đầu tiên render
+
+    }, []); // [] để chỉ gọi một lần khi component được mount lần đầu
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // Kiểm tra lại khi màn hình focus và `userId` đã có
+            if (userId) {
+                fetchCartItems(userId);
+            }
+        }, [userId]) // Chỉ chạy lại khi `userId` thay đổi
+    );
 
     const fetchCartItems = async (id) => {
         try {
@@ -58,33 +70,30 @@ const CartScreen = () => {
             Alert.alert('Error', 'Quantity must be at least 1.');
             return;
         }
+
+        // Optimistic Update
+        const updatedCartItems = cartItems.map((item) =>
+            item.productId._id === productId ? { ...item, quantity: newQuantity } : item
+        );
+        setCartItems(updatedCartItems);
+        calculateTotal(updatedCartItems);
+
         try {
             const response = await fetch('http://192.168.3.110:3000/cart/update', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, productId, quantity: newQuantity }),
             });
-            if (response.ok) {
-                const data = await response.json();
-                const updatedItems = data.cart.items.map(item => ({
-                    ...item,
-                    productId: {
-                        ...item.productId,
-                        hinhAnh: item.productId?.hinhAnh,
-                    },
-                }));
-                setCartItems(updatedItems);
-                calculateTotal(updatedItems);
-            } else {
-                const error = await response.json();
-                Alert.alert('Error', error.message || 'Failed to update quantity.');
+            if (!response.ok) {
+                throw new Error('Failed to update quantity');
             }
         } catch (error) {
             console.error('Error updating quantity:', error);
-            Alert.alert('Error', 'Unable to connect to the server. Please try again later.');
+            Alert.alert('Error', 'Unable to update quantity. Please try again.');
+            // Rollback optimistic update
+            fetchCartItems(userId);
         }
     };
-    
 
     const handleRemoveItem = async (productId) => {
         try {
@@ -114,42 +123,42 @@ const CartScreen = () => {
                 <Text style={styles.headerText}>My Cart</Text>
             </View>
             <ScrollView contentContainerStyle={styles.cartContainer}>
-    {cartItems.length > 0 ? (
-        cartItems.map((item) => (
-            <View key={item.productId?._id || item._id} style={styles.cartItem}>
-                <Image source={{ uri: item.productId?.hinhAnh }} style={styles.itemImage} />
-                <View style={styles.itemDetails}>
-                    <Text style={styles.itemName}>{item.productId?.ten || 'Unknown Product'}</Text>
-                    <Text style={styles.itemPrice}>
-                        {item.productId?.gia
-                            ? `${item.productId.gia.toLocaleString()} VND`
-                            : 'Price unavailable'}
-                    </Text>
-                </View>
-                <View style={styles.itemActions}>
-                    <TouchableOpacity
-                        onPress={() => handleUpdateQuantity(item.productId?._id, item.quantity - 1)}
-                        style={styles.quantityButton}
-                    >
-                        <Text style={styles.quantityText}>-</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.quantityText}>{item.quantity}</Text>
-                    <TouchableOpacity
-                        onPress={() => handleUpdateQuantity(item.productId?._id, item.quantity + 1)}
-                        style={styles.quantityButton}
-                    >
-                        <Text style={styles.quantityText}>+</Text>
-                    </TouchableOpacity>
-                </View>
-                <TouchableOpacity onPress={() => handleRemoveItem(item.productId?._id)}>
-                    <Text style={styles.removeItemText}>✕</Text>
-                </TouchableOpacity>
-            </View>
-        ))
-    ) : (
-        <Text style={styles.emptyCartText}>Your cart is empty.</Text>
-    )}
-</ScrollView>
+                {cartItems.length > 0 ? (
+                    cartItems.map((item) => (
+                        <View key={item.productId?._id || item._id} style={styles.cartItem}>
+                            <Image source={{ uri: item.productId?.hinhAnh }} style={styles.itemImage} />
+                            <View style={styles.itemDetails}>
+                                <Text style={styles.itemName}>{item.productId?.ten || 'Unknown Product'}</Text>
+                                <Text style={styles.itemPrice}>
+                                    {item.productId?.gia
+                                        ? `${item.productId.gia.toLocaleString()} VND`
+                                        : 'Price unavailable'}
+                                </Text>
+                            </View>
+                            <View style={styles.itemActions}>
+                                <TouchableOpacity
+                                    onPress={() => handleUpdateQuantity(item.productId?._id, item.quantity - 1)}
+                                    style={styles.quantityButton}
+                                >
+                                    <Text style={styles.quantityText}>-</Text>
+                                </TouchableOpacity>
+                                <Text style={styles.quantityText}>{item.quantity}</Text>
+                                <TouchableOpacity
+                                    onPress={() => handleUpdateQuantity(item.productId?._id, item.quantity + 1)}
+                                    style={styles.quantityButton}
+                                >
+                                    <Text style={styles.quantityText}>+</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <TouchableOpacity onPress={() => handleRemoveItem(item.productId?._id)}>
+                                <Text style={styles.removeItemText}>✕</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ))
+                ) : (
+                    <Text style={styles.emptyCartText}>Your cart is empty.</Text>
+                )}
+            </ScrollView>
 
             <View style={styles.checkoutBar}>
                 <TouchableOpacity style={styles.checkoutButton}>

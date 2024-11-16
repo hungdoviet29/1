@@ -1,10 +1,9 @@
-// ProductScreen.js
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
-import { addToCart } from '../redux/cartSlice'; // Import hành động từ cartSlice
+import axios from 'axios'; // Sử dụng Axios để gọi API
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProductScreen = () => {
     const navigation = useNavigation();
@@ -12,7 +11,6 @@ const ProductScreen = () => {
     const { product } = route.params; // Lấy dữ liệu sản phẩm từ params
 
     const [quantity, setQuantity] = useState(1);
-    const dispatch = useDispatch(); // Khởi tạo useDispatch
 
     const handleIncreaseQuantity = () => {
         setQuantity(quantity + 1);
@@ -24,16 +22,32 @@ const ProductScreen = () => {
         }
     };
 
-    const handleAddToCart = () => {
-        dispatch(addToCart({ ...product, quantity })); // Thêm sản phẩm vào giỏ hàng
-        navigation.navigate('Cart'); // Điều hướng tới màn hình giỏ hàng
+    const handleAddToCart = async () => {
+        try {
+            const userId = await AsyncStorage.getItem('userId'); // Lấy userId từ AsyncStorage
+            if (!userId) {
+                Alert.alert('Lỗi', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+                navigation.navigate('Login'); // Điều hướng tới màn hình đăng nhập nếu userId không tồn tại
+                return;
+            }
+            const response = await axios.post('http://192.168.3.110:3000/cart/add', {
+                userId,
+                productId: product._id,
+                quantity,
+            });
+            Alert.alert('Thành công', 'Sản phẩm đã được thêm vào giỏ hàng');
+            navigation.navigate('Cart');
+        } catch (error) {
+            console.error('Lỗi khi thêm vào giỏ hàng:', error);
+            Alert.alert('Lỗi', 'Không thể thêm sản phẩm vào giỏ hàng');
+        }
     };
 
     return (
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => { navigation.goBack() }}>
+                <TouchableOpacity onPress={() => { navigation.goBack(); }}>
                     <Image source={require('../acssets/BackButton.png')} style={styles.icon} />
                 </TouchableOpacity>
                 <TouchableOpacity>
@@ -102,8 +116,8 @@ const ProductScreen = () => {
     );
 };
 
-
 const styles = StyleSheet.create({
+    // (Style giữ nguyên từ trước)
     container: {
         flex: 1,
         backgroundColor: '#F9F9F9',
@@ -194,15 +208,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginHorizontal: 10,
         color: '#333',
-    },
-    shareButton: {
-        backgroundColor: '#f5f7fb',
-        borderRadius: 50,
-        padding: 12,
-    },
-    iconShare: {
-        width: 24,
-        height: 24,
     },
     descriptionContainer: {
         marginBottom: 16,
