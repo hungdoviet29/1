@@ -47,13 +47,16 @@ const Login = ({ route }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://192.168.0.104:3000/users');
+      const response = await fetch('http://192.168.3.110:3000/users');
       const users = await response.json();
       const user = users.find(
         user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau
       );
-
+  
       if (user) {
+        // Save userId to AsyncStorage
+        await AsyncStorage.setItem('userId', user._id);
+  
         // Save credentials if "Remember Me" is checked
         if (rememberMe) {
           await AsyncStorage.setItem('username', tenDangNhap);
@@ -65,7 +68,8 @@ const Login = ({ route }) => {
           await AsyncStorage.removeItem('password');
           await AsyncStorage.setItem('rememberMe', 'false');
         }
-
+  
+        // Navigate to the appropriate screen based on user role
         navigation.navigate(user.roll === 1 ? 'AdminHome' : 'MainHomeScreen', {
           username: user.tenDangNhap,
         });
@@ -76,6 +80,7 @@ const Login = ({ route }) => {
       setError('Lỗi kết nối mạng.');
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -83,7 +88,7 @@ const Login = ({ route }) => {
         <ImageBackground
           source={require('../acssets/laplogin.png')}
           style={styles.background}
-          imageStyle={{ borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}
+          imageStyle={{ borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}
         >
           <Text style={styles.welcomeText}>Welcome Back!</Text>
         </ImageBackground>
@@ -138,8 +143,6 @@ const Login = ({ route }) => {
   );
 };
 
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -161,12 +164,6 @@ const styles = StyleSheet.create({
     color: '#FFF',
     textAlign: 'center',
     marginBottom: 5,
-  },
-  subText: {
-    fontSize: 14,
-    color: '#FFF',
-    textAlign: 'center',
-    paddingHorizontal: 20,
   },
   loginText: {
     fontSize: 30,
@@ -214,12 +211,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     marginHorizontal: 20,
   },
-  inputIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
-    tintColor: '#6C63FF',
-  },
   input: {
     flex: 1,
     fontSize: 16,
@@ -259,11 +250,6 @@ const styles = StyleSheet.create({
     color: '#333',
     marginLeft: 8,
   },
-  forgotPassword: {
-    fontSize: 14,
-    color: '#6C63FF',
-    textDecorationLine: 'underline',
-  },
   loginButton: {
     backgroundColor: '#4B4B8F',
     paddingVertical: 15,
@@ -276,15 +262,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  createAccount: {
-    fontSize: 14,
-    color: '#333',
-    textAlign: 'center',
-  },
-  createAccountLink: {
-    color: '#6C63FF',
-    textDecorationLine: 'underline',
   },
   errorText: {
     color: 'red',
