@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios'; // Sử dụng Axios để gọi API
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProductScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { product } = route.params; // Lấy dữ liệu sản phẩm từ params
+    const { product } = route.params;
 
     const [quantity, setQuantity] = useState(1);
+    const [isFavorite, setIsFavorite] = useState(false);
 
     const handleIncreaseQuantity = () => {
         setQuantity(quantity + 1);
@@ -24,13 +25,13 @@ const ProductScreen = () => {
 
     const handleAddToCart = async () => {
         try {
-            const userId = await AsyncStorage.getItem('userId'); // Lấy userId từ AsyncStorage
+            const userId = await AsyncStorage.getItem('userId');
             if (!userId) {
                 Alert.alert('Lỗi', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
-                navigation.navigate('Login'); // Điều hướng tới màn hình đăng nhập nếu userId không tồn tại
+                navigation.navigate('Login');
                 return;
             }
-            const response = await axios.post('http://192.168.3.110:3000/cart/add', {
+            await axios.post('http://192.168.3.110:3000/cart/add', {
                 userId,
                 productId: product._id,
                 quantity,
@@ -43,35 +44,81 @@ const ProductScreen = () => {
         }
     };
 
+    const toggleFavorite = async () => {
+        try {
+            const userId = await AsyncStorage.getItem('userId');
+            if (!userId) {
+                Alert.alert('Lỗi', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+                navigation.navigate('Login');
+                return;
+            }
+    
+            if (isFavorite) {
+                // Xóa sản phẩm khỏi yêu thích
+                await axios.post('http://192.168.3.110:3000/removeFavoriteProduct', {
+                    userId,
+                    productId: product._id,
+                });
+                setIsFavorite(false);
+                Alert.alert('Thành công', 'Sản phẩm đã bị gỡ khỏi danh sách yêu thích');
+            } else {
+                // Thêm sản phẩm vào yêu thích
+                await axios.post('http://192.168.3.110:3000/addFavoriteProduct', {
+                    userId,
+                    productId: product._id,
+                });
+                setIsFavorite(true);
+                Alert.alert('Thành công', 'Sản phẩm đã được thêm vào danh sách yêu thích');
+            }
+        } catch (error) {
+            console.error('Lỗi khi cập nhật danh sách yêu thích:', error.response?.data || error.message);
+            Alert.alert('Lỗi', 'Không thể cập nhật danh sách yêu thích');
+        }
+    };
+
+    useEffect(() => {
+        const checkIfFavorite = async () => {
+            try {
+                const userId = await AsyncStorage.getItem('userId');
+                if (!userId) {
+                    console.error('User ID không tồn tại');
+                    return;
+                }
+                const response = await axios.get(`http://192.168.3.110:3000/favorites/${userId}`);
+                const favoriteList = response.data.favorites || [];
+                const isFavorite = favoriteList.some(item => item._id === product._id);
+                setIsFavorite(isFavorite);
+            } catch (error) {
+                console.error('Lỗi khi kiểm tra danh sách yêu thích:', error);
+            }
+        };
+        checkIfFavorite();
+    }, [product._id]);
+
     return (
         <View style={styles.container}>
-            {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => { navigation.goBack(); }}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Image source={require('../acssets/BackButton.png')} style={styles.icon} />
                 </TouchableOpacity>
-                <TouchableOpacity>
-                    <Image source={require('../acssets/Vector.png')} style={styles.iconHeart} />
+                <TouchableOpacity onPress={toggleFavorite}>
+                <Image
+                    source={require('../acssets/Vector.png')}
+                    style={[styles.iconHeart, isFavorite && { tintColor: 'red' }]}
+                />
+
                 </TouchableOpacity>
             </View>
-
             <ScrollView contentContainerStyle={styles.contentContainer}>
-                {/* Hình ảnh sản phẩm */}
                 <Image source={{ uri: product.hinhAnh }} style={styles.productImage} />
-
-                {/* Thông tin sản phẩm */}
                 <View style={styles.productInfo}>
                     <Text style={styles.productTitle}>{product.hang}</Text>
                     <Text style={styles.productName}>{product.ten}</Text>
                     <Text style={styles.productPrice}>{product.gia.toLocaleString()} VND</Text>
-
-                    {/* Đánh giá */}
                     <View style={styles.rating}>
                         <Text>⭐⭐⭐⭐</Text>
                         <Text style={styles.ratingText}>(4.5)</Text>
                     </View>
-
-                    {/* Chọn số lượng */}
                     <View style={styles.quantityShareContainer}>
                         <View style={styles.quantityContainer}>
                             <TouchableOpacity onPress={handleDecreaseQuantity} style={styles.quantityButton}>
@@ -83,41 +130,20 @@ const ProductScreen = () => {
                             </TouchableOpacity>
                         </View>
                     </View>
-
-                    {/* Mô tả */}
                     <View style={styles.descriptionContainer}>
                         <Text style={styles.sectionTitle}>MÔ TẢ</Text>
                         <Text style={styles.descriptionText}>{product.moTa}</Text>
                     </View>
-
-                    {/* Nút thêm vào giỏ hàng */}
                     <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
                         <Text style={styles.addToCartText}>THÊM VÀO GIỎ HÀNG</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
-
-            {/* Thanh điều hướng dưới cùng */}
-            <View style={styles.bottomNavigation}>
-                <TouchableOpacity>
-                    <Image source={require('../acssets/home.png')} style={styles.iconNav} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Image source={require('../acssets/BasketIcon.png')} style={styles.iconNav} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Image source={require('../acssets/Vector.png')} style={styles.iconNav} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Image source={require('../acssets/profile.png')} style={styles.iconNav} />
-                </TouchableOpacity>
-            </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    // (Style giữ nguyên từ trước)
     container: {
         flex: 1,
         backgroundColor: '#F9F9F9',
@@ -235,20 +261,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
-    },
-    bottomNavigation: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingVertical: 16,
-        paddingHorizontal: 30,
-        backgroundColor: '#f1f1f1',
-        borderRadius: 30,
-        borderTopWidth: 1,
-        borderTopColor: '#ddd',
-    },
-    iconNav: {
-        width: 24,
-        height: 24,
     },
 });
 
