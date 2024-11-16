@@ -11,7 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
-const MainHomeScreen = () => {
+const MainHome = () => {
   const navigation = useNavigation();
   const [popularLaptops, setPopularLaptops] = useState([]);
   const [saleLaptops, setSaleLaptops] = useState([]);
@@ -89,34 +89,45 @@ const MainHomeScreen = () => {
           {/* Banner */}
           <Image source={require('../acssets/banner.png')} style={styles.banner} />
           {/* Popular Section */}
-          <View style={styles.fixedCategories}>
-            <Text style={styles.category}>Popular ➞</Text>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
-            {renderProducts(popularLaptops)}
-          </ScrollView>
+{/* Popular Section */}
+<View style={styles.fixedCategories}>
+  <TouchableOpacity
+    onPress={() => navigation.navigate('Home', { category: 'Popular' })}>
+    <Text style={styles.category}>Popular ➞</Text>
+  </TouchableOpacity>
+</View>
+<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
+  {renderProducts(popularLaptops)}
+</ScrollView>
 
-          {/* Sale Section */}
-          <View style={styles.fixedCategories}>
-            <Text style={styles.category}>Sale ➞</Text>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
-            {renderProducts(saleLaptops, true)}
-          </ScrollView>
+{/* Sale Section */}
+<View style={styles.fixedCategories}>
+  <TouchableOpacity
+    onPress={() => navigation.navigate('Home', { category: 'Sale' })}>
+    <Text style={styles.category}>Sale ➞</Text>
+  </TouchableOpacity>
+</View>
+<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
+  {renderProducts(saleLaptops, true)}
+</ScrollView>
 
-          {/* Trending Section */}
-          <View style={styles.fixedCategories}>
-            <Text style={styles.category}>Trending ➞</Text>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
-            {renderProducts(trendingLaptops)}
-          </ScrollView>
+{/* Trending Section */}
+<View style={styles.fixedCategories}>
+  <TouchableOpacity
+    onPress={() => navigation.navigate('Home', { category: 'Trending' })}>
+    <Text style={styles.category}>Trending ➞</Text>
+  </TouchableOpacity>
+</View>
+<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
+  {renderProducts(trendingLaptops)}
+</ScrollView>
+
 
           <View style={styles.bottomSpacing} />
 
           {/* Bottom Navigation */}
           <View style={styles.bottomNavigation}>
-            <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+            <TouchableOpacity onPress={() => navigation.navigate('Home')}>
               <Image source={require('../acssets/home.png')} style={styles.iconNav} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('CartScreen')}>
@@ -202,4 +213,4 @@ const styles = StyleSheet.create({
   iconNav: { width: 24, height: 24 },
 });
 
-export default MainHomeScreen;
+export default MainHome;

@@ -11,7 +11,7 @@ const BottomNavigation = () => {
       {/* Nút Home */}
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('Home')}
+        onPress={() => navigation.navigate('MainHomeScreen')}
       >
         <Image
           source={require('../acssets/home.png')} // Đảm bảo đường dẫn đúng

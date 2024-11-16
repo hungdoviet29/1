@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-
 import {
   View,
   Text,
@@ -9,49 +8,46 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
-
-import {useDispatch, useSelector} from 'react-redux';
-import {addToFavorites, removeFromFavorites} from '../redux/favoriteSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToFavorites, removeFromFavorites } from '../redux/favoriteSlice';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute(); // Nhận route
   const dispatch = useDispatch();
   const favorites = useSelector(state => state.favorites.favorites);
   const [laptops, setLaptops] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('Popular');
+  const [activeCategory, setActiveCategory] = useState('All');
 
   const fetchData = category => {
     setLoading(true);
     let apiUrl = '';
 
-    // Xác định link API cho từng danh mục
     switch (category) {
       case 'Popular':
-        apiUrl = 'http://192.168.0.245:3000/LapTop/getPopularLapTop';
+        apiUrl = 'http://192.168.3.110:3000/LapTop/getPopularLapTop';
         break;
       case 'Trending':
-        apiUrl = 'http://192.168.0.245:3000/LapTop/getTrendingLapTop';
+        apiUrl = 'http://192.168.3.110:3000/LapTop/getTrendingLapTop';
         break;
       case 'News':
-        apiUrl = 'http://192.168.0.245:3000/LapTop/getNewsLapTop';
+        apiUrl = 'http://192.168.3.110:3000/LapTop/getNewsLapTop';
         break;
       case 'Sale':
-        apiUrl = 'http://192.168.0.245:3000/LapTop/getSaleLapTop';
+        apiUrl = 'http://192.168.3.110:3000/LapTop/getSaleLapTop';
         break;
       case 'All':
-        apiUrl = 'http://192.168.0.245:3000/LapTop/getListLapTop';
-        break;
       default:
-        apiUrl = 'http://192.168.0.245:3000/LapTop/getListLapTop';
+        apiUrl = 'http://192.168.3.110:3000/LapTop/getListLapTop';
     }
 
     axios
       .get(apiUrl)
       .then(response => {
-        setLaptops(response.data.data);
+        setLaptops(response.data.data || []);
       })
       .catch(error => {
         console.error('Error fetching laptop data:', error);
@@ -63,7 +59,12 @@ const HomeScreen = () => {
   };
 
   useEffect(() => {
-    fetchData(activeCategory);
+    const categoryFromRoute = route.params?.category || 'All'; // Lấy tham số
+    setActiveCategory(categoryFromRoute); // Cập nhật danh mục
+  }, [route.params]);
+
+  useEffect(() => {
+    fetchData(activeCategory); // Tải dữ liệu khi danh mục thay đổi
   }, [activeCategory]);
 
   const handleCategoryPress = category => {
@@ -84,40 +85,26 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        <Image
-          source={require('../acssets/profile1.png')}
-          style={styles.profileImage}
-        />
+        <Image source={require('../acssets/profile1.png')} style={styles.profileImage} />
         <View style={styles.headerIcons}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('NotificationScreen')}>
-            <Image
-              source={require('../acssets/bell.png')}
-              style={styles.icon}
-            />
+          <TouchableOpacity onPress={() => navigation.navigate('NotificationScreen')}>
+            <Image source={require('../acssets/bell.png')} style={styles.icon} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Find')}>
-            <Image
-              source={require('../acssets/SearchIcon.png')}
-              style={styles.icon}
-            />
+            <Image source={require('../acssets/SearchIcon.png')} style={styles.icon} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('CustomDrawerContent')}>
-            <Image
-              source={require('../acssets/Menu.png')}
-              style={styles.icon}
-            />
+          <TouchableOpacity onPress={() => navigation.navigate('CustomDrawerContent')}>
+            <Image source={require('../acssets/Menu.png')} style={styles.icon} />
           </TouchableOpacity>
         </View>
       </View>
 
+      {/* Categories */}
       <View style={styles.categories}>
         {['All', 'Popular', 'Trending', 'News', 'Sale'].map(category => (
-          <TouchableOpacity
-            key={category}
-            onPress={() => handleCategoryPress(category)}>
+          <TouchableOpacity key={category} onPress={() => handleCategoryPress(category)}>
             <Text
               style={[
                 styles.category,
@@ -129,19 +116,7 @@ const HomeScreen = () => {
         ))}
       </View>
 
-      {/* Nút lọc */}
-      <View style={styles.filterContainer}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('FilterScreen')}
-          style={styles.filterButton}>
-          <Image
-            source={require('../acssets/sorttool.png')}
-            style={styles.filterIcon}
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* Danh sách sản phẩm */}
+      {/* Product List */}
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#6C63FF" />
@@ -149,43 +124,34 @@ const HomeScreen = () => {
       ) : (
         <ScrollView contentContainerStyle={styles.productScrollView}>
           <View style={styles.productList}>
-            {Array.isArray(laptops) &&
-              laptops.map(laptop => (
-                <View style={styles.product} key={laptop._id}>
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate('ProductScreen', {product: laptop})
-                    }>
-                    <Image
-                      source={{uri: laptop.hinhAnh}}
-                      style={styles.productImage}
-                    />
-                    <Text style={styles.productName}>{laptop.ten}</Text>
-                    <Text style={styles.productPrice}>
-                      {laptop.gia.toLocaleString()} VND
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.heartIconContainer}
-                    onPress={() => handleAddToFavorites(laptop)}>
-                    <Image
-                      source={
-                        isFavorite(laptop)
-                          ? require('../acssets/VectorRed.png')
-                          : require('../acssets/Vector.png')
-                      }
-                      style={styles.heartIcon}
-                    />
-                  </TouchableOpacity>
-                </View>
-              ))}
+            {laptops.map(laptop => (
+              <View style={styles.product} key={laptop._id}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('ProductScreen', { product: laptop })}>
+                  <Image source={{ uri: laptop.hinhAnh }} style={styles.productImage} />
+                  <Text style={styles.productName}>{laptop.ten}</Text>
+                  <Text style={styles.productPrice}>{laptop.gia.toLocaleString()} VND</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.heartIconContainer}
+                  onPress={() => handleAddToFavorites(laptop)}>
+                  <Image
+                    source={
+                      isFavorite(laptop)
+                        ? require('../acssets/VectorRed.png')
+                        : require('../acssets/Vector.png')
+                    }
+                    style={styles.heartIcon}
+                  />
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
         </ScrollView>
       )}
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: '#fff'},
   loadingContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
