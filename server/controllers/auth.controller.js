@@ -1,29 +1,30 @@
-const {UserModel} = require('../models/user.model'); // Đảm bảo import đúng model User
-const nodemailer = require('nodemailer'); //thư viện gửi email cho người dùng
+const { UserModel } = require('../models/user.model'); // Đảm bảo import đúng model User
+const { CartModel } = require('../models/cart_model'); // Đảm bảo import đúng model Cart
+const nodemailer = require('nodemailer'); // Thư viện gửi email cho người dùng
 
 // Hàm xóa người dùng theo ID
 exports.deleteUser = async (req, res) => {
   try {
-    const {id} = req.params; // Lấy ID từ URL
+    const { id } = req.params; // Lấy ID từ URL
     console.log('Received User ID:', id); // Log ID
 
     if (!id || id.length !== 24) {
-      return res.status(400).json({message: 'ID không hợp lệ'});
+      return res.status(400).json({ message: 'ID không hợp lệ' });
     }
 
     // Kiểm tra người dùng có tồn tại không
     const user = await UserModel.findById(id);
     if (!user) {
       console.log('Không tìm thấy người dùng với ID:', id);
-      return res.status(404).json({message: 'Không tìm thấy người dùng'});
+      return res.status(404).json({ message: 'Không tìm thấy người dùng' });
     }
 
     // Nếu người dùng tồn tại, thực hiện xóa
     await UserModel.findByIdAndDelete(id);
-    return res.json({message: 'Xóa người dùng thành công'});
+    return res.json({ message: 'Xóa người dùng thành công' });
   } catch (error) {
     console.error('Lỗi khi xóa người dùng:', error);
-    return res.status(500).json({message: 'Lỗi khi xóa người dùng', error});
+    return res.status(500).json({ message: 'Lỗi khi xóa người dùng', error });
   }
 };
 
@@ -41,11 +42,13 @@ exports.register = async (req, res) => {
   } = req.body;
 
   try {
-    const existingUser = await UserModel.findOne({tenDangNhap});
+    // Kiểm tra tên đăng nhập đã tồn tại chưa
+    const existingUser = await UserModel.findOne({ tenDangNhap });
     if (existingUser) {
-      return res.status(400).json({message: 'Tên đăng nhập đã tồn tại'});
+      return res.status(400).json({ message: 'Tên đăng nhập đã tồn tại' });
     }
 
+    // Tạo người dùng mới
     const newUser = new UserModel({
       tenDangNhap,
       matKhau,
@@ -54,54 +57,67 @@ exports.register = async (req, res) => {
       hoSo,
       lichSuDonHang,
       sanPhamYeuThich,
+      avatar,
     });
-    await newUser.save();
-    res.status(201).json({message: 'Đăng ký thành công!'});
+
+    const savedUser = await newUser.save();
+
+    // Tạo giỏ hàng mặc định cho người dùng mới
+    const newCart = new CartModel({
+      userId: savedUser._id,
+      items: [],
+    });
+    await newCart.save();
+
+    res.status(201).json({
+      message: 'Đăng ký thành công và giỏ hàng đã được tạo.',
+      user: savedUser,
+    });
   } catch (error) {
     console.error('Lỗi khi đăng ký:', error);
-    res.status(500).json({message: 'Lỗi đăng ký người dùng', error});
+    res.status(500).json({ message: 'Lỗi đăng ký người dùng', error });
   }
 };
 
 // Hàm đăng nhập
 exports.login = async (req, res) => {
-  const {tenDangNhap, matKhau} = req.body;
+  const { tenDangNhap, matKhau } = req.body;
 
   try {
-    const user = await UserModel.findOne({tenDangNhap});
+    const user = await UserModel.findOne({ tenDangNhap });
     if (!user || user.matKhau !== matKhau) {
-      return res.status(401).json({message: 'Sai tên đăng nhập hoặc mật khẩu'});
+      return res.status(401).json({ message: 'Sai tên đăng nhập hoặc mật khẩu' });
     }
 
-    res.status(200).json({message: 'Đăng nhập thành công!', user});
+    res.status(200).json({ message: 'Đăng nhập thành công!', user });
   } catch (error) {
     console.error('Lỗi khi đăng nhập:', error);
-    res.status(500).json({message: 'Lỗi đăng nhập người dùng', error});
+    res.status(500).json({ message: 'Lỗi đăng nhập người dùng', error });
   }
 };
 
 // Hàm thay đổi mật khẩu
 exports.changePassword = async (req, res) => {
-  const {tenDangNhap, oldPassword, newPassword} = req.body;
+  const { tenDangNhap, oldPassword, newPassword } = req.body;
 
   try {
-    const user = await UserModel.findOne({tenDangNhap});
+    const user = await UserModel.findOne({ tenDangNhap });
     if (!user) {
-      return res.status(404).json({message: 'Người dùng không tồn tại'});
+      return res.status(404).json({ message: 'Người dùng không tồn tại' });
     }
 
     // So sánh mật khẩu cũ (so sánh trực tiếp vì không cần bcrypt)
     if (user.matKhau !== oldPassword) {
-      return res.status(401).json({message: 'Mật khẩu cũ không đúng'});
+      return res.status(401).json({ message: 'Mật khẩu cũ không đúng' });
     }
 
     // Cập nhật mật khẩu mới
     user.matKhau = newPassword;
     await user.save();
-    res.status(200).json({message: 'Đổi mật khẩu thành công'});
+    res.status(200).json({ message: 'Đổi mật khẩu thành công' });
   } catch (error) {
     console.error('Lỗi khi đổi mật khẩu:', error);
-    res.status(500).json({message: 'Lỗi khi đổi mật khẩu', error});
+    res.status(500).json({ message: 'Lỗi khi đổi mật khẩu', error });
   }
 };
 
@@ -153,15 +169,15 @@ const sendEmail = async (email, newPassword) => {
 
 // Hàm quên mật khẩu
 exports.forgotPassword = async (req, res) => {
-  const {email} = req.body; // Lấy email từ yêu cầu
+  const { email } = req.body; // Lấy email từ yêu cầu
 
   try {
     // Tìm người dùng trong cơ sở dữ liệu bằng email (tenDangNhap là email)
-    const user = await UserModel.findOne({tenDangNhap: email}); // tenDangNhap là email
+    const user = await UserModel.findOne({ tenDangNhap: email }); // tenDangNhap là email
     if (!user) {
       return res
         .status(404)
-        .json({message: 'Không tìm thấy người dùng với email này'});
+        .json({ message: 'Không tìm thấy người dùng với email này' });
     }
 
     // Tạo mật khẩu mới ngẫu nhiên
@@ -174,9 +190,9 @@ exports.forgotPassword = async (req, res) => {
     // Gửi email với mật khẩu mới
     await sendEmail(email, newPassword);
 
-    res.status(200).json({message: 'Mật khẩu mới đã được gửi qua email!'});
+    res.status(200).json({ message: 'Mật khẩu mới đã được gửi qua email!' });
   } catch (error) {
     console.error('Lỗi khi quên mật khẩu:', error);
-    res.status(500).json({message: 'Lỗi khi quên mật khẩu', error});
+    res.status(500).json({ message: 'Lỗi khi quên mật khẩu', error });
   }
 };

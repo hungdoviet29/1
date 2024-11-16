@@ -10,7 +10,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var laptopRouter = require('./routes/laptop_router');
 var donHangRouter = require('./routes/donhang_router'); // Import route đơn hàng
-// var gioHangRouter = require('./routes/giohang_router'); // Import route giỏ hàng
+var cartRouter = require('./routes/cart_router');
 
 var app = express();
 
@@ -33,10 +33,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/laptop', laptopRouter);
 app.use('/donhang', donHangRouter); // Sử dụng route đơn hàng
-// app.use(function(req, res, next) {
-//     next(createError(404));
-// });
-
+app.use('/cart', cartRouter);
 // Error handler
 app.use(function(err, req, res, next) {
     // Thiết lập locals, chỉ cung cấp lỗi trong môi trường phát triển
