@@ -1,45 +1,39 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
 const {
   register,
   login,
+  getUserById,
   getAllUsers,
+  updateUser,
   deleteUser,
   changePassword,
   forgotPassword,
-  getUserById,
 } = require('../controllers/auth.controller');
 
+const router = express.Router();
 
-const { UserModel } = require('../models/user.model');
+// Route: Lấy danh sách tất cả người dùng
+router.get('/', getAllUsers);
 
-router.get('/:id', getUserById); // Đặt trước
-router.get('/', async function (req, res) {
-  try {
-    const users = await UserModel.find();
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: 'Lỗi khi lấy danh sách người dùng' });
-  }
-});
+// Route: Lấy thông tin người dùng theo ID
+router.get('/:id', getUserById);
 
-
-
-
-// Route xóa người dùng
-router.delete('/:id', deleteUser); // Đảm bảo rằng bạn đang sử dụng đường dẫn đúng
-
-
-// Route đăng ký
+// Route: Đăng ký người dùng mới
 router.post('/register', register);
 
-// Route đăng nhập
+// Route: Đăng nhập
 router.post('/login', login);
 
-// Route thay đổi mật khẩu
+// Route: Cập nhật thông tin người dùng
+router.put('/:id', updateUser);
+
+// Route: Thay đổi mật khẩu
 router.put('/changePassword', changePassword);
 
-// Route quên mật khẩu
-router.post('/forgotPassword', forgotPassword); // Thêm route forgotPassword
+// Route: Quên mật khẩu
+router.post('/forgotPassword', forgotPassword);
+
+// Route: Xóa người dùng
+router.delete('/:id', deleteUser);
 
 module.exports = router;

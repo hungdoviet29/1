@@ -22,6 +22,7 @@ import PortfolioDetails from './ScreensAdmin/PortfolioDetails';
 import PortfolioAdd from './ScreensAdmin/PortfolioAdd';
 import ProductBrandScreen from './ScreensAdmin/ProductBrandScreen';
 import AddBrand from './ScreensAdmin/AddBrand';
+import EditProfileScreen from './ScreensAdmin/EditProfileScreen';
 
 
 
@@ -65,6 +66,8 @@ import MainHomeScreen from './Screens/MainHomeScreen';
 import ShopContactInfo from './Screens/ShopContactInfo';
 
 
+
+
 // Import component Bottom Navigation
 import BottomNavigation from './components/bottomnavigation';
 import ProductScreen from './Screens/Buy';
@@ -102,7 +105,8 @@ const AppNavigator = ({ navigationRef }) => {
     'ProductBrandScreen',
     'ProductCategoryScreen',
     ,'PortfolioDetails',
-    'ShopContactInfo'
+    'ShopContactInfo',
+    'EditProfileScreen'
     
   ];
 
@@ -175,6 +179,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="MainHomeScreen" component={MainHomeScreen} />
         <Stack.Screen name="AddBrand" component={AddBrand} />
         <Stack.Screen name="ShopContactInfo" component={ShopContactInfo} />
+        <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
       </Stack.Navigator>
 
       {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}

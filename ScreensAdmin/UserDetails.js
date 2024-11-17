@@ -29,8 +29,8 @@ export default function UserDetails() {
         <Text style={styles.info}>{user.phone}</Text>
         <Text style={styles.email}>{user.email}</Text>
         
-        <Text style={styles.info}>VIET NAM</Text>
-        <Text style={styles.address}>{user.address}</Text>
+        
+        <Text style={styles.address}>{user.diaChi}</Text>
         
         <TouchableOpacity onPress={() => setShowHistory(!showHistory)}>
           <Text style={styles.historyLink}>LỊCH SỬ MUA HÀNG</Text>
