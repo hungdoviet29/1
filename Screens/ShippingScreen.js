@@ -1,91 +1,87 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useRoute } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, Button, Alert, StyleSheet, Text } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ShippingScreen = () => {
-    const navigation = useNavigation();
+const ShippingScreen = ({ navigation }) => {
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
     const [phone, setPhone] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const route = useRoute();
+    useEffect(() => {
+        const getSavedShippingInfo = async () => {
+            try {
+                const savedShippingInfo = await AsyncStorage.getItem('shippingInfo');
+                if (savedShippingInfo) {
+                    const parsedInfo = JSON.parse(savedShippingInfo);
+                    setName(parsedInfo.name);
+                    setAddress(parsedInfo.address);
+                    setPhone(parsedInfo.phone);
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy thông tin giao hàng:', error);
+            }
+        };
 
-    const handleContinue = () => {
+        getSavedShippingInfo();
+    }, []);
+
+    const handleSaveShippingInfo = async () => {
         if (!name || !address || !phone) {
-            Alert.alert('Error', 'Please fill in all the fields');
+            Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin giao hàng');
             return;
         }
 
-        const shippingInfo = {
-            name,
-            address,
-            phone,
-        };
+        const shippingInfo = { name, address, phone };
 
-        // Navigate to OrderScreen and pass shipping info along with total cost
-        navigation.navigate('OderScreen', { shippingInfo, totalCost: route.params?.totalCost });
+        try {
+            await AsyncStorage.setItem('shippingInfo', JSON.stringify(shippingInfo));
+
+            // Chuyển sang CheckoutScreen với thông tin giao hàng và tổng tiền
+            navigation.navigate('OderScreen', { shippingInfo });
+        } catch (error) {
+            console.error('Lỗi khi lưu thông tin giao hàng:', error);
+            Alert.alert('Lỗi', 'Không thể lưu thông tin giao hàng. Vui lòng thử lại.');
+        }
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Shipping Information</Text>
-            <TextInput 
-                style={[styles.input, { borderColor: '#007AFF' }]}
-                placeholder="Name"
+            <TextInput
+                style={styles.input}
+                placeholder="Tên"
                 value={name}
                 onChangeText={setName}
             />
-            <TextInput 
-                style={[styles.input, { borderColor: '#8A2BE2' }]}
-                placeholder="Address"
+            <TextInput
+                style={styles.input}
+                placeholder="Địa chỉ"
                 value={address}
                 onChangeText={setAddress}
             />
-            <TextInput 
-                style={[styles.input, { borderColor: '#8A2BE2' }]}
-                placeholder="Phone"
+            <TextInput
+                style={styles.input}
+                placeholder="Số điện thoại"
                 value={phone}
                 onChangeText={setPhone}
                 keyboardType="phone-pad"
             />
-            <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-                <Text style={styles.continueText}>Continue to Checkout</Text>
-            </TouchableOpacity>
+
+            <Button title="Lưu và Tiếp tục" onPress={handleSaveShippingInfo} />
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         padding: 20,
-        backgroundColor: '#FFF',
-        justifyContent: 'center', // Center elements on the screen
-    },
-    header: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 30,
     },
     input: {
-        borderWidth: 2,
-        padding: 15,  // Increase padding for larger input box
-        borderRadius: 8,
-        marginBottom: 20,
-        fontSize: 18,  // Larger font size for bigger text
-    },
-    continueButton: {
-        backgroundColor: '#6C63FF',
-        padding: 15,
-        borderRadius: 8,
-        alignItems: 'center',
-        marginTop: 30,
-    },
-    continueText: {
-        color: '#FFF',
+        borderWidth: 1,
+        borderColor: '#ddd',
+        marginBottom: 15,
+        padding: 10,
         fontSize: 16,
-        fontWeight: 'bold',
     },
 });
 

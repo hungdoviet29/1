@@ -26,9 +26,9 @@ const MainHome = () => {
     setLoading(true);
     try {
       const [popularResponse, saleResponse, trendingResponse] = await Promise.all([
-        axios.get('http://192.168.3.110:3000/LapTop/getPopularLapTop'),
-        axios.get('http://192.168.3.110:3000/LapTop/getSaleLapTop'),
-        axios.get('http://192.168.3.110:3000/LapTop/getTrendingLapTop'),
+        axios.get('http://192.168.3.106:3000/LapTop/getPopularLapTop'),
+        axios.get('http://192.168.3.106:3000/LapTop/getSaleLapTop'),
+        axios.get('http://192.168.3.106:3000/LapTop/getTrendingLapTop'),
       ]);
 
       setPopularLaptops(popularResponse.data.data);

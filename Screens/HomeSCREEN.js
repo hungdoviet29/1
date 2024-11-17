@@ -28,20 +28,20 @@ const HomeScreen = () => {
 
     switch (category) {
       case 'Popular':
-        apiUrl = 'http://192.168.3.110:3000/LapTop/getPopularLapTop';
+        apiUrl = 'http://192.168.3.106:3000/LapTop/getPopularLapTop';
         break;
       case 'Trending':
-        apiUrl = 'http://192.168.3.110:3000/LapTop/getTrendingLapTop';
+        apiUrl = 'http://192.168.3.106:3000/LapTop/getTrendingLapTop';
         break;
       case 'News':
-        apiUrl = 'http://192.168.3.110:3000/LapTop/getNewsLapTop';
+        apiUrl = 'http://192.168.3.106:3000/LapTop/getNewsLapTop';
         break;
       case 'Sale':
-        apiUrl = 'http://192.168.3.110:3000/LapTop/getSaleLapTop';
+        apiUrl = 'http://192.168.3.106:3000/LapTop/getSaleLapTop';
         break;
       case 'All':
       default:
-        apiUrl = 'http://192.168.3.110:3000/LapTop/getListLapTop';
+        apiUrl = 'http://192.168.3.106:3000/LapTop/getListLapTop';
     }
 
     axios

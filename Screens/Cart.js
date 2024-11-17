@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 const CartScreen = () => {
     const [userId, setUserId] = useState(null);
     const [cartItems, setCartItems] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
-
+    const navigation = useNavigation();
     useEffect(() => {
         const fetchUserId = async () => {
             try {
@@ -40,7 +41,7 @@ const CartScreen = () => {
 
     const fetchCartItems = async (id) => {
         try {
-            const response = await fetch(`http://192.168.3.110:3000/cart/${id}`);
+            const response = await fetch(`http://192.168.3.106:3000/cart/${id}`);
             const data = await response.json();
             console.log('Cart API Response:', data);
             if (response.ok) {
@@ -79,7 +80,7 @@ const CartScreen = () => {
         calculateTotal(updatedCartItems);
 
         try {
-            const response = await fetch('http://192.168.3.110:3000/cart/update', {
+            const response = await fetch('http://192.168.3.106:3000/cart/update', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, productId, quantity: newQuantity }),
@@ -97,7 +98,7 @@ const CartScreen = () => {
 
     const handleRemoveItem = async (productId) => {
         try {
-            const response = await fetch('http://192.168.3.110:3000/cart/remove', {
+            const response = await fetch('http://192.168.3.106:3000/cart/remove', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, productId }),
@@ -159,7 +160,9 @@ const CartScreen = () => {
             </ScrollView>
 
             <View style={styles.checkoutBar}>
-                <TouchableOpacity style={styles.checkoutButton}>
+                <TouchableOpacity style={styles.checkoutButton} onPress={() =>
+                        navigation.navigate('Checkout', { cartItems, totalAmount })
+                    }>
                     <Text style={styles.checkoutText}>Checkout</Text>
                     <Text style={styles.totalAmount}>{`${totalAmount.toLocaleString()} VND`}</Text>
                 </TouchableOpacity>
