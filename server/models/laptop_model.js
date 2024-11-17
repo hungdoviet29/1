@@ -10,7 +10,7 @@ const laptopSchema = new mongoose.Schema(
     danhMuc: { 
       type: String, 
       required: true,
-      enum: ['Popular', 'Trending', 'News', 'Sale'], // Giới hạn các giá trị của danh mục
+      enum: ['Popular', 'Trending', 'News', 'Sale', 'New', 'sale'], // Thêm các giá trị khác
     },
     soLuong: { type: Number, required: true },
     hang: { type: String, required: true },

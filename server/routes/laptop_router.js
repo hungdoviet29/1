@@ -1,7 +1,10 @@
-var express = require('express');
-var router = express.Router();
-const LapTopCtl = require('../controllers/laptop_controller');
 const multer = require('multer');
+const express = require('express');
+const router = express.Router();
+const upload = require('../middleware/upload'); // Middleware xử lý upload
+const LapTopCtl = require('../controllers/laptop_controller');
+const LapTopModel = require('../models/laptop_model');
+
 
 // Cấu hình multer để tải lên hình ảnh
 const storage = multer.diskStorage({

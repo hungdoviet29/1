@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-
 const ProductManagementScreen = () => {
   const navigation = useNavigation();
 
@@ -37,15 +36,12 @@ const ProductManagementScreen = () => {
     console.log(`Delete item with id: ${id}`);
   };
 
-  const handleAdd = () => {
-    navigation.navigate('AddBrand');
-  };
-  const handleBrandPress = (id) => {
-    navigation.navigate('ProductBrandScreen', { brandId: id });
+  const handleAddProduct = (brandName) => {
+    navigation.navigate('ProductAdd', { selectedBrand: brandName }); // Truyền tên hãng sang màn ProductAdd
   };
 
   const renderBrand = ({ item }) => (
-    <TouchableOpacity onPress={() => handleBrandPress(item.id)} style={styles.brandContainer}>
+    <TouchableOpacity onPress={() => handleAddProduct(item.name)} style={styles.brandContainer}>
       <Image source={item.logo} style={styles.logo} />
       <Text style={styles.brandName}>{item.name}</Text>
       <View style={styles.buttonContainer}>
@@ -71,9 +67,6 @@ const ProductManagementScreen = () => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
       />
-      <TouchableOpacity style={styles.addButton} onPress={handleAdd}>
-        <Image source={require('../acssets/them.png')} />
-      </TouchableOpacity>
     </View>
   );
 };
@@ -85,8 +78,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
-    textAlign:'center',
-    color:'black',
+    textAlign: 'center',
+    color: 'black',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 15,
@@ -126,17 +119,6 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     tintColor: '#333',
-  },
-  addButton: {
-    position: 'absolute',
-    bottom: 100,
-    right: 50,
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#00C853',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
 

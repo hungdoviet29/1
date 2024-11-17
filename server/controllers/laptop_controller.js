@@ -67,28 +67,38 @@ exports.getPopularLapTop = async (req, res) => {
   };
   
 
-exports.addlaptop = async (req, res, next) => {
+  exports.addlaptop = async (req, res) => {
     try {
-        const { file } = req;
-        const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
-
-        const data = req.body;
-        const newlaptop = new laptopModel({
-            id: data.id,
-            ten: data.ten,
-            moTa: data.moTa,
-            gia: data.gia,
-            hinhAnh: imageUrl,
-            danhMuc: data.danhMuc,
-            soLuong: data.soLuong,
-            hang: data.hang,
-        });
-        const savelaptop = await newlaptop.save();
-        res.status(201).json(savelaptop);
+      console.log('Body:', req.body);
+      console.log('File:', req.file);
+  
+      const { ten, moTa, gia, danhMuc, soLuong, hang } = req.body;
+  
+      let hinhAnhUrl = '';
+      if (req.file) {
+        hinhAnhUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+      }
+  
+      const newLaptop = new laptopModel({
+        ten,
+        moTa,
+        gia: Number(gia),
+        hinhAnh: hinhAnhUrl,
+        danhMuc,
+        soLuong: Number(soLuong),
+        hang,
+      });
+  
+      const savedLaptop = await newLaptop.save();
+      console.log('Lưu vào MongoDB thành công:', savedLaptop);
+  
+      res.status(201).json({ message: 'Sản phẩm đã được thêm thành công!', data: savedLaptop });
     } catch (error) {
-        res.json({ status: "lỗi", result: error });
+      console.error('Lỗi khi thêm sản phẩm:', error);
+      res.status(500).json({ message: 'Không thể thêm sản phẩm', error: error.message });
     }
-};
+  };
+  
 
 exports.updatelaptop = async (req, res, next) => {
     try {
