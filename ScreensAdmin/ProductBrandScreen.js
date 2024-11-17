@@ -1,21 +1,44 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, FlatList } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, FlatList, ActivityIndicator } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const ProductBrandScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
 
-  const handleAdd = () => {
-    navigation.navigate('ProductAdd');
+  const [selectedBrand, setSelectedBrand] = useState('');
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true); // Hiển thị trạng thái tải dữ liệu
+
+  useEffect(() => {
+    if (route.params?.selectedBrand) {
+      setSelectedBrand(route.params.selectedBrand);
+      fetchProducts(route.params.selectedBrand);
+    }
+  }, [route.params]);
+
+  // Hàm gọi API để lấy sản phẩm theo hãng
+  const fetchProducts = async (brand) => {
+    try {
+      const response = await fetch(`http://192.168.3.110:3000/laptops/brand/${brand}`);
+      const result = await response.json();
+      if (response.ok) {
+        setProducts(result.data); // Gán dữ liệu sản phẩm từ API
+      } else {
+        console.log('Error:', result.message);
+        setProducts([]);
+      }
+    } catch (error) {
+      console.error('Lỗi khi gọi API:', error);
+      setProducts([]);
+    } finally {
+      setLoading(false); // Dừng trạng thái tải dữ liệu
+    }
   };
 
-  // Dữ liệu giả để hiển thị danh sách sản phẩm
-  const products = [
-    { id: '1', name: 'Asus vivobook', price: 120, originalPrice: 240, discount: 50, rating: 4.5 },
-    { id: '2', name: 'Asus vivobook', price: 120, originalPrice: 240, discount: 50, rating: 4.5 },
-    { id: '3', name: 'Asus vivobook', price: 120, originalPrice: 240, discount: 50, rating: 4.5 },
-    { id: '4', name: 'Asus vivobook', price: 120, originalPrice: 240, discount: 50, rating: 4.5 },
-  ];
+  const handleAdd = () => {
+    navigation.navigate('ProductAdd', { selectedBrand }); // Truyền tiếp tên hãng sang màn ProductAdd
+  };
 
   // Hàm render từng sản phẩm trong danh sách
   const renderProduct = ({ item }) => (
@@ -23,22 +46,19 @@ const ProductBrandScreen = () => {
       <TouchableOpacity style={styles.deleteButton}>
         <Text style={styles.deleteIcon}>×</Text>
       </TouchableOpacity>
-      <Image
-        source={require('../acssets/image_sp2.png')}
-        style={styles.productImage}
-      />
+      <Image source={{ uri: item.hinhAnh }} style={styles.productImage} />
       <View style={styles.productInfo}>
-        <Text style={styles.discountText}>-{item.discount}%</Text>
-        <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productPrice}>${item.price.toFixed(2)} USD</Text>
-        <Text style={styles.originalPrice}>${item.originalPrice.toFixed(2)}</Text>
+        <Text style={styles.discountText}>-{item.danhMuc === 'Sale' ? '50%' : ''}</Text>
+        <Text style={styles.productName}>{item.ten}</Text>
+        <Text style={styles.productPrice}>${(item.gia / 1000000).toFixed(2)}M</Text>
+        <Text style={styles.originalPrice}>${((item.gia * 1.5) / 1000000).toFixed(2)}M</Text>
         <View style={styles.ratingContainer}>
           {[...Array(5)].map((_, index) => (
-            <Text key={index} style={[styles.star, index < item.rating ? styles.starFilled : styles.starEmpty]}>
+            <Text key={index} style={[styles.star, index < 4 ? styles.starFilled : styles.starEmpty]}>
               ★
             </Text>
           ))}
-          <Text style={styles.ratingText}>({item.rating})</Text>
+          <Text style={styles.ratingText}>(4.5)</Text>
         </View>
       </View>
     </View>
@@ -49,21 +69,21 @@ const ProductBrandScreen = () => {
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
       </TouchableOpacity>
-      <Text style={styles.header}>Product Brand</Text>
+      <Text style={styles.header}>Sản phẩm theo hãng: {selectedBrand}</Text>
       <View style={styles.content}>
-        <Text style={styles.title}>Acer</Text>
-        <FlatList
-          data={products}
-          renderItem={renderProduct}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          contentContainerStyle={styles.productList}
-        />
-        <TouchableOpacity style={styles.addButton}  onPress={handleAdd}>
-          <Image
-            source={require('../acssets/them.png')}
-            style={styles.addIcon}
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <FlatList
+            data={products}
+            renderItem={renderProduct}
+            keyExtractor={(item) => item._id}
+            numColumns={2}
+            contentContainerStyle={styles.productList}
           />
+        )}
+        <TouchableOpacity style={styles.addButton} onPress={handleAdd}>
+          <Image source={require('../acssets/them.png')} style={styles.addIcon} />
         </TouchableOpacity>
       </View>
     </View>
@@ -89,13 +109,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     marginHorizontal: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#6C4AB6',
-    marginBottom: 20,
-    textAlign: 'center',
   },
   productList: {
     paddingBottom: 80,

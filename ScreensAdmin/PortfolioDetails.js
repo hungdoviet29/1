@@ -1,46 +1,73 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, FlatList } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, FlatList, ActivityIndicator } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const DetailPortfolio = () => {
   const navigation = useNavigation();
-  // Dữ liệu giả để hiển thị danh sách sản phẩm
-  const products = [
-    { id: '1', name: 'Asus vivobook', price: 120, originalPrice: 240, discount: 50, rating: 4.5 },
-    { id: '2', name: 'Asus vivobook', price: 120, originalPrice: 240, discount: 50, rating: 4.5 },
-    { id: '3', name: 'Asus vivobook', price: 120, originalPrice: 240, discount: 50, rating: 4.5 },
-    { id: '4', name: 'Asus vivobook', price: 120, originalPrice: 240, discount: 50, rating: 4.5 },
-  ];
+  const route = useRoute();
 
-  // Hàm render từng sản phẩm trong danh sách
+  const [category, setCategory] = useState('');
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const categoryUrls = {
+    ALL: 'http://192.168.3.110:3000/LapTop/getListLapTop',
+    Popular: 'http://192.168.3.110:3000/LapTop/getPopularLapTop',
+    Trending: 'http://192.168.3.110:3000/LapTop/getTrendingLapTop',
+    Sale: 'http://192.168.3.110:3000/LapTop/getSaleLapTop',
+    New: 'http://192.168.3.110:3000/LapTop/getNewsLapTop',
+  };
+
+  useEffect(() => {
+    if (route.params?.category) {
+      const selectedCategory = route.params.category;
+      setCategory(selectedCategory);
+      fetchProductsByCategory(selectedCategory);
+    }
+  }, [route.params]);
+
+  const fetchProductsByCategory = async (categoryName) => {
+    setLoading(true);
+    const url = categoryUrls[categoryName] || categoryUrls.ALL;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (response.ok && data.data) {
+        setProducts(data.data);
+      } else {
+        setProducts([]);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderProduct = ({ item }) => (
     <View style={styles.productContainer}>
-      {/* Nút xóa */}
       <TouchableOpacity style={styles.deleteButton}>
         <Text style={styles.deleteIcon}>×</Text>
       </TouchableOpacity>
 
-      {/* Ảnh sản phẩm */}
       <Image
-        source={require('../acssets/Asus1.png')} // Đường dẫn tới ảnh sản phẩm
+        source={{ uri: item.hinhAnh || 'https://via.placeholder.com/150' }}
         style={styles.productImage}
       />
 
-      {/* Thông tin sản phẩm */}
       <View style={styles.productInfo}>
-        <Text style={styles.discountText}>-{item.discount}%</Text>
-        <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productPrice}>${item.price.toFixed(2)} USD</Text>
-        <Text style={styles.originalPrice}>${item.originalPrice.toFixed(2)}</Text>
-        
-        {/* Hiển thị đánh giá */}
+        <Text style={styles.discountText}>-{item.discount || 50}%</Text>
+        <Text style={styles.productName}>{item.ten || 'Tên sản phẩm'}</Text>
+        <Text style={styles.productPrice}>${(item.gia || 0).toLocaleString()} USD</Text>
+        <Text style={styles.originalPrice}>${((item.gia || 0) * 2).toLocaleString()}</Text>
         <View style={styles.ratingContainer}>
           {[...Array(5)].map((_, index) => (
             <Text key={index} style={[styles.star, index < item.rating ? styles.starFilled : styles.starEmpty]}>
               ★
             </Text>
           ))}
-          <Text style={styles.ratingText}>({item.rating})</Text>
+          <Text style={styles.ratingText}>({item.rating || '4.0'})</Text>
         </View>
       </View>
     </View>
@@ -49,30 +76,42 @@ const DetailPortfolio = () => {
   return (
     <View style={styles.container}>
       {/* Nút Quay Lại */}
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
-      </TouchableOpacity>
-      <Text style={styles.header}>Detail Portfolio</Text>
-      <View style={styles.content}>
-        <Text style={styles.title}>Popular</Text>
-        <FlatList
-          data={products}
-          renderItem={renderProduct}
-          keyExtractor={(item) => item.id}
-          numColumns={2} // Hiển thị 2 sản phẩm trên 1 hàng
-          contentContainerStyle={styles.productList}
+      <TouchableOpacity 
+        onPress={() => navigation.navigate('PortfolioManagement')} 
+        style={styles.backButton}>
+        <Image 
+          source={require('../acssets/BackButton.png')} 
+          style={styles.backIcon} 
         />
+      </TouchableOpacity>
 
-        {/* Nút thêm sản phẩm */}
-        <TouchableOpacity 
+      {/* Header */}
+      <Text style={styles.header}>Danh mục: {category || 'Tất cả sản phẩm'}</Text>
+
+      {/* Danh sách sản phẩm */}
+      <View style={styles.content}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <FlatList
+            data={products}
+            renderItem={renderProduct}
+            keyExtractor={(item) => item._id}
+            numColumns={2}
+            contentContainerStyle={styles.productList}
+          />
+        )}
+      </View>
+
+      {/* Nút Thêm */}
+      <TouchableOpacity 
         style={styles.addButton}
         onPress={() => navigation.navigate('PortfolioAdd')}>
-          <Image
-            source={require('../acssets/them.png')} // Đường dẫn tới ảnh icon nút thêm
-            style={styles.addIcon}
-          />
-        </TouchableOpacity>
-      </View>
+        <Image
+          source={require('../acssets/them.png')} // Đường dẫn tới ảnh icon nút thêm
+          style={styles.addIcon}
+        />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -84,7 +123,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   header: {
-    textAlign:'center',
+    textAlign: 'center',
     fontSize: 18,
     fontWeight: 'bold',
     paddingHorizontal: 20,
@@ -97,25 +136,21 @@ const styles = StyleSheet.create({
     padding: 20,
     marginHorizontal: 20,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#6C4AB6',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
   productList: {
-    paddingBottom: 80, // Để tránh nút thêm che khuất sản phẩm
+    paddingBottom: 80,
   },
   productContainer: {
-    width: '47%',
-    backgroundColor: 'while',
+    width: '45%',
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     marginBottom: 20,
-    marginHorizontal: '1.5%',
+    marginHorizontal: '2.5%',
     padding: 10,
-    position: 'relative',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
   },
   deleteButton: {
     position: 'absolute',
@@ -130,32 +165,33 @@ const styles = StyleSheet.create({
     width: 100,
     height: 80,
     resizeMode: 'contain',
+    marginBottom: 10,
   },
   productInfo: {
     alignItems: 'center',
-    marginTop: 10,
   },
   discountText: {
     color: '#FF3B30',
     fontSize: 12,
     fontWeight: 'bold',
-    position: 'absolute',
-    top: -10,
-    left: -5,
+    marginBottom: 5,
   },
   productName: {
     fontSize: 14,
     fontWeight: 'bold',
-    marginVertical: 5,
+    marginBottom: 5,
+    textAlign: 'center',
   },
   productPrice: {
     fontSize: 14,
     color: '#FF3B30',
+    fontWeight: 'bold',
   },
   originalPrice: {
     fontSize: 12,
     color: '#888',
     textDecorationLine: 'line-through',
+    marginBottom: 5,
   },
   ratingContainer: {
     flexDirection: 'row',
@@ -164,7 +200,6 @@ const styles = StyleSheet.create({
   },
   star: {
     fontSize: 12,
-    color: '#FFD700',
   },
   starFilled: {
     color: '#FFD700',
@@ -177,15 +212,30 @@ const styles = StyleSheet.create({
     color: '#888',
     marginLeft: 5,
   },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'absolute',
+    top: 20,
+    left: 10,
+    zIndex: 10, // Đảm bảo nút nằm trên các thành phần khác
+    backgroundColor: 'transparent',
+    padding: 0,
+  },
+  backIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 5,
+  },
   addButton: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
+    bottom: 70,
+    right: 30,
     width: 50,
-    paddingBottom:100,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 10,
   },
   addIcon: {
     width: 50,

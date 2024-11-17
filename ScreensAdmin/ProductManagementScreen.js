@@ -37,7 +37,7 @@ const ProductManagementScreen = () => {
   };
 
   const handleAddProduct = (brandName) => {
-    navigation.navigate('ProductAdd', { selectedBrand: brandName }); // Truyền tên hãng sang màn ProductAdd
+    navigation.navigate('ProductBrandScreen', { selectedBrand: brandName }); // Truyền tên hãng sang ProductBrandScreen
   };
 
   const renderBrand = ({ item }) => (

@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'react-native-image-picker';
 
@@ -9,9 +19,15 @@ export default function ProductAdd() {
 
   // Nhận thông tin hãng từ route params
   const [selectedBrand, setSelectedBrand] = useState('');
+  const [loading, setLoading] = useState(false); // State để hiển thị spinner khi tải
+
   useEffect(() => {
+    // Gán thông tin hãng từ route params
     if (route.params?.selectedBrand) {
-      setSelectedBrand(route.params.selectedBrand); // Gán hãng từ màn trước
+      console.log('Received brand:', route.params.selectedBrand); // Log kiểm tra dữ liệu
+      setSelectedBrand(route.params.selectedBrand);
+    } else {
+      console.log('No brand received');
     }
   }, [route.params]);
 
@@ -39,6 +55,8 @@ export default function ProductAdd() {
       return;
     }
 
+    setLoading(true); // Hiển thị spinner khi gửi yêu cầu
+
     const formData = new FormData();
     formData.append('ten', productName);
     formData.append('moTa', productDescription);
@@ -60,12 +78,12 @@ export default function ProductAdd() {
         method: 'POST',
         body: formData,
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
       });
 
       const result = await response.json();
-      console.log('Response:', result);
+      setLoading(false); // Ẩn spinner sau khi nhận phản hồi
 
       if (response.ok) {
         Alert.alert('Thành công', 'Sản phẩm đã được thêm!');
@@ -74,8 +92,9 @@ export default function ProductAdd() {
         Alert.alert('Lỗi', result.message || 'Có lỗi xảy ra.');
       }
     } catch (error) {
-      console.log('Error:', error);
-      Alert.alert('Lỗi', error.message);
+      setLoading(false); // Ẩn spinner khi xảy ra lỗi
+      console.error('Error:', error);
+      Alert.alert('Lỗi', 'Đã xảy ra lỗi trong quá trình thêm sản phẩm.');
     }
   };
 
@@ -89,7 +108,9 @@ export default function ProductAdd() {
       {/* Tiêu đề */}
       <Text style={styles.headerText}>PRODUCT ADD</Text>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.label}>Hãng: {selectedBrand}</Text>
+        <Text style={styles.label}>
+          Hãng: {selectedBrand ? selectedBrand : 'Không có thông tin hãng'}
+        </Text>
 
         {/* Hình ảnh sản phẩm */}
         <View style={styles.infoSection}>
@@ -166,10 +187,16 @@ export default function ProductAdd() {
       <TouchableOpacity onPress={handleSaveProduct} style={styles.okButton}>
         <Text style={styles.okButtonText}>OK</Text>
       </TouchableOpacity>
+
+      {/* Loading Spinner */}
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      )}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -239,5 +266,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     left: 10,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

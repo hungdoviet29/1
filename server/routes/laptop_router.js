@@ -4,6 +4,8 @@ const router = express.Router();
 const upload = require('../middleware/upload'); // Middleware xử lý upload
 const LapTopCtl = require('../controllers/laptop_controller');
 const LapTopModel = require('../models/laptop_model');
+const laptopController = require('../controllers/laptop_controller');
+
 
 
 // Cấu hình multer để tải lên hình ảnh
@@ -31,6 +33,7 @@ router.get("/getTrendingLapTop", LapTopCtl.getTrendingLapTop);
 router.get("/getNewsLapTop", LapTopCtl.getNewsLapTop);
 router.get("/getSaleLapTop", LapTopCtl.getSaleLapTop);
 router.get("/getListLapTop", LapTopCtl.getListlaptop);
-
+//theo hãng
+router.get('/brand/:brand', laptopController.getLaptopsByBrand);
 
 module.exports = router;

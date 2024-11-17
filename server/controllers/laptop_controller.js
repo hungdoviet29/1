@@ -167,3 +167,18 @@ exports.getlaptopById = async (req, res, next) => {
         res.status(500).json({ message: "Lỗi server", result: error });
     }
 };
+exports.getLaptopsByBrand = async (req, res) => {
+  const brand = req.params.brand;
+
+  try {
+      const brandLaptops = await laptopModel.find({ hang: brand });
+      if (brandLaptops.length === 0) {
+          return res.status(404).json({ message: 'Không có sản phẩm nào thuộc hãng này' });
+      }
+
+      res.status(200).json({ status: 200, data: brandLaptops });
+  } catch (error) {
+      res.status(500).json({ status: "lỗi", result: error.message });
+  }
+};
+
