@@ -17,11 +17,24 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
+  // Kiểm tra độ mạnh của mật khẩu
+  const validatePassword = (password) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/;
+    return regex.test(password);
+  };
+
   const handleRegister = async () => {
-    if (password !== confirmPassword) {
-      setError('Mật khẩu không khớp.');
-      return;
-    }
+    // if (!validatePassword(password)) {
+    //   setError(
+    //     'Mật khẩu cần có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.'
+    //   );
+    //   return;
+    // }
+
+    // if (password !== confirmPassword) {
+    //   setError('Mật khẩu không khớp.');
+    //   return;
+    // }
 
     const newUser = {
       tenDangNhap: email,
@@ -197,5 +210,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+//sgfdtsfd
 
 export default Register;

@@ -29,7 +29,6 @@ const Login = ({ route }) => {
   );
 
   useEffect(() => {
-    // Load saved credentials on component mount
     const loadCredentials = async () => {
       const savedUsername = await AsyncStorage.getItem('username');
       const savedPassword = await AsyncStorage.getItem('password');
@@ -46,30 +45,41 @@ const Login = ({ route }) => {
   }, []);
 
   const handleLogin = async () => {
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Kiểm tra định dạng email
+    // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/; // Mật khẩu mạnh
+
+    // if (!emailRegex.test(tenDangNhap)) {
+    //   setError('Email không hợp lệ. Vui lòng nhập đúng định dạng.');
+    //   return;
+    // }
+
+    // if (!passwordRegex.test(matKhau)) {
+    //   setError(
+    //     'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.'
+    //   );
+    //   return;
+    // }
+
     try {
-      const response = await fetch('http://192.168.3.110:3000/users');
+      const response = await fetch('http://192.168.0.104:3000/users');
       const users = await response.json();
       const user = users.find(
         user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau
       );
-  
+
       if (user) {
-        // Save userId to AsyncStorage
         await AsyncStorage.setItem('userId', user._id);
-  
-        // Save credentials if "Remember Me" is checked
+
         if (rememberMe) {
           await AsyncStorage.setItem('username', tenDangNhap);
           await AsyncStorage.setItem('password', matKhau);
           await AsyncStorage.setItem('rememberMe', 'true');
         } else {
-          // Clear saved credentials if "Remember Me" is unchecked
           await AsyncStorage.removeItem('username');
           await AsyncStorage.removeItem('password');
           await AsyncStorage.setItem('rememberMe', 'false');
         }
-  
-        // Navigate to the appropriate screen based on user role
+
         navigation.navigate(user.roll === 1 ? 'AdminHome' : 'MainHomeScreen', {
           username: user.tenDangNhap,
         });
@@ -80,7 +90,6 @@ const Login = ({ route }) => {
       setError('Lỗi kết nối mạng.');
     }
   };
-  
 
   return (
     <View style={styles.container}>
@@ -88,12 +97,12 @@ const Login = ({ route }) => {
         <ImageBackground
           source={require('../acssets/laplogin.png')}
           style={styles.background}
-          imageStyle={{ borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}
+          imageStyle={{ borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}
         >
           <Text style={styles.welcomeText}>Welcome Back!</Text>
         </ImageBackground>
         <Text style={styles.loginText}>LOG IN</Text>
-        
+
         <Text style={styles.label}>Email address</Text>
         <View style={styles.inputContainer}>
           <TextInput
@@ -103,6 +112,7 @@ const Login = ({ route }) => {
             placeholder="Enter your email"
             keyboardType="email-address"
             placeholderTextColor="#C1C1C1"
+            autoCapitalize="none"
           />
         </View>
 
@@ -125,10 +135,12 @@ const Login = ({ route }) => {
             onPress={() => setRememberMe(!rememberMe)}
             style={styles.checkboxContainer}
           >
-            <View style={[
-              styles.checkbox,
-              rememberMe && styles.checkboxChecked,
-            ]}>
+            <View
+              style={[
+                styles.checkbox,
+                rememberMe && styles.checkboxChecked,
+              ]}
+            >
               {rememberMe && <View style={styles.checkboxTick} />}
             </View>
             <Text style={styles.rememberMeText}>Remember me</Text>
@@ -146,7 +158,7 @@ const Login = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F1F1', // Màu nền tổng thể
+    backgroundColor: '#F4F1F1',
     justifyContent: 'center',
     alignItems: 'center',
     margin: 0,
@@ -167,7 +179,6 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 30,
-    fontWeight: 'condensed',
     color: '#333',
     marginLeft: 20,
     marginVertical: 50,
@@ -177,11 +188,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
     paddingBottom: 20,
   },
   label: {
@@ -270,5 +276,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+//lo
 
 export default Login;

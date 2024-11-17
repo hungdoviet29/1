@@ -1,26 +1,48 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Alert, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
-const AccountManagement = ({ navigation }) => {
-  const userData = {
-    avatar: 'https://via.placeholder.com/100', // Replace with actual URL
-    name: 'NGUYỄN VĂN A',
-    id: '0336394568',
-    phone: '0357103658',
-    email: 'linhdtqph35049@gmail.com',
-    nationality: 'Việt Nam',
-    gender: 'Nữ',
-    birthDate: '29/12/2004',
-    password: '********',
-  };
+const AccountManagement = () => {
+  const [userInfo, setUserInfo] = useState(null);
+  const navigation = useNavigation();
 
-  const handleLogout = () => {
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const userId = await AsyncStorage.getItem('userId');
+        if (!userId) {
+          Alert.alert('Lỗi', 'Không tìm thấy thông tin đăng nhập.');
+          return;
+        }
+        const response = await axios.get(`http://192.168.0.104:3000/users/${userId}`);
+        setUserInfo(response.data);
+      } catch (error) {
+        console.error('Lỗi khi lấy thông tin người dùng:', error);
+        Alert.alert('Lỗi', 'Không thể tải thông tin người dùng.');
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  const handleLogout = async () => {
+    await AsyncStorage.clear();
     navigation.reset({
       index: 0,
       routes: [{ name: 'Login', params: { clearInputs: true } }],
     });
   };
+
+  if (!userInfo) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007BFF" />
+        <Text style={styles.loadingText}>Đang tải thông tin...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -30,34 +52,39 @@ const AccountManagement = ({ navigation }) => {
 
       <Text style={styles.header}>Account Management</Text>
 
-      <View style={styles.profileSection}>
-        <Image source={{ uri: userData.avatar }} style={styles.avatar} />
-        <Text style={styles.username}>{userData.name}</Text>
-        <Text style={styles.userId}>ID: {userData.id}</Text>
+      {/* Header thông tin người dùng */}
+      <View style={styles.headerContainer}>
+        <Image
+          source={{ uri: userInfo.avatar || 'https://via.placeholder.com/100' }}
+          style={styles.avatar}
+        />
+        <Text style={styles.name}>{userInfo.tenDangNhap || 'Nguyễn Văn A'}</Text>
+        <Text style={styles.userId}>ID: {userInfo._id || 'Không xác định'}</Text>
       </View>
 
+      {/* Danh sách tùy chọn */}
       <View style={styles.optionList}>
-        <TouchableOpacity 
-          style={styles.optionItem} 
-          onPress={() => navigation.navigate('EditPersonalInformation', { userData })}
-        >
-          <Text style={styles.optionIcon}>👤</Text>
-          <Text style={styles.optionText}>Chỉnh sửa thông tin</Text>
-          <Text style={styles.arrow}>›</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.optionItem} 
-          onPress={() => navigation.navigate('ShopContactInfo', { userData })}
+      <TouchableOpacity
+  style={styles.optionItem}
+  onPress={() => navigation.navigate('EditPersonalInformation', { userData: userInfo })} // Truyền userInfo sang màn tiếp theo
+>
+  <Text style={styles.optionIcon}>👤</Text>
+  <Text style={styles.optionText}>Chỉnh sửa thông tin</Text>
+  <Text style={styles.arrow}>›</Text>
+</TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.optionItem}
+          onPress={() => navigation.navigate('ShopContactInfo', { userData: userInfo })}
         >
           <Text style={styles.optionIcon}>📞</Text>
           <Text style={styles.optionText}>Thông tin liên hệ</Text>
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.optionItem} 
-          onPress={() => navigation.navigate('DirectMessaging', { userData })}
+        <TouchableOpacity
+          style={styles.optionItem}
+          onPress={() => navigation.navigate('DirectMessaging', { userData: userInfo })}
         >
           <Text style={styles.optionIcon}>💬</Text>
           <Text style={styles.optionText}>Nhắn tin trực tiếp</Text>
@@ -65,6 +92,7 @@ const AccountManagement = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
+      {/* Nút đăng xuất */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Đăng xuất</Text>
       </TouchableOpacity>
@@ -93,9 +121,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 20,
   },
-  profileSection: {
+  headerContainer: {
     alignItems: 'center',
-    marginBottom: 30,
+    padding: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    borderRadius: 10,
+    marginBottom: 20,
   },
   avatar: {
     width: 100,
@@ -103,32 +136,34 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginBottom: 10,
   },
-  username: {
-    fontSize: 18,
+  name: {
+    fontSize: 20,
     fontWeight: 'bold',
+    color: '#333',
   },
   userId: {
     fontSize: 14,
-    color: '#666',
+    color: '#888',
+    marginTop: 5,
   },
   optionList: {
-    backgroundColor: '#EDEDED',
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    marginTop: 20,
+    elevation: 3,
+    paddingVertical: 10,
   },
   optionItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 15,
-    paddingHorizontal: 10,
-    marginBottom: 15, // Add marginBottom for spacing
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#D0D0D0',
+    borderBottomColor: '#E0E0E0',
   },
   optionIcon: {
-    fontSize: 20,
+    fontSize: 22,
+    color: '#007BFF',
     marginRight: 15,
-    color: '#333',
   },
   optionText: {
     flex: 1,
@@ -152,6 +187,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    color: '#555',
+  },
 });
+
 
 export default AccountManagement;

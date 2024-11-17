@@ -24,7 +24,7 @@ export default function UserDetails() {
           style={styles.avatar}
         />
         
-        <Text style={styles.name}>{user.name}</Text>
+        <Text style={styles.name}>{user.tenDangNhap}</Text>
         
         <Text style={styles.info}>{user.phone}</Text>
         <Text style={styles.email}>{user.email}</Text>
@@ -136,3 +136,4 @@ const styles = StyleSheet.create({
     color: '#666',
   },
 });
+

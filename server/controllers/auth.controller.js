@@ -1,7 +1,6 @@
 const { UserModel } = require('../models/user.model'); // Đảm bảo import đúng model User
 const { CartModel } = require('../models/cart_model'); // Đảm bảo import đúng model Cart
 const nodemailer = require('nodemailer'); // Thư viện gửi email cho người dùng
-
 // Hàm xóa người dùng theo ID
 exports.deleteUser = async (req, res) => {
   try {
@@ -27,6 +26,27 @@ exports.deleteUser = async (req, res) => {
     return res.status(500).json({ message: 'Lỗi khi xóa người dùng', error });
   }
 };
+// sem thong tin
+exports.getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id || id.length !== 24) {
+      return res.status(400).json({ message: 'ID không hợp lệ' });
+    }
+
+    const user = await UserModel.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Lỗi khi lấy thông tin người dùng:', error);
+    res.status(500).json({ message: 'Lỗi server', error });
+  }
+};
+
 
 // Hàm đăng ký
 exports.register = async (req, res) => {
@@ -86,15 +106,16 @@ exports.login = async (req, res) => {
   try {
     const user = await UserModel.findOne({ tenDangNhap });
     if (!user || user.matKhau !== matKhau) {
-      return res.status(401).json({ message: 'Sai tên đăng nhập hoặc mật khẩu' });
+      return res.status(401).json({ message: 'Sai tên đăng nhập hoặc mật khẩu.' });
     }
 
-    res.status(200).json({ message: 'Đăng nhập thành công!', user });
+    res.status(200).json({ user, message: 'Đăng nhập thành công!' });
   } catch (error) {
     console.error('Lỗi khi đăng nhập:', error);
-    res.status(500).json({ message: 'Lỗi đăng nhập người dùng', error });
+    res.status(500).json({ message: 'Lỗi server', error });
   }
 };
+
 
 // Hàm thay đổi mật khẩu
 exports.changePassword = async (req, res) => {

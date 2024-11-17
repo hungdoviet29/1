@@ -6,23 +6,29 @@ const {
   getAllUsers,
   deleteUser,
   changePassword,
-  forgotPassword, // Thêm forgotPassword vào
+  forgotPassword,
+  getUserById,
 } = require('../controllers/auth.controller');
-const {UserModel} = require('../models/user.model');
 
-// Route lấy danh sách người dùng
-router.get('/', async function (req, res, next) {
+
+const { UserModel } = require('../models/user.model');
+
+router.get('/:id', getUserById); // Đặt trước
+router.get('/', async function (req, res) {
   try {
-    const users = await UserModel.find(); // Truy vấn tất cả người dùng từ MongoDB
-    res.json(users); // Trả về danh sách người dùng, bao gồm trường avatar
+    const users = await UserModel.find();
+    res.json(users);
   } catch (error) {
-    console.error('Lỗi khi lấy danh sách người dùng:', error);
-    res.status(500).json({message: 'Lỗi khi lấy danh sách người dùng'});
+    res.status(500).json({ message: 'Lỗi khi lấy danh sách người dùng' });
   }
 });
 
-// Xử lý xóa người dùng
+
+
+
+// Route xóa người dùng
 router.delete('/:id', deleteUser); // Đảm bảo rằng bạn đang sử dụng đường dẫn đúng
+
 
 // Route đăng ký
 router.post('/register', register);
