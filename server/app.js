@@ -34,6 +34,7 @@ app.use('/users', usersRouter);
 app.use('/laptop', laptopRouter);
 app.use('/donhang', donHangRouter); // Sử dụng route đơn hàng
 app.use('/cart', cartRouter);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Error handler
 app.use(function(err, req, res, next) {
     // Thiết lập locals, chỉ cung cấp lỗi trong môi trường phát triển
