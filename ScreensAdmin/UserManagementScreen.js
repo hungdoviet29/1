@@ -16,13 +16,16 @@ const UserManagementScreen = ({navigation}) => {
   // Hàm gọi API lấy danh sách người dùng
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://192.168.101.9:3000/users'); // Đặt URL đúng
-      setUsers(response.data);
+      const response = await axios.get('http://192.168.0.104:3000/users'); // Đặt URL đúng
+  
+      // Lọc ra các tài khoản không phải admin
+      const filteredUsers = response.data.filter(user => user.vaiTro !== 'admin');
+  
+      setUsers(filteredUsers);
     } catch (error) {
       console.error('Lỗi khi lấy dữ liệu người dùng:', error);
     }
   };
-
   useEffect(() => {
     fetchUsers(); // Lấy dữ liệu người dùng khi component được render
   }, []);
@@ -37,7 +40,7 @@ const UserManagementScreen = ({navigation}) => {
           try {
             // Gọi API xóa người dùng
             console.log('User ID:', userId); // Kiểm tra giá trị của userId
-            axios.delete(`http://192.168.101.9:3000/users/${userId}`);
+            axios.delete(`http://192.168.0.104:3000/users/${userId}`);
 
             setUsers(users.filter(user => user._id !== userId)); // Cập nhật danh sách người dùng
           } catch (error) {
