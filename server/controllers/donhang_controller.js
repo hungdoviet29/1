@@ -1,99 +1,59 @@
-const { donHangModel } = require('../models/donhang_model');
+// controllers/donhangController.js
+const DonHang = require('../models/donhangs_model');
 
-exports.getListDonHang = async (req, res, next) => {
+// Tạo đơn hàng mới
+const createDonHang = async (req, res) => {
     try {
-        const listDonHang = await donHangModel.find({});
-        res.status(200).json({ status: 200, data: listDonHang });
-    } catch (error) {
-        res.status(500).json({ status: "lỗi", result: error.message });
-    }
-};
+        const { userId, cartItems, totalAmount, paymentMethod, shippingInfo } = req.body;
 
-exports.addDonHang = async (req, res, next) => {
-    try {
-        const data = req.body;
-        const newDonHang = new donHangModel({
-            nguoiDungId: data.nguoiDungId,
-            laptop: data.laptop,
-            trangThai: data.trangThai,
-            tongTien: data.tongTien,
-            ngayDatHang: data.ngayDatHang,
-            phuongThucThanhToan: data.phuongThucThanhToan,
-            thongTinVanChuyen: {
-                tenNguoiNhan: data.thongTinVanChuyen.tenNguoiNhan,
-                soDienThoai: data.thongTinVanChuyen.soDienThoai,
-                diaChi: data.thongTinVanChuyen.diaChi,
-            },
+        // Kiểm tra xem tất cả các trường cần thiết có tồn tại trong request hay không
+        if (!userId || !cartItems || !totalAmount || !paymentMethod || !shippingInfo) {
+            return res.status(400).json({ message: 'Thiếu thông tin cần thiết để tạo đơn hàng' });
+        }
+
+        // Tạo một đơn hàng mới
+        const newDonHang = new DonHang({
+            userId,
+            cartItems,
+            totalAmount,
+            paymentMethod,
+            shippingInfo,
+            status: 'Chờ vận chuyển',  // Trạng thái mặc định
         });
 
-        const savedDonHang = await newDonHang.save();
-        res.status(201).json(savedDonHang);
+        // Lưu đơn hàng vào cơ sở dữ liệu
+        await newDonHang.save();
+
+        // Trả về phản hồi thành công
+        res.status(201).json({ success: true, message: 'Đơn hàng đã được tạo thành công!' });
     } catch (error) {
-        res.status(500).json({ status: "lỗi", result: error.message });
+        console.error('Lỗi khi tạo đơn hàng:', error);
+        res.status(500).json({ message: 'Đã xảy ra lỗi khi tạo đơn hàng. Vui lòng thử lại sau.' });
     }
 };
 
-exports.updateDonHang = async (req, res, next) => {
+//Lấy tất cả đơn hàng của một người dùng
+const getDonHangsByUser = async (req, res) => {
     try {
-        const { id } = req.params;
-        const data = req.body;
+        const { userId } = req.params;
 
-        const updatedDonHang = {
-            nguoiDungId: data.nguoiDungId,
-            laptop: data.laptop,
-            trangThai: data.trangThai,
-            tongTien: data.tongTien,
-            ngayDatHang: data.ngayDatHang,
-            phuongThucThanhToan: data.phuongThucThanhToan,
-            thongTinVanChuyen: {
-                tenNguoiNhan: data.thongTinVanChuyen.tenNguoiNhan,
-                soDienThoai: data.thongTinVanChuyen.soDienThoai,
-                diaChi: data.thongTinVanChuyen.diaChi,
-            },
-        };
+        // Tìm tất cả đơn hàng của người dùng
+        const donHangs = await DonHang.find({ userId });
 
-        const result = await donHangModel.findByIdAndUpdate(id, updatedDonHang, { new: true });
-
-        if (result) {
-            return res.status(200).json({
-                status: 200,
-                message: "Cập nhật đơn hàng thành công",
-                data: result,
-            });
-        } else {
-            return res.status(400).json({
-                status: 400,
-                message: "Không thể cập nhật đơn hàng",
-                data: [],
-            });
+        if (!donHangs || donHangs.length === 0) {
+            return res.status(404).json({ message: 'Không có đơn hàng nào cho người dùng này.' });
         }
+
+        // Trả về danh sách đơn hàng
+        res.status(200).json(donHangs);
     } catch (error) {
-        res.status(500).json({ message: "Lỗi server", result: error.message });
+        console.error('Lỗi khi lấy đơn hàng:', error);
+        res.status(500).json({ message: 'Đã xảy ra lỗi khi lấy đơn hàng. Vui lòng thử lại sau.' });
     }
 };
 
-exports.deleteDonHang = async (req, res) => {
-    try {
-        const deletedDonHang = await donHangModel.findByIdAndDelete(req.params.id);
-        if (!deletedDonHang) {
-            return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
-        }
-        res.status(200).json({ message: 'Xóa đơn hàng thành công' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-exports.getDonHangById = async (req, res, next) => {
-    try {
-        const donHang = await donHangModel.findById(req.params.id);
-       
-        if (!donHang) {
-            return res.status(404).json({ message: 'Đơn hàng không tồn tại' });
-        }
-        
-        res.status(200).json({ status: 200, data: donHang });
-    } catch (error) {
-        res.status(500).json({ message: "Lỗi server", result: error.message });
-    }
+  
+module.exports = {
+    createDonHang,
+    getDonHangsByUser,
 };
