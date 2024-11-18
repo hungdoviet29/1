@@ -16,7 +16,7 @@ const AccountManagement = () => {
           Alert.alert('Lỗi', 'Không tìm thấy thông tin đăng nhập.');
           return;
         }
-        const response = await axios.get(`http://192.168.0.104:3000/users/${userId}`);
+        const response = await axios.get(`http://192.168.3.106:3000/users/${userId}`);
         setUserInfo(response.data);
       } catch (error) {
         console.error('Lỗi khi lấy thông tin người dùng:', error);

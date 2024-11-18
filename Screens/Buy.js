@@ -64,6 +64,7 @@ const ProductScreen = () => {
             } else {
                 // Thêm sản phẩm vào yêu thích
                 await axios.post('http://172.20.10.6:3000/addFavoriteProduct', {
+
                     userId,
                     productId: product._id,
                 });

@@ -1,316 +1,271 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { useDispatch, useSelector } from 'react-redux';
-import { addNotification } from '../redux/notificationSlice';
-import { loadCart, resetCart } from '../redux/cartSlice';
-import { addOrder, setPaymentMethod, selectPaymentMethod } from '../redux/orderSlice';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, ScrollView, Image, TextInput } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CheckoutScreen = () => {
-    const navigation = useNavigation();
-    const dispatch = useDispatch();
-    const route = useRoute();
-
-    const cartItems = useSelector(state => state.cart.items);
-    const selectedPaymentMethod = useSelector(selectPaymentMethod); // Lấy phương thức thanh toán đã chọn từ Redux
-    const { shippingInfo } = route.params || {}; // Thông tin giao hàng từ route params
-    const [deliveryMethod, setDeliveryMethod] = useState('Select Method');
-    const [promoCode, setPromoCode] = useState('');
-    const [totalCost, setTotalCost] = useState(0);
-    const [deliveryCost, setDeliveryCost] = useState(0); // Phí giao hàng
+const CheckoutScreen = ({ navigation }) => {
+    const [userId, setUserId] = useState(null);
+    const [cartItems, setCartItems] = useState([]);
+    const [totalAmount, setTotalAmount] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+    const [shippingInfo, setShippingInfo] = useState({
+        name: '',
+        phone: '',
+        address: '',
+    });
 
     useEffect(() => {
-        dispatch(loadCart());
-    }, [dispatch]);
-
-    useEffect(() => {
-        calculateTotalCost(cartItems);
-    }, [cartItems, deliveryCost]);
-
-    const calculateTotalCost = (items) => {
-        if (!Array.isArray(items)) return;
-
-        const productTotal = items.reduce((sum, item) => {
-            const price = item.gia || 0;
-            const quantity = item.quantity || 0;
-            return sum + (price * quantity);
-        }, 0);
-
-        let total = productTotal + deliveryCost;
-        if (promoCode === 'DISCOUNT10') {
-            total *= 0.9; // Giảm giá 10%
-        }
-
-        setTotalCost(total);
-    };
-
-    const handleSelectDelivery = () => {
-        Alert.alert(
-            'Select Delivery Method',
-            '',
-            [
-                { text: 'Standard Shipping', onPress: () => { 
-                    setDeliveryMethod('Standard Shipping'); 
-                    setDeliveryCost(20000);
-                }},
-                { text: 'Express Shipping', onPress: () => { 
-                    setDeliveryMethod('Express Shipping'); 
-                    setDeliveryCost(50000);
-                }},
-                { text: 'Cancel', style: 'cancel' },
-            ]
-        );
-    };
-
-    const handleSelectPayment = () => {
-        Alert.alert(
-            'Select Payment Method',
-            '',
-            [
-                { text: 'Cash', onPress: () => dispatch(setPaymentMethod('Cash')) },
-                { text: 'Banking', onPress: () => dispatch(setPaymentMethod('Banking')) },
-                { text: 'Cancel', style: 'cancel' },
-            ]
-        );
-    };
-
-    const handleApplyPromoCode = () => {
-        calculateTotalCost(cartItems);
-        if (promoCode === 'DISCOUNT10') {
-            Alert.alert('Promo Applied', 'You received a 10% discount!');
-        } else {
-            Alert.alert('Invalid Promo Code', 'Please try again.');
-        }
-    };
-
-    const confirmOrder = () => {
-        const newOrder = {
-            id: new Date().getTime(),
-            shippingInfo,
-            totalAmount: totalCost,
-            status: selectedPaymentMethod === 'Banking' ? 'Chờ vận chuyển' : 'Chưa thanh toán',
-            hinhAnh: cartItems[0]?.hinhAnh || '',
+        const fetchUserId = async () => {
+            try {
+                const id = await AsyncStorage.getItem('userId');
+                if (id) {
+                    setUserId(id);
+                    fetchCartItems(id);
+                } else {
+                    Alert.alert('Lỗi', 'Không tìm thấy User ID. Vui lòng đăng nhập lại.');
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy User ID:', error);
+                Alert.alert('Lỗi', 'Không thể truy xuất User ID.');
+            }
         };
 
-        Alert.alert(
-            'Confirm Order',
-            `Total Cost: ${totalCost.toLocaleString()} VND\n` +
-            `Delivery Method: ${deliveryMethod}\n` +
-            `Payment Method: ${selectedPaymentMethod}\n` +
-            (promoCode ? `Promo Code: ${promoCode}\n` : '') +
-            'Proceed with placing the order?',
-            [
-                { text: 'Cancel', style: 'cancel' },
-                { 
-                    text: 'Confirm', 
-                    onPress: () => {
-                        dispatch(addOrder(newOrder));
-                        dispatch(addNotification({
-                            message: `Bạn đã thanh toán đơn hàng thành công lúc ${new Date().toLocaleTimeString()}`,
-                            timestamp: new Date().toLocaleString(),
-                        }));
-                        dispatch(resetCart());
-                        navigation.navigate('ShippingScreen', {
-                            shippingInfo,
-                            totalCost,
-                            paymentMethod: selectedPaymentMethod,
-                        });
-                    }
-                },
-            ]
-        );
+        fetchUserId();
+    }, []);
+
+    const fetchCartItems = async (id) => {
+        setLoading(true);
+        try {
+            const response = await fetch(`http://192.168.3.106:3000/cart/${id}`);
+            const data = await response.json();
+            if (response.ok) {
+                setCartItems(data.items || []);
+                calculateTotal(data.items || []);
+            } else {
+                Alert.alert('Lỗi', data.message || 'Không thể tải giỏ hàng.');
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải giỏ hàng:', error);
+            Alert.alert('Lỗi', 'Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
+        } finally {
+            setLoading(false);
+        }
     };
+
+    const calculateTotal = (items) => {
+        const total = items.reduce((sum, item) => {
+            if (item.productId?.gia && item.quantity) {
+                return sum + item.productId.gia * item.quantity;
+            }
+            return sum;
+        }, 0);
+        setTotalAmount(total);
+    };
+
+   const handleCheckout = async () => {
+    const validCartItems = cartItems.filter(item => item.productId !== null);
+    if (!validCartItems.length) {
+        Alert.alert('Lỗi', 'Giỏ hàng của bạn có sản phẩm không hợp lệ.');
+        return;
+    }
+    
+    const orderData = {
+        userId,
+        cartItems: validCartItems,
+        totalAmount,
+        paymentMethod: selectedPaymentMethod,
+        shippingInfo,
+    };
+
+    try {
+        const response = await fetch('http://192.168.3.106:3000/donhang', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderData),
+        });
+        const responseBody = await response.json();
+        if (response.ok && responseBody.success) {
+            Alert.alert('Thành công', 'Đơn hàng đã được tạo.');
+            navigation.navigate('OderScreen');
+        } else {
+            Alert.alert('Lỗi', responseBody.message || 'Không thể tạo đơn hàng.');
+        }
+    } catch (error) {
+        console.error('Lỗi khi gửi dữ liệu:', error);
+        Alert.alert('Lỗi', 'Lỗi khi tạo đơn hàng. Vui lòng thử lại.');
+    }
+};
+
+
+
+    const handleSelectPaymentMethod = (method) => {
+        setSelectedPaymentMethod(method);
+    };
+
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#F8B400" />
+                <Text>Đang tải...</Text>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image source={require('../acssets/BackButton.png')} style={styles.icon} />
-                </TouchableOpacity>
-                <Text style={styles.headerText}>Checkout</Text>
+                <Text style={styles.headerText}>Thanh toán</Text>
             </View>
-
-            <ScrollView contentContainerStyle={styles.productList}>
-                {cartItems.length === 0 ? (
-                    <Text style={styles.emptyCartText}>Giỏ hàng trống.</Text>
-                ) : (
-                    cartItems.map((item, index) => (
-                        <View key={index} style={styles.productItem}>
-                            <Image source={{ uri: item.hinhAnh }} style={styles.itemImage} />
-                            <View style={styles.productDetails}>
-                                <Text style={styles.productName}>{item.ten}</Text>
-                                <Text style={styles.productPrice}>{item.gia.toLocaleString()} VND x {item.quantity}</Text>
+            <ScrollView contentContainerStyle={styles.cartContainer}>
+                {cartItems.length > 0 ? (
+                    cartItems.map((item) => (
+                        <View key={item.productId?._id || item._id} style={styles.cartItem}>
+                            <Image
+                                source={{ uri: item.productId?.hinhAnh }}
+                                style={styles.itemImage}
+                            />
+                            <View style={styles.itemDetails}>
+                                <Text style={styles.itemName}>
+                                    {item.productId?.ten || 'Sản phẩm không xác định'}
+                                </Text>
+                                <Text style={styles.itemPrice}>
+                                    {item.productId?.gia
+                                        ? `${item.productId.gia.toLocaleString()} VND`
+                                        : 'Không có giá'}
+                                </Text>
+                                <Text style={styles.itemQuantity}>
+                                    Số lượng: {item.quantity}
+                                </Text>
                             </View>
                         </View>
                     ))
+                ) : (
+                    <Text style={styles.emptyCartText}>Giỏ hàng của bạn đang trống.</Text>
                 )}
             </ScrollView>
 
-            <View style={styles.checkoutSection}>
-                <TouchableOpacity style={styles.row} onPress={handleSelectDelivery}>
-                    <Text style={styles.rowLabel}>Delivery</Text>
-                    <View style={styles.rowAction}>
-                        <Text style={styles.actionText}>{deliveryMethod}</Text>
-                        <Image source={require('../acssets/backarrow.png')} style={styles.arrowIcon} />
-                    </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.row} onPress={handleSelectPayment}>
-                    <Text style={styles.rowLabel}>Payment</Text>
-                    <View style={styles.rowAction}>
-                        <Text style={styles.actionText}>{selectedPaymentMethod || 'None'}</Text>
-                        <Image source={require('../acssets/backarrow.png')} style={styles.arrowIcon} />
-                    </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.row} onPress={handleApplyPromoCode}>
-                    <Text style={styles.rowLabel}>Promo Code</Text>
-                    <View style={styles.rowAction}>
-                        <Text style={styles.actionText}>Enter Code: {promoCode || 'None'}</Text>
-                        <Image source={require('../acssets/backarrow.png')} style={styles.arrowIcon} />
-                    </View>
-                </TouchableOpacity>
-
-                <View style={styles.row}>
-                    <Text style={styles.rowLabel}>Total Cost</Text>
-                    <View style={styles.rowAction}>
-                        <Text style={styles.totalText}>{totalCost.toLocaleString()} VND</Text>
-                    </View>
-                </View>
-
-                <TouchableOpacity style={styles.placeOrderButton} onPress={confirmOrder}>
-                    <Image source={require('../acssets/Caricon.png')} style={styles.truckIcon} />
-                    <Text style={styles.placeOrderText}>PLACE ORDER</Text>
-                </TouchableOpacity>
-
-                <Text style={styles.termsText}>
-                    By placing an order you agree to our Terms and Conditions.
-                </Text>
+            {/* Form nhập thông tin vận chuyển */}
+            <View style={styles.shippingContainer}>
+                <Text style={styles.shippingTitle}>Thông tin vận chuyển</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Tên người nhận"
+                    value={shippingInfo.name}
+                    onChangeText={(text) => setShippingInfo({ ...shippingInfo, name: text })}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Số điện thoại"
+                    keyboardType="phone-pad"
+                    value={shippingInfo.phone}
+                    onChangeText={(text) => setShippingInfo({ ...shippingInfo, phone: text })}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Địa chỉ"
+                    value={shippingInfo.address}
+                    onChangeText={(text) => setShippingInfo({ ...shippingInfo, address: text })}
+                />
             </View>
+
+            {/* Các phương thức thanh toán */}
+            <View style={styles.paymentContainer}>
+                <Text style={styles.totalAmount}>Tổng tiền: {totalAmount.toLocaleString()} VND</Text>
+                <View style={styles.paymentMethods}>
+                    <Text style={styles.paymentTitle}>Chọn phương thức thanh toán</Text>
+                    <TouchableOpacity
+                        style={[styles.paymentOption, selectedPaymentMethod === 'Cash' && styles.selectedPaymentOption]}
+                        onPress={() => handleSelectPaymentMethod('Cash')}
+                    >
+                        <Text style={styles.paymentText}>Thanh toán khi nhận hàng</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.paymentOption, selectedPaymentMethod === 'CreditCard' && styles.selectedPaymentOption]}
+                        onPress={() => handleSelectPaymentMethod('CreditCard')}
+                    >
+                        <Text style={styles.paymentText}>Thanh toán qua thẻ tín dụng</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.paymentOption, selectedPaymentMethod === 'BankTransfer' && styles.selectedPaymentOption]}
+                        onPress={() => handleSelectPaymentMethod('BankTransfer')}
+                    >
+                        <Text style={styles.paymentText}>Chuyển khoản ngân hàng</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+
+            {/* Nút thanh toán */}
+            <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
+                <Text style={styles.checkoutButtonText}>Tiến hành thanh toán</Text>
+            </TouchableOpacity>
         </View>
     );
 };
 
+
+
+
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#F8F8F8',
-        paddingHorizontal: 16,
-    },
-    emptyCartText: {
-        fontSize: 16,
-        color: '#888',
-        textAlign: 'center',
-        marginTop: 20,
-    },
-    header: {
+    container: { flex: 1, padding: 16, backgroundColor: '#f9f9f9' },
+    header: { backgroundColor: '#F8B400', padding: 16, borderRadius: 8, marginBottom: 10 },
+    headerText: { fontSize: 24, fontWeight: 'bold', color: '#fff' },
+    cartContainer: { paddingTop: 20, paddingBottom: 120 }, // Tăng không gian cho nút thanh toán
+    cartItem: {
         flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 10,
-    },
-    headerText: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
-        flex: 1,
-        textAlign: 'center',
-    },
-    itemImage: {
-        width: 60, 
-        height: 60,
-        resizeMode: 'contain',
-        marginRight: 16,
-    },
-    icon: {
-        width: 20,
-        height: 20,
-        tintColor: '#6C63FF',
-    },
-    productList: {
-        paddingHorizontal: 16,
-        paddingTop: 10,
-        paddingBottom: 20,
-    },
-    productItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    productDetails: {
-        flex: 1,
-    },
-    productName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    productPrice: {
-        fontSize: 14,
-        color: '#666',
-    },
-    checkoutSection: {
-        backgroundColor: '#fff',
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        padding: 16,
-        elevation: 5,
-    },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
         marginBottom: 16,
-    },
-    rowLabel: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    rowAction: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    actionText: {
-        fontSize: 16,
-        color: '#666',
-        marginRight: 8,
-    },
-    arrowIcon: {
-        width: 14,
-        height: 14,
-        tintColor: '#888',
-    },
-    totalText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    placeOrderButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#6C63FF',
-        paddingVertical: 12,
+        backgroundColor: '#fff',
+        padding: 12,
         borderRadius: 8,
-        marginTop: 16,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 2,
+        alignItems: 'center', // căn giữa các sản phẩm
     },
-    placeOrderText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#fff',
-        marginLeft: 8,
+    itemImage: { width: 60, height: 60, borderRadius: 8, marginRight: 12 },
+    itemDetails: { justifyContent: 'center', flex: 1 },
+    itemName: { fontSize: 14, fontWeight: 'bold', color: '#333' },
+    itemPrice: { fontSize: 12, color: '#666' },
+    itemQuantity: { fontSize: 12, color: '#888' },
+    emptyCartText: { textAlign: 'center', fontSize: 16, color: '#888' },
+    totalAmount: { fontSize: 14, fontWeight: 'bold', textAlign: 'right', marginTop: 20, color: '#333' },
+    paymentContainer: {
+        marginTop: 20,
+        paddingBottom: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
     },
-    termsText: {
-        fontSize: 12,
-        color: '#666',
-        textAlign: 'center',
-        marginTop: 16,
+    paymentMethods: { marginTop: 10 },
+    paymentTitle: { fontSize: 16, fontWeight: 'bold', color: '#333' },
+    paymentOption: {
+        backgroundColor: '#fff',
+        padding: 10,
+        borderRadius: 8,
+        marginTop: 10,
+        borderWidth: 1,
+        borderColor: '#ddd',
     },
-    truckIcon: {
-        width: 20,
-        height: 20,
-        tintColor: '#fff',
+    selectedPaymentOption: {
+        backgroundColor: '#F8B400',
+    },
+    paymentText: { fontSize: 14, color: '#333' },
+    checkoutButton: {
+        backgroundColor: '#F8B400',
+        paddingVertical: 14,
+        borderRadius: 8,
+        marginTop: 20,  // Điều chỉnh khoảng cách từ các phần tử trên
+        marginBottom: 20, // Khoảng cách dưới
+// Khoảng cách dưới
+    },
+    checkoutButtonText: { textAlign: 'center', fontSize: 16, color: '#fff', fontWeight: 'bold' },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
     },
 });
 
-export default CheckoutScreen;
+export default CheckoutScreen;  

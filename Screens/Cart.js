@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 const CartScreen = () => {
     const [userId, setUserId] = useState(null);
     const [cartItems, setCartItems] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
-
+    const navigation = useNavigation();
     useEffect(() => {
         const fetchUserId = async () => {
             try {
@@ -113,8 +114,6 @@ const CartScreen = () => {
             Alert.alert('Error', 'Unable to connect to the server. Please try again later.');
         }
     };
-    
-
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -159,7 +158,9 @@ const CartScreen = () => {
             </ScrollView>
 
             <View style={styles.checkoutBar}>
-                <TouchableOpacity style={styles.checkoutButton}>
+                <TouchableOpacity style={styles.checkoutButton} onPress={() =>
+                        navigation.navigate('Checkout', { cartItems, totalAmount })
+                    }>
                     <Text style={styles.checkoutText}>Checkout</Text>
                     <Text style={styles.totalAmount}>{`${totalAmount.toLocaleString()} VND`}</Text>
                 </TouchableOpacity>
