@@ -31,7 +31,7 @@ const ProductScreen = () => {
                 navigation.navigate('Login');
                 return;
             }
-            await axios.post('http://192.168.3.110:3000/cart/add', {
+            await axios.post('http://172.20.10.6:3000/cart/add', {
                 userId,
                 productId: product._id,
                 quantity,
@@ -55,7 +55,7 @@ const ProductScreen = () => {
     
             if (isFavorite) {
                 // Xóa sản phẩm khỏi yêu thích
-                await axios.post('http://192.168.3.110:3000/removeFavoriteProduct', {
+                await axios.post('http://172.20.10.6:3000/removeFavoriteProduct', {
                     userId,
                     productId: product._id,
                 });
@@ -63,7 +63,7 @@ const ProductScreen = () => {
                 Alert.alert('Thành công', 'Sản phẩm đã bị gỡ khỏi danh sách yêu thích');
             } else {
                 // Thêm sản phẩm vào yêu thích
-                await axios.post('http://192.168.3.110:3000/addFavoriteProduct', {
+                await axios.post('http://172.20.10.6:3000/addFavoriteProduct', {
                     userId,
                     productId: product._id,
                 });
@@ -84,7 +84,7 @@ const ProductScreen = () => {
                     console.error('User ID không tồn tại');
                     return;
                 }
-                const response = await axios.get(`http://192.168.3.110:3000/favorites/${userId}`);
+                const response = await axios.get(`http://172.20.10.6:3000/favorites/${userId}`);
                 const favoriteList = response.data.favorites || [];
                 const isFavorite = favoriteList.some(item => item._id === product._id);
                 setIsFavorite(isFavorite);

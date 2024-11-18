@@ -20,7 +20,7 @@ const ProductBrandScreen = () => {
   // Hàm gọi API để lấy sản phẩm theo hãng
   const fetchProducts = async (brand) => {
     try {
-      const response = await fetch(`http://192.168.3.110:3000/laptops/brand/${brand}`);
+      const response = await fetch(`http://172.20.10.6:3000/laptops/brand/${brand}`);
       const result = await response.json();
       if (response.ok) {
         setProducts(result.data); // Gán dữ liệu sản phẩm từ API

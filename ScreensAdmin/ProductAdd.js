@@ -74,7 +74,7 @@ export default function ProductAdd() {
     }
 
     try {
-      const response = await fetch('http://192.168.3.110:3000/laptop/addLapTop', {
+      const response = await fetch('http://172.20.10.6:3000/laptop/addLapTop', {
         method: 'POST',
         body: formData,
         headers: {

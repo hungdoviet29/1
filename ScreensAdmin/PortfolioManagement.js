@@ -5,11 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 const PortfolioManagement = () => {
   const navigation = useNavigation();
   const [categories, setCategories] = useState([
-    { name: 'ALL', count: 0, url: 'http://192.168.3.110:3000/LapTop/getListLapTop' },
-    { name: 'Popular', count: 0, url: 'http://192.168.3.110:3000/LapTop/getPopularLapTop' },
-    { name: 'Trending', count: 0, url: 'http://192.168.3.110:3000/LapTop/getTrendingLapTop' },
-    { name: 'Sale', count: 0, url: 'http://192.168.3.110:3000/LapTop/getSaleLapTop' },
-    { name: 'New', count: 0, url: 'http://192.168.3.110:3000/LapTop/getNewsLapTop' },
+    { name: 'ALL', count: 0, url: 'http://172.20.10.6:3000/LapTop/getListLapTop' },
+    { name: 'Popular', count: 0, url: 'http://172.20.10.6:3000/LapTop/getPopularLapTop' },
+    { name: 'Trending', count: 0, url: 'http://172.20.10.6:3000/LapTop/getTrendingLapTop' },
+    { name: 'Sale', count: 0, url: 'http://172.20.10.6:3000/LapTop/getSaleLapTop' },
+    { name: 'New', count: 0, url: 'http://172.20.10.6:3000/LapTop/getNewsLapTop' },
   ]);
   const [loading, setLoading] = useState(true);
 

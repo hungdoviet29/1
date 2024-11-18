@@ -11,11 +11,11 @@ const DetailPortfolio = () => {
   const [loading, setLoading] = useState(true);
 
   const categoryUrls = {
-    ALL: 'http://192.168.3.110:3000/LapTop/getListLapTop',
-    Popular: 'http://192.168.3.110:3000/LapTop/getPopularLapTop',
-    Trending: 'http://192.168.3.110:3000/LapTop/getTrendingLapTop',
-    Sale: 'http://192.168.3.110:3000/LapTop/getSaleLapTop',
-    New: 'http://192.168.3.110:3000/LapTop/getNewsLapTop',
+    ALL: 'http://172.20.10.6:3000/LapTop/getListLapTop',
+    Popular: 'http://172.20.10.6:3000/LapTop/getPopularLapTop',
+    Trending: 'http://172.20.10.6:3000/LapTop/getTrendingLapTop',
+    Sale: 'http://172.20.10.6:3000/LapTop/getSaleLapTop',
+    New: 'http://172.20.10.6:3000/LapTop/getNewsLapTop',
   };
 
   useEffect(() => {

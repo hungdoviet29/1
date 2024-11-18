@@ -40,7 +40,7 @@ const CartScreen = () => {
 
     const fetchCartItems = async (id) => {
         try {
-            const response = await fetch(`http://192.168.3.110:3000/cart/${id}`);
+            const response = await fetch(`http://172.20.10.6:3000/cart/${id}`);
             const data = await response.json();
             console.log('Cart API Response:', data);
             if (response.ok) {
@@ -79,7 +79,7 @@ const CartScreen = () => {
         calculateTotal(updatedCartItems);
 
         try {
-            const response = await fetch('http://192.168.3.110:3000/cart/update', {
+            const response = await fetch('http://172.20.10.6:3000/cart/update', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, productId, quantity: newQuantity }),
@@ -97,7 +97,7 @@ const CartScreen = () => {
 
     const handleRemoveItem = async (productId) => {
         try {
-            const response = await fetch('http://192.168.3.110:3000/cart/remove', {
+            const response = await fetch('http://172.20.10.6:3000/cart/remove', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, productId }),
