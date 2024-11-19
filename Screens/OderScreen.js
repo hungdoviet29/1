@@ -41,8 +41,8 @@ const OrderScreen = ({ navigation }) => {
   const fetchOrders = async (userId, status = '') => {
     try {
       const url = status
-        ? `http://172.20.10.6:3000/donhang/user/${userId}/status?status=${encodeURIComponent(status)}`
-        : `http://172.20.10.6:3000/donhang/user/${userId}`;
+        ? `http://192.168.3.106:3000/donhang/user/${userId}/status?status=${encodeURIComponent(status)}`
+        : `http://192.168.3.106:3000/donhang/user/${userId}`;
 
       const response = await fetch(url);
 

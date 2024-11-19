@@ -15,7 +15,7 @@ const donhangSchema = new mongoose.Schema({
         phone: { type: String, required: true },
         address: { type: String, required: true },
     },
-    status: { type: String, default: 'Chờ vận chuyển' }, // Trạng thái mặc định
+    status: { type: String, default: 'Chờ xác nhận' }, // Trạng thái mặc định
 }, { timestamps: true });
 
 // Export mô hình DonHang

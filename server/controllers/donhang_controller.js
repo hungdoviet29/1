@@ -18,7 +18,7 @@ const createDonHang = async (req, res) => {
             totalAmount,
             paymentMethod,
             shippingInfo,
-            status: 'Chờ vận chuyển',  // Trạng thái mặc định
+            status: 'Chờ xác nhận',  // Trạng thái mặc định
         });
 
         // Lưu đơn hàng vào cơ sở dữ liệu
