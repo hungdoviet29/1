@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema(
       default:
         'https://img.myloview.com/stickers/default-avatar-profile-icon-vector-social-media-user-photo-700-205577532.jpg',
     },
+    sanPhamYeuThich: [{ type: mongoose.Schema.Types.ObjectId, ref: 'LapStore', default: [] }],
   },
   { timestamps: true, collection: 'users' }
 );

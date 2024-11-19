@@ -1,39 +1,22 @@
 const express = require('express');
-const {
-  register,
-  login,
-  getUserById,
-  getAllUsers,
-  updateUser,
-  deleteUser,
-  changePassword,
-  forgotPassword,
-} = require('../controllers/auth.controller');
-
 const router = express.Router();
+const authController = require('../controllers/auth.controller');
 
-// Route: Lấy danh sách tất cả người dùng
-router.get('/', getAllUsers);
+// Routes cho người dùng
+router.get('/users', authController.getAllUsers);
+router.get('/users/:id', authController.getUserById);
+router.post('/register', authController.register);
+router.post('/login', authController.login);
+router.put('/update/:id', authController.updateUser);
+router.post('/change-password', authController.changePassword);
+router.post('/forgot-password', authController.forgotPassword);
+router.delete('/delete/:id', authController.deleteUser);
 
-// Route: Lấy thông tin người dùng theo ID
-router.get('/:id', getUserById);
+// Routes cho yêu thích sản phẩm
+router.get('/favorites/:userId', authController.getFavoriteProducts);
+router.post('/favorites', authController.addFavoriteProduct);
+router.post('/removeFavoriteProduct', authController.removeFavoriteProduct);
+router.post('/addFavoriteProduct', authController.addFavoriteProduct);
 
-// Route: Đăng ký người dùng mới
-router.post('/register', register);
-
-// Route: Đăng nhập
-router.post('/login', login);
-
-// Route: Cập nhật thông tin người dùng
-router.put('/:id', updateUser);
-
-// Route: Thay đổi mật khẩu
-router.put('/changePassword', changePassword);
-
-// Route: Quên mật khẩu
-router.post('/forgotPassword', forgotPassword);
-
-// Route: Xóa người dùng
-router.delete('/:id', deleteUser);
 
 module.exports = router;

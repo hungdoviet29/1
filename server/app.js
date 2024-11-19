@@ -13,6 +13,7 @@ var usersRouter = require('./routes/users');
 var laptopRouter = require('./routes/laptop_router');
 var donHangRouter = require('./routes/donhang_router'); // Route đơn hàng
 var cartRouter = require('./routes/cart_router');
+const favoriteRouter = require('./routes/users');
 
 var app = express();
 
@@ -29,7 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use('/', favoriteRouter); 
 // Kiểm tra trạng thái server
 app.get('/health-check', (req, res) => {
     res.status(200).json({ status: 'OK', message: 'Server is running.' });
