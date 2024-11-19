@@ -142,16 +142,18 @@ exports.updatelaptop = async (req, res, next) => {
 };
 
 exports.deletelaptop = async (req, res) => {
-    try {
-        const deletedlaptop = await laptopModel.findByIdAndDelete(req.params.id);
-        if (!deletedlaptop) {
-            return res.status(404).json({ message: 'Không tìm thấy' });
-        }
-        res.status(200).json({ message: 'Xóa thành công' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+      console.log('Deleting laptop with ID:', req.params.id);  // Thêm log để kiểm tra ID
+      const deletedlaptop = await laptopModel.findByIdAndDelete(req.params.id);
+      if (!deletedlaptop) {
+          return res.status(404).json({ message: 'Không tìm thấy sản phẩm với ID này' });
+      }
+      res.status(200).json({ message: 'Xóa thành công' });
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
 };
+
 
 exports.getlaptopById = async (req, res, next) => {
     try {

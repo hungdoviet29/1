@@ -27,6 +27,7 @@ router.post("/addLapTop", Upload.single('hinhAnh'), LapTopCtl.addlaptop);
 router.put("/updateLapTop/:id", Upload.single('hinhAnh'), LapTopCtl.updatelaptop);
 router.delete("/deleteLapTop/:id", LapTopCtl.deletelaptop);
 router.get("/getLapTopById/:id", LapTopCtl.getlaptopById);
+router.delete('/deleteLapTop/:id', laptopController.deletelaptop);
 // Cập nhật router để xử lý các danh mục
 router.get("/getPopularLapTop", LapTopCtl.getPopularLapTop);
 router.get("/getTrendingLapTop", LapTopCtl.getTrendingLapTop);

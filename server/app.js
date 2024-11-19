@@ -30,10 +30,49 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/', favoriteRouter); 
-// Kiểm tra trạng thái server
+app.use(laptopRouter);
+app.use('/', favoriteRouter);// Kiểm tra trạng thái server
 app.get('/health-check', (req, res) => {
     res.status(200).json({ status: 'OK', message: 'Server is running.' });
+});
+
+// Middleware log toàn bộ request
+app.use((req, res, next) => {
+    console.log(`Request URL: ${req.url}, Method: ${req.method}`);
+    next();
+});
+
+app.get('/manager/products', (req, res) => {
+    res.render('manager_laptops'); // Render file manager_laptops.ejs
+});
+app.get('/manager/users', (req, res) => {
+    res.render('manager_user'); // Render file manager_user.ejs
+});
+app.get('/manager/discount', (req, res) => {
+    res.render('manager_discount'); // Render file manager_user.ejs
+});
+app.get('/manager/statistical', (req, res) => {
+    res.render('manager_statistical'); // Render file manager_user.ejs
+});
+app.get('/login', (req, res) => {
+    res.render('login'); // Render file login.ejs
+});
+app.get('/logout', (req, res) => {
+    res.clearCookie('token'); // Xóa cookie lưu trữ phiên đăng nhập, nếu có
+    res.redirect('/login');   // Chuyển hướng về màn hình đăng nhập
+});
+// Health Check Endpoint
+app.get('/health-check', (req, res) => {
+    res.status(200).json({ status: 'OK', message: 'Server is running.' });
+});
+
+// Route xử lý thông tin thanh toán (checkout)
+app.get('/donhang/:userId', (req, res) => {
+    const userId = req.params.userId;
+    res.json({
+        message: `Đơn hàng của người dùng ${userId}`,
+        // Trả lại dữ liệu thực tế nếu có
+    });
 });
 
 // Xác định route cho endpoint /donhang

@@ -37,12 +37,14 @@ const OrderScreen = ({ navigation }) => {
     fetchUserId();
   }, []);
 
-  // Gọi API lấy danh sách đơn hàng theo userId
-  const fetchOrders = async (userId) => {
+  // Gọi API lấy danh sách đơn hàng theo userId và status
+  const fetchOrders = async (userId, status = '') => {
     try {
-      const response = await fetch(
-        `http://192.168.3.106:3000/donhang/user/${userId}`
-      );
+      const url = status
+        ? `http://172.20.10.6:3000/donhang/user/${userId}/status?status=${encodeURIComponent(status)}`
+        : `http://172.20.10.6:3000/donhang/user/${userId}`;
+
+      const response = await fetch(url);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -50,11 +52,10 @@ const OrderScreen = ({ navigation }) => {
       }
 
       const data = await response.json();
-      console.log('Dữ liệu trả về:', data); // Log dữ liệu trả về từ API
+      console.log('Dữ liệu trả về:', data);
 
-      // Kiểm tra cấu trúc dữ liệu trả về
       if (Array.isArray(data)) {
-        setOrders(data); // Gán dữ liệu nếu là mảng
+        setOrders(data);
       } else {
         throw new Error('Dữ liệu trả về từ API không hợp lệ.');
       }
@@ -66,14 +67,21 @@ const OrderScreen = ({ navigation }) => {
     }
   };
 
-  // Lọc danh sách đơn hàng theo tab
-  const filterOrdersByTab = (order) => {
-    if (order.status && order.shippingInfo && order.totalAmount) {
-      if (selectedTab === 'Tất cả') return order.userId === userId;
-      return order.status === selectedTab && order.userId === userId;
+  // Xử lý khi tab thay đổi
+  useEffect(() => {
+    if (userId) {
+      setLoading(true);
+      const statusMap = {
+        'Tất cả': '',
+        'Chờ xác nhận': 'Chờ xác nhận',
+        'Chờ vận chuyển': 'Chờ vận chuyển',
+        'Đang vận chuyển': 'Đang vận chuyển',
+        'Đã hủy': 'Đã hủy',
+      };
+
+      fetchOrders(userId, statusMap[selectedTab]);
     }
-    return false;
-  };
+  }, [selectedTab]);
 
   // Hiển thị từng đơn hàng
   const renderOrderItem = ({ item: order }) => (
@@ -132,9 +140,6 @@ const OrderScreen = ({ navigation }) => {
     );
   }
 
-  // Lọc danh sách đơn hàng theo tab
-  const filteredOrders = Array.isArray(orders) ? orders.filter(filterOrdersByTab) : [];
-
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -153,7 +158,7 @@ const OrderScreen = ({ navigation }) => {
 
       {/* Tabs */}
       <View style={styles.tabs}>
-        {['Tất cả', 'Chờ xác nhận', 'Chờ vận chuyển', 'Đã vận chuyển', 'Đã hủy'].map((tab) => (
+        {['Tất cả', 'Chờ xác nhận', 'Chờ vận chuyển', 'Đang vận chuyển', 'Đã hủy'].map((tab) => (
           <Text
             key={tab}
             style={[styles.tabItem, selectedTab === tab && styles.activeTab]}
@@ -165,9 +170,9 @@ const OrderScreen = ({ navigation }) => {
       </View>
 
       {/* Danh sách đơn hàng */}
-      {filteredOrders.length > 0 ? (
+      {orders.length > 0 ? (
         <FlatList
-          data={filteredOrders}
+          data={orders}
           keyExtractor={(order) => order._id}
           renderItem={renderOrderItem}
           contentContainerStyle={styles.ordersList}
