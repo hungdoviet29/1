@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, ScrollView, Image, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, FlatList, Image, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CheckoutScreen = ({ navigation }) => {
@@ -14,6 +14,7 @@ const CheckoutScreen = ({ navigation }) => {
         address: '',
     });
 
+    // Lấy User ID và tải giỏ hàng
     useEffect(() => {
         const fetchUserId = async () => {
             try {
@@ -33,6 +34,7 @@ const CheckoutScreen = ({ navigation }) => {
         fetchUserId();
     }, []);
 
+    // Tải giỏ hàng từ API
     const fetchCartItems = async (id) => {
         setLoading(true);
         try {
@@ -52,6 +54,7 @@ const CheckoutScreen = ({ navigation }) => {
         }
     };
 
+    // Tính tổng tiền
     const calculateTotal = (items) => {
         const total = items.reduce((sum, item) => {
             if (item.productId?.gia && item.quantity) {
@@ -62,20 +65,21 @@ const CheckoutScreen = ({ navigation }) => {
         setTotalAmount(total);
     };
 
-   const handleCheckout = async () => {
-    const validCartItems = cartItems.filter(item => item.productId !== null);
-    if (!validCartItems.length) {
-        Alert.alert('Lỗi', 'Giỏ hàng của bạn có sản phẩm không hợp lệ.');
-        return;
-    }
-    
-    const orderData = {
-        userId,
-        cartItems: validCartItems,
-        totalAmount,
-        paymentMethod: selectedPaymentMethod,
-        shippingInfo,
-    };
+    // Xử lý thanh toán
+    const handleCheckout = async () => {
+        const validCartItems = cartItems.filter((item) => item.productId !== null);
+        if (!validCartItems.length) {
+            Alert.alert('Lỗi', 'Giỏ hàng của bạn có sản phẩm không hợp lệ.');
+            return;
+        }
+
+        const orderData = {
+            userId,
+            cartItems: validCartItems,
+            totalAmount,
+            paymentMethod: selectedPaymentMethod,
+            shippingInfo,
+        };
 
     try {
         const response = await fetch('http://172.20.10.6:3000/donhang', {
@@ -98,12 +102,11 @@ const CheckoutScreen = ({ navigation }) => {
     }
 };
 
-
-
     const handleSelectPaymentMethod = (method) => {
         setSelectedPaymentMethod(method);
     };
 
+    // Hiển thị loading
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
@@ -118,33 +121,36 @@ const CheckoutScreen = ({ navigation }) => {
             <View style={styles.header}>
                 <Text style={styles.headerText}>Thanh toán</Text>
             </View>
-            <ScrollView contentContainerStyle={styles.cartContainer}>
-                {cartItems.length > 0 ? (
-                    cartItems.map((item) => (
-                        <View key={item.productId?._id || item._id} style={styles.cartItem}>
-                            <Image
-                                source={{ uri: item.productId?.hinhAnh }}
-                                style={styles.itemImage}
-                            />
-                            <View style={styles.itemDetails}>
-                                <Text style={styles.itemName}>
-                                    {item.productId?.ten || 'Sản phẩm không xác định'}
-                                </Text>
-                                <Text style={styles.itemPrice}>
-                                    {item.productId?.gia
-                                        ? `${item.productId.gia.toLocaleString()} VND`
-                                        : 'Không có giá'}
-                                </Text>
-                                <Text style={styles.itemQuantity}>
-                                    Số lượng: {item.quantity}
-                                </Text>
-                            </View>
+
+            {/* Danh sách sản phẩm */}
+            <FlatList
+                data={cartItems}
+                keyExtractor={(item) => item.productId?._id || item._id}
+                renderItem={({ item }) => (
+                    <View style={styles.cartItem}>
+                        <Image
+                            source={{ uri: item.productId?.hinhAnh }}
+                            style={styles.itemImage}
+                        />
+                        <View style={styles.itemDetails}>
+                            <Text style={styles.itemName}>
+                                {item.productId?.ten || 'Sản phẩm không xác định'}
+                            </Text>
+                            <Text style={styles.itemPrice}>
+                                {item.productId?.gia
+                                    ? `${item.productId.gia.toLocaleString()} VND`
+                                    : 'Không có giá'}
+                            </Text>
+                            <Text style={styles.itemQuantity}>
+                                Số lượng: {item.quantity}
+                            </Text>
                         </View>
-                    ))
-                ) : (
-                    <Text style={styles.emptyCartText}>Giỏ hàng của bạn đang trống.</Text>
+                    </View>
                 )}
-            </ScrollView>
+                ListEmptyComponent={
+                    <Text style={styles.emptyCartText}>Giỏ hàng của bạn đang trống.</Text>
+                }
+            />
 
             {/* Form nhập thông tin vận chuyển */}
             <View style={styles.shippingContainer}>
@@ -170,30 +176,28 @@ const CheckoutScreen = ({ navigation }) => {
                 />
             </View>
 
-            {/* Các phương thức thanh toán */}
+            {/* Phương thức thanh toán */}
             <View style={styles.paymentContainer}>
                 <Text style={styles.totalAmount}>Tổng tiền: {totalAmount.toLocaleString()} VND</Text>
-                <View style={styles.paymentMethods}>
-                    <Text style={styles.paymentTitle}>Chọn phương thức thanh toán</Text>
+                <Text style={styles.paymentTitle}>Chọn phương thức thanh toán</Text>
+                {['Cash', 'CreditCard', 'BankTransfer'].map((method) => (
                     <TouchableOpacity
-                        style={[styles.paymentOption, selectedPaymentMethod === 'Cash' && styles.selectedPaymentOption]}
-                        onPress={() => handleSelectPaymentMethod('Cash')}
+                        key={method}
+                        style={[
+                            styles.paymentOption,
+                            selectedPaymentMethod === method && styles.selectedPaymentOption,
+                        ]}
+                        onPress={() => handleSelectPaymentMethod(method)}
                     >
-                        <Text style={styles.paymentText}>Thanh toán khi nhận hàng</Text>
+                        <Text style={styles.paymentText}>
+                            {method === 'Cash'
+                                ? 'Thanh toán khi nhận hàng'
+                                : method === 'CreditCard'
+                                ? 'Thanh toán qua thẻ tín dụng'
+                                : 'Chuyển khoản ngân hàng'}
+                        </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.paymentOption, selectedPaymentMethod === 'CreditCard' && styles.selectedPaymentOption]}
-                        onPress={() => handleSelectPaymentMethod('CreditCard')}
-                    >
-                        <Text style={styles.paymentText}>Thanh toán qua thẻ tín dụng</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.paymentOption, selectedPaymentMethod === 'BankTransfer' && styles.selectedPaymentOption]}
-                        onPress={() => handleSelectPaymentMethod('BankTransfer')}
-                    >
-                        <Text style={styles.paymentText}>Chuyển khoản ngân hàng</Text>
-                    </TouchableOpacity>
-                </View>
+                ))}
             </View>
 
             {/* Nút thanh toán */}
@@ -206,60 +210,162 @@ const CheckoutScreen = ({ navigation }) => {
 
 
 
-
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 16, backgroundColor: '#f9f9f9' },
-    header: { backgroundColor: '#F8B400', padding: 16, borderRadius: 8, marginBottom: 10 },
-    headerText: { fontSize: 24, fontWeight: 'bold', color: '#fff' },
-    cartContainer: { paddingTop: 20, paddingBottom: 120 }, // Tăng không gian cho nút thanh toán
+    container: { 
+        flex: 1, 
+        backgroundColor: '#f8f9fa', 
+        paddingHorizontal: 8, 
+        paddingVertical: 12 
+    },
+    header: { 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        justifyContent: 'space-between', 
+        paddingVertical: 10, 
+        borderBottomWidth: 1, 
+        borderBottomColor: '#ddd', 
+        marginBottom: 8 
+    },
+    headerText: { 
+        fontSize: 18, 
+        fontWeight: 'bold', 
+        color: '#333' 
+    },
+    cartContainer: { 
+        flex: 1, 
+        marginBottom: 80 
+    },
     cartItem: {
         flexDirection: 'row',
-        marginBottom: 16,
+        alignItems: 'center',
         backgroundColor: '#fff',
-        padding: 12,
-        borderRadius: 8,
+        borderRadius: 10,
+        marginBottom: 10,
+        padding: 8,
         shadowColor: '#000',
         shadowOpacity: 0.1,
-        shadowRadius: 6,
+        shadowRadius: 4,
         elevation: 2,
-        alignItems: 'center', // căn giữa các sản phẩm
     },
-    itemImage: { width: 60, height: 60, borderRadius: 8, marginRight: 12 },
-    itemDetails: { justifyContent: 'center', flex: 1 },
-    itemName: { fontSize: 14, fontWeight: 'bold', color: '#333' },
-    itemPrice: { fontSize: 12, color: '#666' },
-    itemQuantity: { fontSize: 12, color: '#888' },
-    emptyCartText: { textAlign: 'center', fontSize: 16, color: '#888' },
-    totalAmount: { fontSize: 14, fontWeight: 'bold', textAlign: 'right', marginTop: 20, color: '#333' },
+    itemImage: { 
+        width: 60, 
+        height: 60, 
+        borderRadius: 8, 
+        marginRight: 10 
+    },
+    itemDetails: { 
+        flex: 1 
+    },
+    itemName: { 
+        fontSize: 14, 
+        fontWeight: '600', 
+        color: '#333' 
+    },
+    itemPrice: { 
+        fontSize: 13, 
+        fontWeight: '500', 
+        color: '#f68b1e', 
+        marginTop: 4 
+    },
+    itemQuantity: { 
+        fontSize: 12, 
+        color: '#888', 
+        marginTop: 4 
+    },
+    emptyCartText: { 
+        textAlign: 'center', 
+        fontSize: 16, 
+        color: '#888' 
+    },
+    shippingContainer: {
+        marginVertical: 1,
+        padding: 5,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    shippingTitle: { 
+        fontSize: 16, 
+        fontWeight: '600', 
+        marginBottom: 6, 
+        color: '#333' 
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        padding: 5,
+        borderRadius: 6,
+        fontSize: 13,
+        marginBottom: 5,
+        backgroundColor: '#f9f9f9',
+    },
     paymentContainer: {
-        marginTop: 20,
-        paddingBottom: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
+        marginVertical: 8,
+        padding: 8,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
     },
-    paymentMethods: { marginTop: 10 },
-    paymentTitle: { fontSize: 16, fontWeight: 'bold', color: '#333' },
+    paymentTitle: { 
+        fontSize: 16, 
+        fontWeight: '600', 
+        marginBottom: 5, 
+        color: '#333' 
+    },
     paymentOption: {
         backgroundColor: '#fff',
-        padding: 10,
-        borderRadius: 8,
-        marginTop: 10,
+        padding: 5,
+        borderRadius: 6,
+        marginBottom: 8,
         borderWidth: 1,
         borderColor: '#ddd',
     },
-    selectedPaymentOption: {
-        backgroundColor: '#F8B400',
+    selectedPaymentOption: { 
+        backgroundColor: '#f68b1e', 
+        borderColor: '#f68b1e' 
     },
-    paymentText: { fontSize: 14, color: '#333' },
+    paymentText: { 
+        fontSize: 13, 
+        color: '#333', 
+        fontWeight: '500' 
+    },
+    totalAmount: {
+        fontSize: 13,
+        fontWeight: 'bold',
+        color: '#333',
+        textAlign: 'right',
+        marginVertical: 12,
+    },
     checkoutButton: {
-        backgroundColor: '#F8B400',
-        paddingVertical: 14,
-        borderRadius: 8,
-        marginTop: 20,  // Điều chỉnh khoảng cách từ các phần tử trên
-        marginBottom: 20, // Khoảng cách dưới
-// Khoảng cách dưới
+        backgroundColor: '#f68b1e',
+        paddingVertical: 10, // Điều chỉnh chiều cao
+        borderRadius: 7,
+        marginBottom: 40,
     },
-    checkoutButtonText: { textAlign: 'center', fontSize: 16, color: '#fff', fontWeight: 'bold' },
+    checkoutButtonText: {
+        textAlign: 'center',
+        fontSize: 14,
+        color: '#fff',
+        fontWeight: 'bold',
+    },
+    checkoutButton: {
+        backgroundColor: '#f68b1e',
+        paddingVertical: 10, // Điều chỉnh chiều cao
+        borderRadius: 7,
+        marginBottom: 55,
+    },
+    checkoutButtonText: {
+        textAlign: 'center',
+        fontSize: 14,
+        color: '#fff',
+        fontWeight: 'bold',
+    },        
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -267,5 +373,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
 });
+
 
 export default CheckoutScreen;  
