@@ -28,7 +28,7 @@
 
 //     const fetchOrders = async (userId) => {
 //         try {
-//             const response = await fetch(`http://192.168.3.106:3000/donhang/user/${userId}`);  // Chỉnh lại dấu {userId} thành ${userId}
+//             const response = await fetch(`http://172.20.10.6:3000/donhang/user/${userId}`);  // Chỉnh lại dấu {userId} thành ${userId}
             
 //             // Kiểm tra mã trạng thái HTTP
 //             if (!response.ok) {
@@ -176,7 +176,7 @@ const OrderScreen = ({ navigation }) => {
   const fetchOrders = async (userId) => {
     try {
       const response = await fetch(
-        `http://192.168.3.106:3000/donhang/user/${userId}`
+        `http://172.20.10.6:3000/donhang/user/${userId}`
       );
 
       if (!response.ok) {

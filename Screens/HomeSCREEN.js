@@ -42,7 +42,6 @@ const HomeScreen = () => {
       case 'All':
       default:
         apiUrl = 'http://172.20.10.6:3000/LapTop/getListLapTop';
-      }
     }
 
     axios
@@ -133,18 +132,6 @@ const HomeScreen = () => {
                   <Text style={styles.productName}>{laptop.ten}</Text>
                   <Text style={styles.productPrice}>{laptop.gia.toLocaleString()} VND</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.heartIconContainer}
-                  onPress={() => handleAddToFavorites(laptop)}>
-                  <Image
-                    source={
-                      isFavorite(laptop)
-                        ? require('../acssets/VectorRed.png')
-                        : require('../acssets/Vector.png')
-                    }
-                    style={styles.heartIcon}
-                  />
-                </TouchableOpacity>
               </View>
             ))}
           </View>
@@ -153,41 +140,33 @@ const HomeScreen = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#fff'},
-  loadingContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  container: { flex: 1, backgroundColor: '#fff' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 16,
     alignItems: 'center',
   },
-  profileImage: {width: 40, height: 40, borderRadius: 20},
-  headerIcons: {flexDirection: 'row'},
-  icon: {width: 24, height: 24, marginLeft: 16},
+  profileImage: { width: 40, height: 40, borderRadius: 20 },
+  headerIcons: { flexDirection: 'row' },
+  icon: { width: 24, height: 24, marginLeft: 16 },
   categories: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 16,
   },
-  category: {fontSize: 16, fontWeight: 'bold', color: '#999'},
+  category: { fontSize: 16, fontWeight: 'bold', color: '#999' },
   categoryActive: {
     color: '#6C63FF',
     borderBottomWidth: 2,
     borderBottomColor: '#6C63FF',
   },
-  filterContainer: {
-    alignItems: 'flex-end',
-    paddingHorizontal: 20,
-  },
-  filterButton: {},
-  filterIcon: {
-    width: 24,
-    height: 24,
-  },
   productScrollView: {
     paddingBottom: 100,
-    marginTop: 10, // Thêm khoảng cách phía trên để tránh nút lọc
+    marginTop: 10,
   },
   productList: {
     flexDirection: 'row',
@@ -203,16 +182,16 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
-  productImage: {width: 100, height: 100, resizeMode: 'contain'},
+  productImage: { width: 100, height: 100, resizeMode: 'contain' },
   productName: {
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 10,
     textAlign: 'center',
   },
-  productPrice: {fontSize: 14, color: '#888', marginTop: 5},
-  heartIconContainer: {position: 'absolute', top: 10, right: 10},
-  heartIcon: {width: 20, height: 20},
+  productPrice: { fontSize: 14, color: '#888', marginTop: 5 },
+  heartIconContainer: { position: 'absolute', top: 10, right: 10 },
+  heartIcon: { width: 20, height: 20 },
 });
 
 export default HomeScreen;
