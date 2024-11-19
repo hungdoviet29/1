@@ -38,7 +38,7 @@ const CheckoutScreen = ({ navigation }) => {
     const fetchCartItems = async (id) => {
         setLoading(true);
         try {
-            const response = await fetch(`http://172.20.10.6:3000/cart/${id}`);
+            const response = await fetch(`http://192.168.3.106:3000/cart/${id}`);
             const data = await response.json();
             if (response.ok) {
                 setCartItems(data.items || []);
@@ -81,27 +81,26 @@ const CheckoutScreen = ({ navigation }) => {
             shippingInfo,
         };
 
-    try {
-        const response = await fetch('http://172.20.10.6:3000/donhang', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(orderData),
-        });
-        const responseBody = await response.json();
-        if (response.ok && responseBody.success) {
-            Alert.alert('Thành công', 'Đơn hàng đã được tạo.');
-            navigation.navigate('OderScreen');
-        } else {
-            Alert.alert('Lỗi', responseBody.message || 'Không thể tạo đơn hàng.');
+        try {
+            const response = await fetch('http://192.168.3.106:3000/donhang', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData),
+            });
+            const responseBody = await response.json();
+            if (response.ok && responseBody.success) {
+                Alert.alert('Thành công', 'Đơn hàng đã được tạo.');
+                navigation.navigate('OderScreen');
+            } else {
+                Alert.alert('Lỗi', responseBody.message || 'Không thể tạo đơn hàng.');
+            }
+        } catch (error) {
+            console.error('Lỗi khi gửi dữ liệu:', error);
+            Alert.alert('Lỗi', 'Lỗi khi tạo đơn hàng. Vui lòng thử lại.');
         }
-    } catch (error) {
-        console.error('Lỗi khi gửi dữ liệu:', error);
-        Alert.alert('Lỗi', 'Lỗi khi tạo đơn hàng. Vui lòng thử lại.');
-    }
-};
+    };
 
+    // Chọn phương thức thanh toán
     const handleSelectPaymentMethod = (method) => {
         setSelectedPaymentMethod(method);
     };
@@ -207,8 +206,6 @@ const CheckoutScreen = ({ navigation }) => {
         </View>
     );
 };
-
-
 
 const styles = StyleSheet.create({
     container: { 
@@ -375,4 +372,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default CheckoutScreen;  
+export default CheckoutScreen; 
