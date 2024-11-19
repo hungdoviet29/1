@@ -17,7 +17,7 @@ const FavoriteScreen = () => {
                     navigation.navigate('Login');
                     return;
                 }
-                const response = await axios.get(`http://192.168.3.110:3000/favorites/${userId}`);
+                const response = await axios.get(`http://172.20.10.6:3000/favorites/${userId}`);
                 setFavoriteItems(response.data.favorites || []);
             } catch (error) {
                 console.error('Lỗi khi tải danh sách yêu thích:', error.response || error.message);
@@ -31,15 +31,26 @@ const FavoriteScreen = () => {
     const handleRemoveFromFavorites = async (productId) => {
         try {
             const userId = await AsyncStorage.getItem('userId');
-            await axios.delete(`http://192.168.3.110:3000/favorites/${userId}/${productId}`);
-            setFavoriteItems(prevItems => prevItems.filter(item => item._id !== productId));
-            Alert.alert('Thành công', 'Đã xóa sản phẩm khỏi danh sách yêu thích');
+            if (!userId) {
+                Alert.alert('Lỗi', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập.');
+                navigation.navigate('Login');
+                return;
+            }
+            // Gửi yêu cầu xóa sản phẩm khỏi yêu thích
+            const response = await axios.delete(`http://172.20.10.6:3000/favorites/${userId}/${productId}`);
+
+            if (response.status === 200) {
+                // Cập nhật lại danh sách yêu thích trên giao diện
+                setFavoriteItems(prevItems => prevItems.filter(item => item._id !== productId));
+                Alert.alert('Thành công', 'Sản phẩm đã được xóa khỏi danh sách yêu thích');
+            } else {
+                Alert.alert('Lỗi', 'Không thể xóa sản phẩm khỏi danh sách yêu thích');
+            }
         } catch (error) {
             console.error('Lỗi khi xóa sản phẩm yêu thích:', error);
             Alert.alert('Lỗi', 'Không thể xóa sản phẩm khỏi danh sách yêu thích');
         }
     };
-
     const renderFavoriteItem = ({ item }) => (
         <TouchableOpacity style={styles.favoriteItem} onPress={() =>
             navigation.navigate('ProductScreen', { product: item })}>

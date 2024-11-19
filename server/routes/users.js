@@ -15,8 +15,8 @@ router.delete('/delete/:id', authController.deleteUser);
 // Routes cho yêu thích sản phẩm
 router.get('/favorites/:userId', authController.getFavoriteProducts);
 router.post('/favorites', authController.addFavoriteProduct);
-router.post('/removeFavoriteProduct', authController.removeFavoriteProduct);
+// router.post('/removeFavoriteProduct', authController.removeFavoriteProduct);
 router.post('/addFavoriteProduct', authController.addFavoriteProduct);
-
-
+// Route xóa sản phẩm khỏi danh sách yêu thích
+router.delete('/favorites/:userId/:productId', authController.removeFavoriteProduct); // Xóa sản phẩm khỏi yêu thích
 module.exports = router;

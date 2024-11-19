@@ -1,6 +1,7 @@
 const { UserModel } = require('../models/user.model');
 const mongoose = require('mongoose');
 
+
 // Hàm: Lấy danh sách tất cả người dùng
 exports.getAllUsers = async (req, res) => {
   try {
@@ -234,5 +235,73 @@ exports.removeFavoriteProduct = async (req, res) => {
   } catch (error) {
     console.error('Lỗi khi xóa sản phẩm yêu thích:', error);
     res.status(500).json({ message: 'Lỗi server', error });
+  }
+};
+
+// Hàm xóa sản phẩm khỏi danh sách yêu thích
+exports.removeFavoriteProduct = async (req, res) => {
+  const { userId, productId } = req.body;
+
+  try {
+      // Tìm người dùng và kiểm tra sản phẩm có trong danh sách yêu thích của họ không
+      const user = await UserModel.findById(userId);
+      if (!user) {
+          return res.status(404).json({ message: 'Người dùng không tồn tại.' });
+      }
+
+      const productIndex = user.favorites.findIndex(item => item._id.toString() === productId);
+      if (productIndex === -1) {
+          return res.status(404).json({ message: 'Sản phẩm không có trong danh sách yêu thích.' });
+      }
+
+      // Xóa sản phẩm khỏi danh sách yêu thích
+      user.favorites.splice(productIndex, 1);
+      await user.save();
+
+      res.status(200).json({ message: 'Sản phẩm đã bị xóa khỏi danh sách yêu thích.' });
+  } catch (error) {
+      console.error('Lỗi khi xóa sản phẩm yêu thích:', error);
+      res.status(500).json({ message: 'Lỗi server', error });
+  }
+};
+
+// Hàm xóa sản phẩm khỏi danh sách yêu thích
+exports.removeFavoriteProduct = async (req, res) => {
+  const { userId, productId } = req.params;
+
+  try {
+    // Kiểm tra xem userId có hợp lệ không
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: 'ID người dùng không hợp lệ' });
+    }
+
+    // Kiểm tra xem productId có hợp lệ không
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ message: 'ID sản phẩm không hợp lệ' });
+    }
+
+    // Tìm người dùng
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Người dùng không tồn tại' });
+    }
+
+    // Chuyển productId thành ObjectId để so sánh
+    const objectId = new mongoose.Types.ObjectId(productId); // Dùng new để khởi tạo ObjectId
+
+    // Kiểm tra xem sản phẩm có trong danh sách yêu thích không
+    const productIndex = user.sanPhamYeuThich.indexOf(objectId);
+    if (productIndex === -1) {
+      return res.status(400).json({ message: 'Sản phẩm không có trong danh sách yêu thích' });
+    }
+
+    // Xóa sản phẩm khỏi danh sách yêu thích
+    user.sanPhamYeuThich.splice(productIndex, 1);
+    await user.save(); // Lưu lại thay đổi
+
+    res.status(200).json({ message: 'Sản phẩm đã bị xóa khỏi danh sách yêu thích' });
+  } catch (error) {
+    console.error('Lỗi khi xóa sản phẩm yêu thích:', error); // In lỗi chi tiết ra console
+    res.status(500).json({ message: 'Lỗi server', error: error.message }); // Trả lại lỗi chi tiết
   }
 };
