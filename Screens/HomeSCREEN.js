@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,10 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { addToFavorites, removeFromFavorites } from '../redux/favoriteSlice';
+import {useDispatch, useSelector} from 'react-redux';
+import {addToFavorites, removeFromFavorites} from '../redux/favoriteSlice';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -28,16 +28,16 @@ const HomeScreen = () => {
 
     switch (category) {
       case 'Popular':
-        apiUrl = 'http://192.168.3.106:3000/LapTop/getPopularLapTop';
+        apiUrl = 'http://192.168.0.3:3000/LapTop/getPopularLapTop';
         break;
       case 'Trending':
-        apiUrl = 'http://192.168.3.106:3000/LapTop/getTrendingLapTop';
+        apiUrl = 'http://192.168.0.3:3000/LapTop/getTrendingLapTop';
         break;
       case 'News':
-        apiUrl = 'http://192.168.3.106:3000/LapTop/getNewsLapTop';
+        apiUrl = 'http://192.168.0.3:3000/LapTop/getNewsLapTop';
         break;
       case 'Sale':
-        apiUrl = 'http://192.168.3.106:3000/LapTop/getSaleLapTop';
+        apiUrl = 'http://192.168.0.3:3000/LapTop/getSaleLapTop';
         break;
       case 'All':
       default:
@@ -86,16 +86,30 @@ const HomeScreen = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Image source={require('../acssets/profile1.png')} style={styles.profileImage} />
+        <Image
+          source={require('../acssets/profile1.png')}
+          style={styles.profileImage}
+        />
         <View style={styles.headerIcons}>
-          <TouchableOpacity onPress={() => navigation.navigate('NotificationScreen')}>
-            <Image source={require('../acssets/bell.png')} style={styles.icon} />
+          <TouchableOpacity
+            onPress={() => navigation.navigate('NotificationScreen')}>
+            <Image
+              source={require('../acssets/bell.png')}
+              style={styles.icon}
+            />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Find')}>
-            <Image source={require('../acssets/SearchIcon.png')} style={styles.icon} />
+            <Image
+              source={require('../acssets/SearchIcon.png')}
+              style={styles.icon}
+            />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('CustomDrawerContent')}>
-            <Image source={require('../acssets/Menu.png')} style={styles.icon} />
+          <TouchableOpacity
+            onPress={() => navigation.navigate('CustomDrawerContent')}>
+            <Image
+              source={require('../acssets/Menu.png')}
+              style={styles.icon}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -103,7 +117,9 @@ const HomeScreen = () => {
       {/* Categories */}
       <View style={styles.categories}>
         {['All', 'Popular', 'Trending', 'News', 'Sale'].map(category => (
-          <TouchableOpacity key={category} onPress={() => handleCategoryPress(category)}>
+          <TouchableOpacity
+            key={category}
+            onPress={() => handleCategoryPress(category)}>
             <Text
               style={[
                 styles.category,
@@ -126,10 +142,17 @@ const HomeScreen = () => {
             {laptops.map(laptop => (
               <View style={styles.product} key={laptop._id}>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate('ProductScreen', { product: laptop })}>
-                  <Image source={{ uri: laptop.hinhAnh }} style={styles.productImage} />
+                  onPress={() =>
+                    navigation.navigate('ProductScreen', {product: laptop})
+                  }>
+                  <Image
+                    source={{uri: laptop.hinhAnh}}
+                    style={styles.productImage}
+                  />
                   <Text style={styles.productName}>{laptop.ten}</Text>
-                  <Text style={styles.productPrice}>{laptop.gia.toLocaleString()} VND</Text>
+                  <Text style={styles.productPrice}>
+                    {laptop.gia.toLocaleString()} VND
+                  </Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -141,23 +164,23 @@ const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  container: {flex: 1, backgroundColor: '#fff'},
+  loadingContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 16,
     alignItems: 'center',
   },
-  profileImage: { width: 40, height: 40, borderRadius: 20 },
-  headerIcons: { flexDirection: 'row' },
-  icon: { width: 24, height: 24, marginLeft: 16 },
+  profileImage: {width: 40, height: 40, borderRadius: 20},
+  headerIcons: {flexDirection: 'row'},
+  icon: {width: 24, height: 24, marginLeft: 16},
   categories: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 16,
   },
-  category: { fontSize: 16, fontWeight: 'bold', color: '#999' },
+  category: {fontSize: 16, fontWeight: 'bold', color: '#999'},
   categoryActive: {
     color: '#6C63FF',
     borderBottomWidth: 2,
@@ -181,16 +204,16 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
-  productImage: { width: 100, height: 100, resizeMode: 'contain' },
+  productImage: {width: 100, height: 100, resizeMode: 'contain'},
   productName: {
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 10,
     textAlign: 'center',
   },
-  productPrice: { fontSize: 14, color: '#888', marginTop: 5 },
-  heartIconContainer: { position: 'absolute', top: 10, right: 10 },
-  heartIcon: { width: 20, height: 20 },
+  productPrice: {fontSize: 14, color: '#888', marginTop: 5},
+  heartIconContainer: {position: 'absolute', top: 10, right: 10},
+  heartIcon: {width: 20, height: 20},
 });
 
 export default HomeScreen;

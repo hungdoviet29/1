@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,10 @@ import {
   ImageBackground,
   StyleSheet,
 } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Login = ({ route }) => {
+const Login = ({route}) => {
   const navigation = useNavigation();
   const [tenDangNhap, setTenDangNhap] = useState('');
   const [matKhau, setMatKhau] = useState('');
@@ -25,7 +25,7 @@ const Login = ({ route }) => {
         setMatKhau('');
         setError(null);
       }
-    }, [route.params?.clearInputs])
+    }, [route.params?.clearInputs]),
   );
 
   useEffect(() => {
@@ -61,10 +61,10 @@ const Login = ({ route }) => {
     // }
 
     try {
-      const response = await fetch('http://192.168.3.106:3000/users');
+      const response = await fetch('http://192.168.0.3:3000/users');
       const users = await response.json();
       const user = users.find(
-        user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau
+        user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau,
       );
 
       if (user) {
@@ -97,8 +97,10 @@ const Login = ({ route }) => {
         <ImageBackground
           source={require('../acssets/laplogin.png')}
           style={styles.background}
-          imageStyle={{ borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}
-        >
+          imageStyle={{
+            borderBottomLeftRadius: 30,
+            borderBottomRightRadius: 30,
+          }}>
           <Text style={styles.welcomeText}>Welcome Back!</Text>
         </ImageBackground>
         <Text style={styles.loginText}>LOG IN</Text>
@@ -133,14 +135,9 @@ const Login = ({ route }) => {
         <View style={styles.optionsContainer}>
           <TouchableOpacity
             onPress={() => setRememberMe(!rememberMe)}
-            style={styles.checkboxContainer}
-          >
+            style={styles.checkboxContainer}>
             <View
-              style={[
-                styles.checkbox,
-                rememberMe && styles.checkboxChecked,
-              ]}
-            >
+              style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
               {rememberMe && <View style={styles.checkboxTick} />}
             </View>
             <Text style={styles.rememberMeText}>Remember me</Text>
