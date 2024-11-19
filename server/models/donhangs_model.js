@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const donhangSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     cartItems: [{ 
-        productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: 'LapStore', required: true },
         quantity: { type: Number, required: true },
     }],
     totalAmount: { type: Number, required: true },

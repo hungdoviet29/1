@@ -37,8 +37,12 @@ const getDonHangsByUser = async (req, res) => {
     try {
         const { userId } = req.params;
 
-        // Tìm tất cả đơn hàng của người dùng
-        const donHangs = await DonHang.find({ userId });
+        // Tìm tất cả đơn hàng của người dùng và populate thông tin sản phẩm
+        const donHangs = await DonHang.find({ userId })
+            .populate({
+                path: 'cartItems.productId', // Liên kết với `LapStore`
+                select: 'ten gia hinhAnh', // Chỉ lấy các trường cần thiết
+            });
 
         if (!donHangs || donHangs.length === 0) {
             return res.status(404).json({ message: 'Không có đơn hàng nào cho người dùng này.' });
@@ -51,6 +55,7 @@ const getDonHangsByUser = async (req, res) => {
         res.status(500).json({ message: 'Đã xảy ra lỗi khi lấy đơn hàng. Vui lòng thử lại sau.' });
     }
 };
+
 
   
 module.exports = {

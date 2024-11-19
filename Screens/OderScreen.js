@@ -17,6 +17,7 @@ const OrderScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState('Tất cả'); // Tab mặc định
 
+  // Lấy userId từ AsyncStorage và tải danh sách đơn hàng
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -36,6 +37,7 @@ const OrderScreen = ({ navigation }) => {
     fetchUserId();
   }, []);
 
+  // Gọi API lấy danh sách đơn hàng theo userId
   const fetchOrders = async (userId) => {
     try {
       const response = await fetch(
@@ -48,7 +50,14 @@ const OrderScreen = ({ navigation }) => {
       }
 
       const data = await response.json();
-      setOrders(data);
+      console.log('Dữ liệu trả về:', data); // Log dữ liệu trả về từ API
+
+      // Kiểm tra cấu trúc dữ liệu trả về
+      if (Array.isArray(data)) {
+        setOrders(data); // Gán dữ liệu nếu là mảng
+      } else {
+        throw new Error('Dữ liệu trả về từ API không hợp lệ.');
+      }
     } catch (error) {
       console.error('Lỗi khi tải đơn hàng:', error.message);
       Alert.alert('Lỗi', error.message);
@@ -57,6 +66,7 @@ const OrderScreen = ({ navigation }) => {
     }
   };
 
+  // Lọc danh sách đơn hàng theo tab
   const filterOrdersByTab = (order) => {
     if (order.status && order.shippingInfo && order.totalAmount) {
       if (selectedTab === 'Tất cả') return order.userId === userId;
@@ -65,6 +75,7 @@ const OrderScreen = ({ navigation }) => {
     return false;
   };
 
+  // Hiển thị từng đơn hàng
   const renderOrderItem = ({ item: order }) => (
     <View style={styles.orderItem}>
       <View style={styles.productInfo}>
@@ -86,10 +97,10 @@ const OrderScreen = ({ navigation }) => {
         <Text style={styles.productsTitle}>
           Sản phẩm trong đơn hàng:
         </Text>
-        {order.cartItems.map((item) => (
+        {order.cartItems?.map((item) => (
           <View key={item._id} style={styles.cartItem}>
             <Image
-              source={{ uri: item.productId.hinhAnh }}
+              source={{ uri: item.productId?.hinhAnh || 'placeholder_image_url' }}
               style={styles.itemImage}
             />
             <View style={styles.itemDetails}>
@@ -111,6 +122,7 @@ const OrderScreen = ({ navigation }) => {
     </View>
   );
 
+  // Hiển thị trạng thái đang tải
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -120,10 +132,12 @@ const OrderScreen = ({ navigation }) => {
     );
   }
 
-  const filteredOrders = orders.filter(filterOrdersByTab);
+  // Lọc danh sách đơn hàng theo tab
+  const filteredOrders = Array.isArray(orders) ? orders.filter(filterOrdersByTab) : [];
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image
@@ -165,6 +179,7 @@ const OrderScreen = ({ navigation }) => {
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   header: {
