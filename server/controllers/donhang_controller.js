@@ -19,7 +19,7 @@ const createDonHang = async (req, res) => {
         });
 
         await newDonHang.save();
-        res.status(201).json({ success: true, message: 'Đơn hàng đã được tạo thành công!', data: newDonHang });
+        res.status(201).json({ success: true, message: 'Đơn hàng đã được tạo thành công!' });
     } catch (error) {
         console.error('Lỗi khi tạo đơn hàng:', error);
         res.status(500).json({ message: 'Đã xảy ra lỗi khi tạo đơn hàng. Vui lòng thử lại sau.' });
@@ -36,7 +36,7 @@ const getDonHangsByUser = async (req, res) => {
             select: 'ten gia hinhAnh',
         });
 
-        if (!donHangs || donHangs.length === 0) {
+        if (!donHangs.length) {
             return res.status(404).json({ message: 'Không có đơn hàng nào cho người dùng này.' });
         }
 
@@ -55,7 +55,7 @@ const getAllDonHangs = async (req, res) => {
             select: 'ten gia hinhAnh',
         });
 
-        if (!donHangs || donHangs.length === 0) {
+        if (!donHangs.length) {
             return res.status(404).json({ message: 'Không có đơn hàng nào.' });
         }
 
@@ -66,7 +66,7 @@ const getAllDonHangs = async (req, res) => {
     }
 };
 
-// Cập nhật đơn hàng (hủy, xác nhận, thay đổi trạng thái)
+// Sửa đơn hàng
 const updateDonHang = async (req, res) => {
     try {
         const { id } = req.params;
@@ -99,7 +99,7 @@ const getDonHangsByUserAndStatus = async (req, res) => {
             select: 'ten gia hinhAnh',
         });
 
-        if (!donHangs || donHangs.length === 0) {
+        if (!donHangs.length) {
             return res.status(404).json({ message: 'Không tìm thấy đơn hàng nào phù hợp.' });
         }
 
@@ -110,30 +110,11 @@ const getDonHangsByUserAndStatus = async (req, res) => {
     }
 };
 
-// Xóa đơn hàng
-const deleteDonHang = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const deletedDonHang = await DonHang.findByIdAndDelete(id);
-
-        if (!deletedDonHang) {
-            return res.status(404).json({ message: 'Không tìm thấy đơn hàng với ID này.' });
-        }
-
-        res.status(200).json({ success: true, message: 'Đơn hàng đã được xóa.', data: deletedDonHang });
-    } catch (error) {
-        console.error('Lỗi khi xóa đơn hàng:', error);
-        res.status(500).json({ message: 'Đã xảy ra lỗi khi xóa đơn hàng. Vui lòng thử lại sau.' });
-    }
-};
-
-// Xuất khẩu tất cả các hàm
+// Xuất khẩu tất cả hàm
 module.exports = {
     createDonHang,
     getDonHangsByUser,
     getAllDonHangs,
     updateDonHang,
     getDonHangsByUserAndStatus,
-    deleteDonHang,
 };

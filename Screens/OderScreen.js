@@ -62,8 +62,8 @@ const OrderScreen = ({ navigation }) => {
         throw new Error('Dữ liệu trả về từ API không hợp lệ.');
       }
     } catch (error) {
-      console.error('Lỗi khi tải đơn hàng:', error.message);
-      Alert.alert('Lỗi', error.message);
+      // console.error('Lỗi khi tải đơn hàng:', error.message);
+      // Alert.alert('Lỗi', error.message);
     } finally {
       setLoading(false);
     }
