@@ -69,21 +69,25 @@ const getAllDonHangs = async (req, res) => {
 // Sửa đơn hàng
 const updateDonHang = async (req, res) => {
     try {
-        const { id } = req.params;
-        const updatedData = req.body;
+        const { id } = req.params; // Lấy orderId từ URL
+        const updatedData = req.body; // Dữ liệu cần cập nhật
 
+        // Cập nhật đơn hàng
         const updatedDonHang = await DonHang.findByIdAndUpdate(id, updatedData, { new: true });
 
         if (!updatedDonHang) {
             return res.status(404).json({ message: 'Không tìm thấy đơn hàng với ID này.' });
         }
 
+        // Trả về phản hồi sau khi cập nhật
         res.status(200).json({ success: true, message: 'Đơn hàng đã được cập nhật.', data: updatedDonHang });
     } catch (error) {
         console.error('Lỗi khi cập nhật đơn hàng:', error);
         res.status(500).json({ message: 'Đã xảy ra lỗi khi cập nhật đơn hàng. Vui lòng thử lại sau.' });
     }
 };
+
+
 
 // Lấy đơn hàng theo trạng thái và userId
 const getDonHangsByUserAndStatus = async (req, res) => {
