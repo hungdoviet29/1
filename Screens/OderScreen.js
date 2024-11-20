@@ -19,7 +19,16 @@ const OrderScreen = ({ navigation }) => {
   const [selectedTab, setSelectedTab] = useState('Tất cả'); // Tab mặc định
   const [refreshTrigger, setRefreshTrigger] = useState(false); // Trigger để theo dõi thay đổi
 
-  // Lấy userId từ AsyncStorage và tải danh sách đơn hàng
+  // Hàm ánh xạ trạng thái với URL
+  const statusMap = {
+      'Tất cả': `http://172.20.10.6:3000/donhang/user/${userId}`,
+      'Chờ xác nhận': `http://172.20.10.6:3000/donhang/user/${userId}/status?status=${encodeURIComponent('Chờ xác nhận')}`,
+      'Chờ vận chuyển': `http://172.20.10.6:3000/donhang/user/${userId}/status?status=${encodeURIComponent('Chờ vận chuyển')}`,
+      'Đang vận chuyển': `http://172.20.10.6:3000/donhang/user/${userId}/status?status=${encodeURIComponent('Đang vận chuyển')}`,
+      'Đã hủy': `http://172.20.10.6:3000/donhang/user/${userId}/status?status=${encodeURIComponent('Đã hủy')}`,
+  };
+
+  // Lấy userId từ AsyncStorage
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -39,25 +48,30 @@ const OrderScreen = ({ navigation }) => {
     fetchUserId();
   }, []);
 
-  // Gọi API lấy danh sách đơn hàng theo userId và status
-  const fetchOrders = async (userId, status = '') => {
+  // Gọi API lấy danh sách đơn hàng theo userId và trạng thái
+  const fetchOrders = async () => {
+    if (!userId) {
+      console.error('UserId chưa được khởi tạo.');
+      return;
+    }
+  
+    const url = statusMap[selectedTab];
+    console.log(`Fetching data for tab "${selectedTab}" from: ${url}`);
+  
     try {
-      const url = status
-        ? `http://172.20.10.6:3000/donhang/user/${userId}/status?status=${encodeURIComponent(status)}`
-        : `http://172.20.10.6:3000/donhang/user/${userId}`;
-
+      setOrders([]); // Reset dữ liệu trước khi tải mới
       const response = await fetch(url);
-
+  
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Lỗi khi tải đơn hàng: ${errorText}`);
       }
-
+  
       const data = await response.json();
-      console.log('Dữ liệu trả về:', data);
-
+      console.log(`Dữ liệu trả về cho tab "${selectedTab}":`, data);
+  
       if (Array.isArray(data)) {
-        setOrders(data);
+        setOrders(data); // Cập nhật dữ liệu khi API trả về danh sách hợp lệ
       } else {
         throw new Error('Dữ liệu trả về từ API không hợp lệ.');
       }
@@ -65,26 +79,18 @@ const OrderScreen = ({ navigation }) => {
       // console.error('Lỗi khi tải đơn hàng:', error.message);
       // Alert.alert('Lỗi', error.message);
     } finally {
-      setLoading(false);
+      setLoading(false); // Kết thúc trạng thái tải
     }
   };
-
-  // Theo dõi sự thay đổi của selectedTab hoặc refreshTrigger để làm mới dữ liệu
+  
+  // Theo dõi sự thay đổi của tab hoặc refreshTrigger
   useEffect(() => {
     if (userId) {
-      setLoading(true);
-      const statusMap = {
-        'Tất cả': '',
-        'Chờ xác nhận': 'Chờ xác nhận',
-        'Chờ vận chuyển': 'Chờ vận chuyển',
-        'Đang vận chuyển': 'Đang vận chuyển',
-        'Đã hủy': 'Đã hủy',
-      };
-
-      fetchOrders(userId, statusMap[selectedTab]);
+      setLoading(true); // Hiển thị trạng thái tải
+      fetchOrders(); // Gọi API lấy dữ liệu
     }
   }, [selectedTab, refreshTrigger]);
-
+  
   // Hàm xử lý hủy đơn
   const cancelOrder = async (orderId) => {
     try {
@@ -93,7 +99,7 @@ const OrderScreen = ({ navigation }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: 'Đã hủy' }), // Cập nhật trạng thái thành "Đã hủy"
+        body: JSON.stringify({ status: 'Đã hủy' }),
       });
 
       if (!response.ok) {
@@ -102,7 +108,7 @@ const OrderScreen = ({ navigation }) => {
 
       const data = await response.json();
       Alert.alert('Thành công', data.message);
-      setRefreshTrigger((prev) => !prev); // Kích hoạt làm mới danh sách đơn hàng
+      setRefreshTrigger((prev) => !prev);
     } catch (error) {
       console.error('Lỗi khi hủy đơn hàng:', error.message);
       Alert.alert('Lỗi', error.message);
@@ -117,7 +123,7 @@ const OrderScreen = ({ navigation }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: 'Thành Công' }), // Cập nhật trạng thái thành "Thành Công"
+        body: JSON.stringify({ status: 'Thành Công' }),
       });
 
       if (!response.ok) {
@@ -126,7 +132,7 @@ const OrderScreen = ({ navigation }) => {
 
       const data = await response.json();
       Alert.alert('Thành công', data.message);
-      setRefreshTrigger((prev) => !prev); // Kích hoạt làm mới danh sách đơn hàng
+      setRefreshTrigger((prev) => !prev);
     } catch (error) {
       console.error('Lỗi khi xác nhận đơn hàng:', error.message);
       Alert.alert('Lỗi', error.message);
@@ -172,7 +178,6 @@ const OrderScreen = ({ navigation }) => {
             </View>
           </View>
         ))}
-        {/* Nút hủy đơn và xác nhận nhận hàng */}
         {order.status === 'Chờ xác nhận' && (
           <TouchableOpacity
             style={styles.cancelButton}
@@ -193,17 +198,35 @@ const OrderScreen = ({ navigation }) => {
     </View>
   );
 
-  // Hiển thị trạng thái đang tải
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6C63FF" />
-        <Text>Đang tải...</Text>
-      </View>
-    );
-  }
+  // Hiển thị danh sách hoặc thông báo
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#6C63FF" />
+          <Text>Đang tải...</Text>
+        </View>
+      );
+    }
 
-  // Hiển thị danh sách đơn hàng hoặc thông báo không có đơn hàng
+    if (orders.length === 0) {
+      return (
+        <Text style={styles.noOrdersText}>
+          Không có đơn hàng nào {selectedTab !== 'Tất cả' && `trong trạng thái "${selectedTab}"`}.
+        </Text>
+      );
+    }
+
+    return (
+      <FlatList
+        data={orders}
+        keyExtractor={(order) => order._id}
+        renderItem={renderOrderItem}
+        contentContainerStyle={styles.ordersList}
+      />
+    );
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -228,7 +251,13 @@ const OrderScreen = ({ navigation }) => {
           contentContainerStyle={styles.tabsContent}
         >
           {['Tất cả', 'Chờ xác nhận', 'Chờ vận chuyển', 'Đang vận chuyển', 'Đã hủy'].map((tab) => (
-            <TouchableOpacity key={tab} onPress={() => setSelectedTab(tab)}>
+            <TouchableOpacity
+              key={tab}
+              onPress={() => {
+                setSelectedTab(tab);
+                setLoading(true);
+              }}
+            >
               <Text style={[styles.tabItem, selectedTab === tab && styles.activeTab]}>
                 {tab}
               </Text>
@@ -237,22 +266,12 @@ const OrderScreen = ({ navigation }) => {
         </ScrollView>
       </View>
 
-      {/* Danh sách đơn hàng */}
-      {orders.length > 0 ? (
-        <FlatList
-          data={orders}
-          keyExtractor={(order) => order._id}
-          renderItem={renderOrderItem}
-          contentContainerStyle={styles.ordersList}
-        />
-      ) : (
-        <Text style={styles.noOrdersText}>Không có đơn hàng nào.</Text>
-      )}
+      {/* Nội dung */}
+      {renderContent()}
     </View>
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   header: {
