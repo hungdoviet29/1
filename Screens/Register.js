@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   ImageBackground,
   StyleSheet,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
 const Register = () => {
   const navigation = useNavigation();
@@ -18,23 +18,23 @@ const Register = () => {
   const [error, setError] = useState('');
 
   // Kiểm tra độ mạnh của mật khẩu
-  const validatePassword = (password) => {
+  const validatePassword = password => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/;
     return regex.test(password);
   };
 
   const handleRegister = async () => {
-    // if (!validatePassword(password)) {
-    //   setError(
-    //     'Mật khẩu cần có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.'
-    //   );
-    //   return;
-    // }
+    if (!validatePassword(password)) {
+      setError(
+        'Mật khẩu cần có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
+      );
+      return;
+    }
 
-    // if (password !== confirmPassword) {
-    //   setError('Mật khẩu không khớp.');
-    //   return;
-    // }
+    if (password !== confirmPassword) {
+      setError('Mật khẩu không khớp.');
+      return;
+    }
 
     const newUser = {
       tenDangNhap: email,
@@ -44,7 +44,7 @@ const Register = () => {
     };
 
     try {
-      const response = await fetch('http://172.20.10.6:3000/users/register', {
+      const response = await fetch('http://192.168.0.4:3000/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,9 +68,11 @@ const Register = () => {
       <ImageBackground
         source={require('../acssets/dangky.png')}
         style={styles.background}
-        imageStyle={{ borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}>
+        imageStyle={{borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}>
         <Text style={styles.welcomeText}>Get's started with LapStore!</Text>
-        <Text style={styles.subText}>Create your account and start enjoying shopping</Text>
+        <Text style={styles.subText}>
+          Create your account and start enjoying shopping
+        </Text>
       </ImageBackground>
 
       <View style={styles.content}>
@@ -113,13 +115,16 @@ const Register = () => {
             placeholderTextColor="#C1C1C1"
           />
 
-          <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+          <TouchableOpacity
+            style={styles.registerButton}
+            onPress={handleRegister}>
             <Text style={styles.registerButtonText}>SIGN UP</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
             <Text style={styles.signInText}>
-              Already have an account? <Text style={styles.signInLink}>Sign in</Text>
+              Already have an account?{' '}
+              <Text style={styles.signInLink}>Sign in</Text>
             </Text>
           </TouchableOpacity>
         </View>

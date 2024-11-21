@@ -20,7 +20,7 @@ const FixPasswordScreen = ({navigation}) => {
     }
     try {
       const response = await fetch(
-        'http://192.168.3.106:3000/users/changePassword',
+        'http://192.168.0.4:3000/users/changePassword',
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},

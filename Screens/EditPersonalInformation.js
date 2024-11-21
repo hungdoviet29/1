@@ -12,17 +12,17 @@ import {
 } from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import axios from 'axios';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 const EditPersonalInformation = ({route, navigation}) => {
-  const {userData} = route.params; // Nhận dữ liệu từ màn trước
+  const {userData} = route.params;
 
   // Khởi tạo giá trị từ userData
   const [name, setName] = useState(userData.tenDangNhap || '');
-  const [birthDate, setBirthDate] = useState(
-    userData.birthDate || '01/01/2000',
-  );
   const [email, setEmail] = useState(userData.email || 'example@example.com');
   const [phone, setPhone] = useState(userData.phone || 'Không có số');
+  const [matKhau, setmatKhau] = useState(userData.matKhau);
+  const [avatar, setAvatar] = useState(userData.avatar || '');
 
   // Modal trạng thái chỉnh sửa
   const [editField, setEditField] = useState(null);
@@ -39,22 +39,135 @@ const EditPersonalInformation = ({route, navigation}) => {
     const updatedData = {...userData, [editField]: newValue};
     try {
       const response = await axios.put(
-        `http://192.168.0.3:3000/update/${userData._id}`,
+        `http://192.168.0.4:3000/update/${userData._id}`,
         updatedData,
       );
-
       if (response.status === 200) {
         Alert.alert('Thành công', 'Thông tin đã được cập nhật');
-        // Cập nhật dữ liệu hiển thị
         if (editField === 'tenDangNhap') setName(newValue);
         if (editField === 'email') setEmail(newValue);
         if (editField === 'phone') setPhone(newValue);
-        setEditField(null); // Đóng modal
+        if (editField === 'matKhau') setmatKhau(newValue);
+        setEditField(null);
       }
     } catch (error) {
       console.error(error);
       Alert.alert('Lỗi', 'Không thể cập nhật thông tin');
     }
+  };
+
+  // Hàm gửi ảnh lên server
+  const uploadAvatar = async avatarUri => {
+    const formData = new FormData();
+    const uriParts = avatarUri.split('.');
+    const fileType = uriParts[uriParts.length - 1];
+
+    const avatarFile = {
+      uri: avatarUri,
+      name: `avatar.${fileType}`,
+      type: `image/${fileType}`,
+    };
+
+    formData.append('avatar', avatarFile);
+
+    try {
+      const response = await axios.post(
+        `http://192.168.0.4:3000/user/${userData._id}/image`, // Sử dụng đúng userId
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+
+      if (response.status === 200 && response.data.avatarUrl) {
+        const avatarUrl = response.data.avatarUrl;
+
+        const updatedData = {...userData, avatar: avatarUrl};
+        const updateResponse = await axios.put(
+          `http://192.168.0.4:3000/update/${userData._id}`,
+          updatedData,
+        );
+
+        if (updateResponse.status === 200) {
+          setAvatar(avatarUrl);
+          Alert.alert('Thành công', 'Ảnh đại diện đã được cập nhật');
+        } else {
+          throw new Error('Cập nhật thông tin người dùng thất bại');
+        }
+      } else {
+        throw new Error('Không nhận được URL ảnh từ server');
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error('Server Error:', error.response.data);
+        Alert.alert(
+          'Lỗi',
+          `Server: ${
+            error.response.data.message || 'Không thể cập nhật ảnh đại diện'
+          }`,
+        );
+      } else {
+        console.error('Client Error:', error.message);
+        Alert.alert('Lỗi', 'Không thể kết nối đến server');
+      }
+    }
+  };
+
+  // Hàm chọn hoặc chụp ảnh mới
+  const handleAvatarChange = () => {
+    Alert.alert(
+      'Thay đổi ảnh đại diện',
+      'Chọn một tùy chọn',
+      [
+        {
+          text: 'Chọn ảnh từ thư viện',
+          onPress: () => openImagePicker(),
+        },
+        {
+          text: 'Chụp ảnh mới',
+          onPress: () => openCamera(),
+        },
+        {
+          text: 'Hủy',
+          style: 'cancel',
+        },
+      ],
+      {cancelable: true},
+    );
+  };
+
+  // Mở thư viện ảnh
+  const openImagePicker = () => {
+    launchImageLibrary(
+      {mediaType: 'photo', maxWidth: 500, maxHeight: 500},
+      response => {
+        const uri = response.assets && response.assets[0]?.uri;
+        if (uri) {
+          setAvatar(uri);
+          uploadAvatar(uri);
+        } else {
+          console.log('Error: No URI returned from picker');
+        }
+      },
+    );
+  };
+
+  // Mở camera
+  const openCamera = () => {
+    launchCamera(
+      {mediaType: 'photo', maxWidth: 500, maxHeight: 500},
+      response => {
+        const uri = response.assets && response.assets[0]?.uri;
+        if (uri) {
+          setAvatar(uri);
+          uploadAvatar(uri);
+        } else {
+          console.log('Error: No URI returned from camera');
+        }
+      },
+    );
   };
 
   return (
@@ -70,11 +183,9 @@ const EditPersonalInformation = ({route, navigation}) => {
         </View>
 
         {/* Hiển thị avatar */}
-        <TouchableOpacity
-          style={styles.infoItem}
-          onPress={() => Alert.alert('Thay đổi avatar')}>
+        <TouchableOpacity style={styles.infoItem} onPress={handleAvatarChange}>
           <Text style={styles.label}>Ảnh đại diện</Text>
-          <Image source={{uri: userData.avatar}} style={styles.avatar} />
+          <Image source={{uri: avatar}} style={styles.avatar} />
         </TouchableOpacity>
 
         {/* Hiển thị tên đăng nhập */}
@@ -99,6 +210,13 @@ const EditPersonalInformation = ({route, navigation}) => {
           onPress={() => openEditModal('phone', phone)}>
           <Text style={styles.label}>Số điện thoại</Text>
           <Text style={styles.value}>{phone}</Text>
+        </TouchableOpacity>
+        {/*Pass*/}
+        <TouchableOpacity
+          style={styles.infoItem5}
+          onPress={() => navigation.navigate('FixPasswordScreen')}>
+          <Text style={styles.label}>Mật khẩu</Text>
+          <Text style={styles.value}>******</Text>
         </TouchableOpacity>
       </View>
 
@@ -167,7 +285,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
   },
-  modalButtons: {flexDirection: 'row', justifyContent: 'space-around'},
+  modalButtons: {flexDirection: 'row', justifyContent: 'space-between'},
 });
 
 export default EditPersonalInformation;

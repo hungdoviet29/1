@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const Login = ({route}) => {
   const navigation = useNavigation();
@@ -45,23 +46,24 @@ const Login = ({route}) => {
   }, []);
 
   const handleLogin = async () => {
-    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Kiểm tra định dạng email
-    // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/; // Mật khẩu mạnh
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Kiểm tra định dạng email
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/; // Mật khẩu mạnh
 
-    // if (!emailRegex.test(tenDangNhap)) {
-    //   setError('Email không hợp lệ. Vui lòng nhập đúng định dạng.');
-    //   return;
-    // }
+    if (!emailRegex.test(tenDangNhap)) {
+      setError('Email không hợp lệ. Vui lòng nhập đúng định dạng.');
+      return;
+    }
 
-    // if (!passwordRegex.test(matKhau)) {
-    //   setError(
-    //     'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.'
-    //   );
-    //   return;
-    // }
+    if (!passwordRegex.test(matKhau)) {
+      setError(
+        'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
+      );
+      return;
+    }
 
     try {
-      const response = await fetch('http://192.168.0.3:3000/users');
+      const response = await fetch('http://192.168.0.4:3000/users');
       const users = await response.json();
       const user = users.find(
         user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau,
@@ -92,63 +94,71 @@ const Login = ({route}) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.form}>
-        <ImageBackground
-          source={require('../acssets/laplogin.png')}
-          style={styles.background}
-          imageStyle={{
-            borderBottomLeftRadius: 30,
-            borderBottomRightRadius: 30,
-          }}>
-          <Text style={styles.welcomeText}>Welcome Back!</Text>
-        </ImageBackground>
-        <Text style={styles.loginText}>LOG IN</Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <View style={styles.form}>
+          <ImageBackground
+            source={require('../acssets/laplogin.png')}
+            style={styles.background}
+            imageStyle={{
+              borderBottomLeftRadius: 30,
+              borderBottomRightRadius: 30,
+            }}>
+            <Text style={styles.welcomeText}>Welcome Back!</Text>
+          </ImageBackground>
+          <Text style={styles.loginText}>LOG IN</Text>
 
-        <Text style={styles.label}>Email address</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            value={tenDangNhap}
-            onChangeText={setTenDangNhap}
-            placeholder="Enter your email"
-            keyboardType="email-address"
-            placeholderTextColor="#C1C1C1"
-            autoCapitalize="none"
-          />
-        </View>
+          <Text style={styles.label}>Email address</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              value={tenDangNhap}
+              onChangeText={setTenDangNhap}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+              placeholderTextColor="#C1C1C1"
+              autoCapitalize="none"
+            />
+          </View>
 
-        <Text style={styles.label1}>Password</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your password"
-            value={matKhau}
-            onChangeText={setMatKhau}
-            secureTextEntry
-            placeholderTextColor="#C1C1C1"
-          />
-        </View>
+          <Text style={styles.label1}>Password</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your password"
+              value={matKhau}
+              onChangeText={setMatKhau}
+              secureTextEntry
+              placeholderTextColor="#C1C1C1"
+            />
+          </View>
 
-        {error && <Text style={styles.errorText}>{error}</Text>}
+          {error && <Text style={styles.errorText}>{error}</Text>}
 
-        <View style={styles.optionsContainer}>
-          <TouchableOpacity
-            onPress={() => setRememberMe(!rememberMe)}
-            style={styles.checkboxContainer}>
-            <View
-              style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
-              {rememberMe && <View style={styles.checkboxTick} />}
-            </View>
-            <Text style={styles.rememberMeText}>Remember me</Text>
+          <View style={styles.optionsContainer}>
+            <TouchableOpacity
+              onPress={() => setRememberMe(!rememberMe)}
+              style={styles.checkboxContainer}>
+              <View
+                style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+                {rememberMe && <View style={styles.checkboxTick} />}
+              </View>
+              <Text style={styles.rememberMeText}>Remember me</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <Text style={styles.loginButtonText}>SIGN IN</Text>
           </TouchableOpacity>
+          <View style={styles.signupContainer}>
+            <Text style={styles.signupText}>Bạn chưa có mật khẩu?</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+              <Text style={styles.signupLink}> Đăng kí.</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>SIGN IN</Text>
-        </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -264,6 +274,21 @@ const styles = StyleSheet.create({
   loginButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  signupContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  signupText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  signupLink: {
+    fontSize: 14,
+    color: '#4B4B8F',
     fontWeight: 'bold',
   },
   errorText: {
