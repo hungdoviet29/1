@@ -1,4 +1,3 @@
-// models/donhang.js
 const mongoose = require('mongoose');
 
 // Định nghĩa schema cho đơn hàng
@@ -15,7 +14,11 @@ const donhangSchema = new mongoose.Schema({
         phone: { type: String, required: true },
         address: { type: String, required: true },
     },
-    status: { type: String, default: 'Chờ xác nhận' }, // Trạng thái mặc định
+    status: { 
+        type: String, 
+        default: 'Chờ xác nhận',  // Trạng thái mặc định
+        enum: ['Chờ xác nhận', 'Đã xác nhận', 'Đang vận chuyển', 'Đã giao', 'Hủy']  // Các trạng thái có thể có
+    },
 }, { timestamps: true });
 
 // Export mô hình DonHang

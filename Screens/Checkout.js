@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, FlatList, Image, TextInput } from 'react-native';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    Alert,
+    ActivityIndicator,
+    FlatList,
+    Image,
+    TextInput,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CheckoutScreen = ({ navigation }) => {
@@ -14,7 +24,6 @@ const CheckoutScreen = ({ navigation }) => {
         address: '',
     });
 
-    // Lấy User ID và tải giỏ hàng
     useEffect(() => {
         const fetchUserId = async () => {
             try {
@@ -34,7 +43,6 @@ const CheckoutScreen = ({ navigation }) => {
         fetchUserId();
     }, []);
 
-    // Tải giỏ hàng từ API
     const fetchCartItems = async (id) => {
         setLoading(true);
         try {
@@ -54,7 +62,6 @@ const CheckoutScreen = ({ navigation }) => {
         }
     };
 
-    // Tính tổng tiền
     const calculateTotal = (items) => {
         const total = items.reduce((sum, item) => {
             if (item.productId?.gia && item.quantity) {
@@ -65,41 +72,62 @@ const CheckoutScreen = ({ navigation }) => {
         setTotalAmount(total);
     };
 
-    // Xử lý thanh toán
     const handleCheckout = async () => {
         const validCartItems = cartItems.filter((item) => item.productId !== null);
+
         if (!validCartItems.length) {
             Alert.alert('Lỗi', 'Giỏ hàng của bạn có sản phẩm không hợp lệ.');
             return;
         }
 
-        const orderData = {
-            userId,
-            cartItems: validCartItems,
-            totalAmount,
-            paymentMethod: selectedPaymentMethod,
-            shippingInfo,
-        };
+        Alert.alert(
+            'Xác nhận thanh toán',
+            'Bạn có chắc chắn muốn thanh toán với số tiền này?',
+            [
+                {
+                    text: 'Hủy',
+                    onPress: () => console.log('Thanh toán đã bị hủy'),
+                    style: 'cancel',
+                },
+                {
+                    text: 'Tiến hành',
+                    onPress: async () => {
+                        const orderData = {
+                            userId,
+                            cartItems: validCartItems,
+                            totalAmount,
+                            paymentMethod: selectedPaymentMethod,
+                            shippingInfo,
+                        };
 
-        try {
-            const response = await fetch('http://192.168.3.106:3000/donhang', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData),
-            });
-            const responseBody = await response.json();
-            if (response.ok && responseBody.success) {
-                Alert.alert('Thành công', 'Đơn hàng đã được tạo.');
-                navigation.navigate('OderScreen');
-            } else {
-                Alert.alert('Lỗi', responseBody.message || 'Không thể tạo đơn hàng.');
-            }
-        } catch (error) {
-            console.error('Lỗi khi gửi dữ liệu:', error);
-            Alert.alert('Lỗi', 'Lỗi khi tạo đơn hàng. Vui lòng thử lại.');
-        }
+                        try {
+                            const response = await fetch('http://192.168.3.106:3000/donhang', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(orderData),
+                            });
+                            const responseBody = await response.json();
+                            if (response.ok && responseBody.success) {
+                                Alert.alert('Thành công', 'Đơn hàng đã được tạo.');
+                                navigation.navigate('NotificationScreen', {
+                                    message: 'Đơn hàng của bạn đã được tạo thành công!',
+                                });
+                            } else {
+                                Alert.alert('Lỗi', responseBody.message || 'Không thể tạo đơn hàng.');
+                            }
+                        } catch (error) {
+                            console.error('Lỗi khi gửi dữ liệu:', error);
+                            Alert.alert('Lỗi', 'Lỗi khi tạo đơn hàng. Vui lòng thử lại.');
+                        }
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
     };
 
+
+    
     // Chọn phương thức thanh toán
     const handleSelectPaymentMethod = (method) => {
         setSelectedPaymentMethod(method);

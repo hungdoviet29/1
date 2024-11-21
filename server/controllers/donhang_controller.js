@@ -1,4 +1,3 @@
-// controllers/donhangController.js
 const DonHang = require('../models/donhangs_model');
 
 // Tạo đơn hàng mới
@@ -6,25 +5,20 @@ const createDonHang = async (req, res) => {
     try {
         const { userId, cartItems, totalAmount, paymentMethod, shippingInfo } = req.body;
 
-        // Kiểm tra xem tất cả các trường cần thiết có tồn tại trong request hay không
         if (!userId || !cartItems || !totalAmount || !paymentMethod || !shippingInfo) {
             return res.status(400).json({ message: 'Thiếu thông tin cần thiết để tạo đơn hàng' });
         }
 
-        // Tạo một đơn hàng mới
         const newDonHang = new DonHang({
             userId,
             cartItems,
             totalAmount,
             paymentMethod,
             shippingInfo,
-            status: 'Chờ xác nhận',  // Trạng thái mặc định
+            status: 'Chờ xác nhận', // Trạng thái mặc định
         });
 
-        // Lưu đơn hàng vào cơ sở dữ liệu
         await newDonHang.save();
-
-        // Trả về phản hồi thành công
         res.status(201).json({ success: true, message: 'Đơn hàng đã được tạo thành công!' });
     } catch (error) {
         console.error('Lỗi khi tạo đơn hàng:', error);
@@ -37,18 +31,15 @@ const getDonHangsByUser = async (req, res) => {
     try {
         const { userId } = req.params;
 
-        // Tìm tất cả đơn hàng của người dùng và populate thông tin sản phẩm
-        const donHangs = await DonHang.find({ userId })
-            .populate({
-                path: 'cartItems.productId', // Liên kết với `LapStore`
-                select: 'ten gia hinhAnh', // Chỉ lấy các trường cần thiết
-            });
+        const donHangs = await DonHang.find({ userId }).populate({
+            path: 'cartItems.productId',
+            select: 'ten gia hinhAnh',
+        });
 
-        if (!donHangs || donHangs.length === 0) {
+        if (!donHangs.length) {
             return res.status(404).json({ message: 'Không có đơn hàng nào cho người dùng này.' });
         }
 
-        // Trả về danh sách đơn hàng
         res.status(200).json(donHangs);
     } catch (error) {
         console.error('Lỗi khi lấy đơn hàng:', error);
@@ -56,16 +47,15 @@ const getDonHangsByUser = async (req, res) => {
     }
 };
 
-// Lấy tất cả đơn hàng của tất cả người dùng
+// Lấy tất cả đơn hàng
 const getAllDonHangs = async (req, res) => {
     try {
-        // Lấy tất cả đơn hàng mà không populate để kiểm tra
         const donHangs = await DonHang.find().populate({
             path: 'cartItems.productId',
             select: 'ten gia hinhAnh',
         });
 
-        if (!donHangs || donHangs.length === 0) {
+        if (!donHangs.length) {
             return res.status(404).json({ message: 'Không có đơn hàng nào.' });
         }
 
@@ -76,27 +66,20 @@ const getAllDonHangs = async (req, res) => {
     }
 };
 
-
-// Export tất cả các hàm cùng một lần
-module.exports = {
-    createDonHang,
-    getDonHangsByUser,
-    getAllDonHangs,
-};
-
-
 // Sửa đơn hàng
 const updateDonHang = async (req, res) => {
     try {
-        const { id } = req.params;
-        const updatedData = req.body;
+        const { id } = req.params; // Lấy orderId từ URL
+        const updatedData = req.body; // Dữ liệu cần cập nhật
 
+        // Cập nhật đơn hàng
         const updatedDonHang = await DonHang.findByIdAndUpdate(id, updatedData, { new: true });
 
         if (!updatedDonHang) {
             return res.status(404).json({ message: 'Không tìm thấy đơn hàng với ID này.' });
         }
 
+        // Trả về phản hồi sau khi cập nhật
         res.status(200).json({ success: true, message: 'Đơn hàng đã được cập nhật.', data: updatedDonHang });
     } catch (error) {
         console.error('Lỗi khi cập nhật đơn hàng:', error);
@@ -104,42 +87,38 @@ const updateDonHang = async (req, res) => {
     }
 };
 
-module.exports = {
-    ...require('./donhang_controller'),
-    updateDonHang,
-};
 
 
+// Lấy đơn hàng theo trạng thái và userId
 const getDonHangsByUserAndStatus = async (req, res) => {
     try {
-        const { userId } = req.params; // Lấy userId từ route params
-        const { status } = req.query; // Lấy trạng thái từ query parameter
+        const { userId } = req.params;
+        const { status } = req.query;
 
-        // Điều kiện tìm kiếm
         const query = { userId };
-        if (status) {
-            query.status = status; // Thêm điều kiện lọc trạng thái nếu có
-        }
+        if (status) query.status = status;
 
-        // Tìm tất cả đơn hàng của người dùng và populate thông tin sản phẩm
         const donHangs = await DonHang.find(query).populate({
-            path: 'cartItems.productId', // Liên kết với `LapStore`
-            select: 'ten gia hinhAnh', // Chỉ lấy các trường cần thiết
+            path: 'cartItems.productId',
+            select: 'ten gia hinhAnh',
         });
 
-        if (!donHangs || donHangs.length === 0) {
+        if (!donHangs.length) {
             return res.status(404).json({ message: 'Không tìm thấy đơn hàng nào phù hợp.' });
         }
 
-        // Trả về danh sách đơn hàng
         res.status(200).json(donHangs);
     } catch (error) {
-        console.error('Lỗi khi lấy đơn hàng theo trạng thái và người dùng:', error);
+        console.error('Lỗi khi lấy đơn hàng:', error);
         res.status(500).json({ message: 'Đã xảy ra lỗi. Vui lòng thử lại sau.' });
     }
 };
 
+// Xuất khẩu tất cả hàm
 module.exports = {
-    ...require('./donhang_controller'),
+    createDonHang,
+    getDonHangsByUser,
+    getAllDonHangs,
+    updateDonHang,
     getDonHangsByUserAndStatus,
 };

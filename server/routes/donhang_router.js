@@ -18,6 +18,4 @@ router.put('/:id', donhangController.updateDonHang);
 // Route để lấy đơn hàng theo trạng thái và userId
 router.get('/user/:userId/status', donhangController.getDonHangsByUserAndStatus);
 
-
-
 module.exports = router;

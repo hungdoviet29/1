@@ -28,6 +28,7 @@ const HomeScreen = () => {
 
     switch (category) {
       case 'Popular':
+<<<<<<< HEAD
         apiUrl = 'http://192.168.0.4:3000/LapTop/getPopularLapTop';
         break;
       case 'Trending':
@@ -38,6 +39,18 @@ const HomeScreen = () => {
         break;
       case 'Sale':
         apiUrl = 'http://192.168.0.4:3000/LapTop/getSaleLapTop';
+=======
+        apiUrl = 'http://192.168.3.106:3000/LapTop/getPopularLapTop';
+        break;
+      case 'Trending':
+        apiUrl = 'http://192.168.3.106:3000/LapTop/getTrendingLapTop';
+        break;
+      case 'News':
+        apiUrl = 'http://192.168.3.106:3000/LapTop/getNewsLapTop';
+        break;
+      case 'Sale':
+        apiUrl = 'http://192.168.3.106:3000/LapTop/getSaleLapTop';
+>>>>>>> a78a0828112fb877d85b3feb8c4526c846a0f641
         break;
       case 'All':
       default:
