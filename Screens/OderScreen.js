@@ -100,7 +100,7 @@ const OrderScreen = ({ navigation }) => {
       }
 
       const data = await response.json();
-      Alert.alert('Thành công', data.message);
+      Alert.alert('Hoàn Thành', data.message);
       setRefreshTrigger((prev) => !prev);
     } catch (error) {
       console.error('Lỗi khi hủy đơn hàng:', error.message);
@@ -113,7 +113,7 @@ const OrderScreen = ({ navigation }) => {
       const response = await fetch(`http://172.20.10.6:3000/donhang/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Thành Công' }),
+        body: JSON.stringify({ status: 'Hoàn Thành' }),
       });
 
       if (!response.ok) {
@@ -121,7 +121,7 @@ const OrderScreen = ({ navigation }) => {
       }
 
       const data = await response.json();
-      Alert.alert('Thành công', data.message);
+      Alert.alert('Hoàn Thành', data.message);
       setRefreshTrigger((prev) => !prev);
     } catch (error) {
       console.error('Lỗi khi xác nhận đơn hàng:', error.message);
@@ -218,7 +218,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
   },
   icon: { width: 24, height: 24 },
-  headerText: { fontSize: 18, fontWeight: 'bold' },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center', // Căn giữa nội dung văn bản
+    flex: 1, // Đảm bảo chiếm không gian giữa
+  },
   tabsContainer: {
     marginHorizontal: 16,
     marginBottom: 10,

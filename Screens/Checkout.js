@@ -46,7 +46,7 @@ const CheckoutScreen = ({ navigation }) => {
     const fetchCartItems = async (id) => {
         setLoading(true);
         try {
-            const response = await fetch(`http://192.168.3.106:3000/cart/${id}`);
+            const response = await fetch(`http://172.20.10.6:3000/cart/${id}`);
             const data = await response.json();
             if (response.ok) {
                 setCartItems(data.items || []);
@@ -101,7 +101,7 @@ const CheckoutScreen = ({ navigation }) => {
                         };
 
                         try {
-                            const response = await fetch('http://192.168.3.106:3000/donhang', {
+                            const response = await fetch('http://172.20.10.6:3000/donhang', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(orderData),
@@ -129,10 +129,10 @@ const CheckoutScreen = ({ navigation }) => {
 
     const resetCart = async () => {
         try {
-            const response = await fetch(`http://192.168.3.106:3000/cart/${userId}`);
+            const response = await fetch(`http://172.20.10.6:3000/cart/${userId}`);
             const data = await response.json();
             if (data && data.items && data.items.length > 0) {
-                const deleteResponse = await fetch(`http://192.168.3.106:3000/cart/${userId}`, {
+                const deleteResponse = await fetch(`http://172.20.10.6:3000/cart/${userId}`, {
                     method: 'DELETE',
                 });
                 if (deleteResponse.ok) {
