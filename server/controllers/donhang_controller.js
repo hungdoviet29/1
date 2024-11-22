@@ -96,23 +96,27 @@ const getDonHangsByUserAndStatus = async (req, res) => {
         const { status } = req.query;
 
         const query = { userId };
-        if (status) query.status = status;
+        if (status) query.status = status; // Thêm điều kiện status nếu có
 
+        // Tìm đơn hàng theo điều kiện
         const donHangs = await DonHang.find(query).populate({
             path: 'cartItems.productId',
             select: 'ten gia hinhAnh',
         });
 
+        // Nếu không tìm thấy đơn hàng, trả về danh sách rỗng
         if (!donHangs.length) {
-            return res.status(404).json({ message: 'Không tìm thấy đơn hàng nào phù hợp.' });
+            return res.status(200).json([]);
         }
 
+        // Trả về danh sách đơn hàng
         res.status(200).json(donHangs);
     } catch (error) {
         console.error('Lỗi khi lấy đơn hàng:', error);
         res.status(500).json({ message: 'Đã xảy ra lỗi. Vui lòng thử lại sau.' });
     }
 };
+
 
 // Xuất khẩu tất cả hàm
 module.exports = {
