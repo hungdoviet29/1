@@ -109,6 +109,7 @@ const CheckoutScreen = ({ navigation }) => {
                             const responseBody = await response.json();
                             if (response.ok && responseBody.success) {
                                 Alert.alert('Thành công', 'Đơn hàng đã được tạo.');
+                                await resetCart(); // Reset giỏ hàng sau khi tạo đơn hàng thành công
                                 navigation.navigate('NotificationScreen', {
                                     message: 'Đơn hàng của bạn đã được tạo thành công!',
                                 });
@@ -126,8 +127,30 @@ const CheckoutScreen = ({ navigation }) => {
         );
     };
 
-
+    const resetCart = async () => {
+        try {
+            const response = await fetch(`http://192.168.3.106:3000/cart/${userId}`);
+            const data = await response.json();
+            if (data && data.items && data.items.length > 0) {
+                const deleteResponse = await fetch(`http://192.168.3.106:3000/cart/${userId}`, {
+                    method: 'DELETE',
+                });
+                if (deleteResponse.ok) {
+                    setCartItems([]); // Empty the cart in UI
+                    setTotalAmount(0); // Reset the total
+                } else {
+                    const errorData = await deleteResponse.json();
+                    console.error('Error deleting cart:', errorData.message);
+                }
+            } else {
+                console.log('Cart is already empty.');
+            }
+        } catch (error) {
+            console.error('Failed to reset cart:', error);
+        }
+    };
     
+
     // Chọn phương thức thanh toán
     const handleSelectPaymentMethod = (method) => {
         setSelectedPaymentMethod(method);
@@ -234,6 +257,7 @@ const CheckoutScreen = ({ navigation }) => {
         </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: { 

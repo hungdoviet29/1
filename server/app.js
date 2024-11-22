@@ -45,6 +45,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/cart', (req, res, next) => {
+  console.log('Đã nhận yêu cầu: ', req.method, req.originalUrl);
+  next();
+});
+
+
 app.get('/manager/products', (req, res) => {
   res.render('manager_laptops'); // Render file manager_laptops.ejs
 });
