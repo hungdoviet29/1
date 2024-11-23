@@ -70,20 +70,18 @@ exports.getPopularLapTop = async (req, res) => {
   exports.addlaptop = async (req, res) => {
     try {
       console.log('Body:', req.body);
-      console.log('File:', req.file);
   
-      const { ten, moTa, gia, danhMuc, soLuong, hang } = req.body;
+      const { ten, moTa, gia, danhMuc, soLuong, hang ,hinhAnh} = req.body;
   
-      let hinhAnhUrl = '';
-      if (req.file) {
-        hinhAnhUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+      if (!hinhAnh) {
+        return res.status(400).json({ message: 'Vui lòng cung cấp đường dẫn hình ảnh' });
       }
   
       const newLaptop = new laptopModel({
         ten,
         moTa,
         gia: Number(gia),
-        hinhAnh: hinhAnhUrl,
+        hinhAnh,
         danhMuc,
         soLuong: Number(soLuong),
         hang,
@@ -100,47 +98,47 @@ exports.getPopularLapTop = async (req, res) => {
   };
   
 
-exports.updatelaptop = async (req, res, next) => {
+  exports.updatelaptop = async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const { file } = req;
-        if (!file) {
-            return res.status(400).json({ message: 'Không có tệp được gửi' });
-        }
-        const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
-        const data = req.body;
-        const updatelaptop = {
-            id: data.id,
-            ten: data.ten,
-            moTa: data.moTa,
-            gia: data.gia,
-            hinhAnh: imageUrl,
-            danhMuc: data.danhMuc,
-            soLuong: data.soLuong,
-            hang: data.hang,
-        };
-
-        let result = await laptopModel.findByIdAndUpdate(id, updatelaptop, { new: true });
-
-        if (result) {
-            return res.status(200).json({
-                status: 200,
-                message: "Cập nhật laptop thành công",
-                data: result,
-            });
-        } else {
-            return res.status(400).json({
-                status: 400,
-                message: "Không thể cập nhật laptop",
-                data: [],
-            });
-        }
+      const { id } = req.params;
+      const { hinhAnh, ten, moTa, gia, danhMuc, soLuong, hang } = req.body;
+  
+      // Kiểm tra nếu không có `hinhAnh` trong request body
+      if (!hinhAnh) {
+        return res.status(400).json({ message: 'Vui lòng cung cấp đường dẫn hình ảnh' });
+      }
+  
+      const updatelaptop = {
+        ten,
+        moTa,
+        gia: Number(gia),
+        hinhAnh, // Sử dụng link ảnh từ request body
+        danhMuc,
+        soLuong: Number(soLuong),
+        hang,
+      };
+  
+      const result = await laptopModel.findByIdAndUpdate(id, updatelaptop, { new: true });
+  
+      if (result) {
+        return res.status(200).json({
+          status: 200,
+          message: 'Cập nhật laptop thành công',
+          data: result,
+        });
+      } else {
+        return res.status(400).json({
+          status: 400,
+          message: 'Không thể cập nhật laptop',
+          data: [],
+        });
+      }
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Lỗi server", result: error });
+      console.error('Lỗi server:', error);
+      res.status(500).json({ message: 'Lỗi server', result: error });
     }
-};
-
+  };
+  
 exports.deletelaptop = async (req, res) => {
   try {
       console.log('Deleting laptop with ID:', req.params.id);  // Thêm log để kiểm tra ID
