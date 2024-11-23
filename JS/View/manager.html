@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Điều Khiển Quản Lý</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background-color: #6c63ff;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .summary-cards {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            width: 300px;
+            margin: 10px;
+            text-align: center;
+        }
+
+        .card h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .card p {
+            font-size: 18px;
+            color: #555;
+        }
+
+        nav {
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #6c63ff;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .table-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #6c63ff;
+            color: white;
+        }
+
+        .status-icon {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .status-icon.complete {
+            color: green;
+        }
+
+        .status-icon.cancelled {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <header>Bảng Điều Khiển Quản Lý</header>
+
+    <nav>
+        <ul>
+            <li><a href="manager.html">Đơn Hàng</a></li>
+            <li><a href="manager_laptops.html">Sản phẩm</a></li>
+            <li><a href="manager_user.html">Người Dùng</a></li>
+            <li><a href="manager_discount.html">Khuyến mại</a></li>
+            <li><a href="manager_statistical.html">Thống kê</a></li>
+            <li><a href="login.html">Đăng Xuất</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="summary-cards">
+            <div class="card">
+                <h3>Tổng Sản Phẩm</h3>
+                <p>120</p>
+            </div>
+            <div class="card">
+                <h3>Tổng Đơn Hàng</h3>
+                <p id="total-orders">0</p>
+            </div>
+            
+            <div class="card">
+                <h3>Tổng Người Dùng</h3>
+                <p>50</p>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h3>Đơn Hàng Gần Đây</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID đơn hàng</th>
+                        <th>Người Dùng</th>
+                        <th>Sản Phẩm</th>
+                        <th>Tổng tiền</th>
+                        <th>Địa chỉ</th>
+                        <th>Tên người nhận</th>
+                        <th>SĐT</th>
+                        <th>Ngày tạo</th>
+                        <th>Tình trạng</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="order-list"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+
+function saveTotalProducts() {
+            const totalProducts = document.getElementById('total-products').textContent;
+
+            // Lưu dữ liệu vào localStorage
+            localStorage.setItem('totalProducts', totalProducts);
+
+            // Chuyển đến màn hình thứ hai
+            window.location.href = 'secondScreen.html';
+        }
+
+
+
+function fetchData() {
+    fetch('http://192.168.3.106:3000/donhang')
+        .then(response => response.json())
+        .then(data => {
+            const orderList = document.getElementById('order-list');
+            const totalOrdersElement = document.getElementById('total-orders');
+            
+            orderList.innerHTML = ''; // Xóa dữ liệu cũ trước khi cập nhật
+
+            // Cập nhật tổng số đơn hàng
+            totalOrdersElement.textContent = data.length;
+
+            // Sắp xếp theo ngày mới nhất
+            data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            data.forEach(order => {
+                const row = document.createElement('tr');
+
+                // Populate cells
+                row.innerHTML = `
+                    <td>${order._id}</td>
+                    <td>${order.shippingInfo.name}</td>
+                    <td>${order.cartItems.map(item => item.productId ? `${item.productId.ten} (x${item.quantity})` : 'Sản phẩm không tồn tại').join('<br>')}</td>
+                    <td>${order.totalAmount.toLocaleString()} VND</td>
+                    <td>${order.shippingInfo.address}</td>
+                    <td>${order.shippingInfo.name}</td>
+                    <td>${order.shippingInfo.phone}</td>
+                    <td>${new Date(order.createdAt).toLocaleDateString('vi-VN')} ${new Date(order.createdAt).toLocaleTimeString('vi-VN')}</td>
+                    <td>${order.status || 'Không xác định'}</td>
+                `;
+
+                const actionCell = document.createElement('td');
+                const status = order.status.toLowerCase();
+
+                if (status === 'chờ xác nhận') {
+                    const confirmButton = document.createElement('button');
+                    confirmButton.textContent = 'Xác nhận';
+                    confirmButton.addEventListener('click', () => updateOrderStatus(order._id, 'Chờ vận chuyển', row));
+                    actionCell.appendChild(confirmButton);
+                } else if (status === 'chờ vận chuyển') {
+                    const shipButton = document.createElement('button');
+                    shipButton.textContent = 'Gửi hàng';
+                    shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đang vận chuyển', row));
+                    actionCell.appendChild(shipButton);
+                } else if (status === 'đang vận chuyển') {
+                    actionCell.innerHTML = ''; // Ẩn nút, không hiện gì
+                } else if (status === 'hoàn thành' || status === 'thành công') {
+                    actionCell.innerHTML = '<span class="status-icon complete">✔</span>';
+                } else if (status === 'đã hủy') {
+                    actionCell.innerHTML = '<span class="status-icon cancelled">✘</span>';
+                }
+
+                row.appendChild(actionCell);
+                orderList.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+
+        // Cập nhật dữ liệu mỗi 3 giây
+        setInterval(fetchData, 3000);
+
+        // Gọi hàm fetchData ngay khi trang được tải
+        fetchData();
+
+        function updateOrderStatus(orderId, newStatus, row) {
+            fetch(`http://192.168.3.106:3000/donhang/${orderId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            })
+                .then(response => response.json())
+                .then(updatedOrder => {
+                    if (updatedOrder.success) {
+                        alert(`Đơn hàng ${orderId} đã được cập nhật.`);
+                        row.querySelector('td:nth-child(9)').textContent = newStatus;
+
+                        const actionCell = row.querySelector('td:last-child');
+                        actionCell.innerHTML = '';
+
+                        if (newStatus === 'Hoàn thành') {
+                            actionCell.innerHTML = '<span class="status-icon complete">✔</span>';
+                        }
+                    } else {
+                        alert(`Không thể cập nhật đơn hàng ${orderId}.`);
+                    }
+                })
+                .catch(error => console.error('Error updating order:', error));
+        }
+        
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Điều Khiển Quản Lý</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background-color: #6c63ff;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .summary-cards {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            width: 300px;
+            margin: 10px;
+            text-align: center;
+        }
+
+        .card h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .card p {
+            font-size: 18px;
+            color: #555;
+        }
+
+        nav {
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #6c63ff;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .table-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #6c63ff;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <header>Bảng Điều Khiển Quản Lý</header>
+
+    <nav>
+        <ul>
+            
+          <li><a href="manager.html">Đơn Hàng</a></li>
+            <li>
+                <a href="manager_laptops.html" style="text-decoration: none; color: #6c63ff;">Sản phẩm</a>
+            </li>
+            <li><a href="manager_user.html">Người Dùng</a></li>
+            <li><a href="manager_discount.html">Khuyến mại</a></li>
+            <li><a href="manager_statistical.html">Thống kê</a></li>
+            <li><a href="login.html">Đăng Xuất</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Thẻ Tóm Tắt -->
+        <div class="summary-cards">
+            <div class="card">
+                <h3>Tổng Sản Phẩm</h3>
+                <p>120</p>
+            </div>
+            <div class="card">
+                <h3>Tổng Đơn Hàng</h3>
+                <p>75</p>
+            </div>
+            <div class="card">
+                <h3>Tổng Người Dùng</h3>
+                <p>50</p>
+            </div>
+        </div>
+
+        <!-- Bảng Chi Tiết -->
+        <div class="table-container">
+            <!-- Sửa từ đoạn này  -->
+            <h3>Thống kê</h3>
+            <div style="max-width: 1000px; margin: 0 auto; font-family: Arial, sans-serif;">
+                <h1 style="text-align: center;">Thống Kê Sản Phẩm</h1>
+              
+                <!-- Bộ lọc thống kê -->
+                <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                  <!-- Thống kê theo tháng -->
+                  <div>
+                    <label for="month">Thống kê theo tháng:</label>
+                    <select id="month" style="padding: 5px; margin-left: 10px;">
+                      <option value="1">Tháng 1</option>
+                      <option value="2">Tháng 2</option>
+                      <option value="3">Tháng 3</option>
+                      <option value="4">Tháng 4</option>
+                      <option value="5">Tháng 5</option>
+                      <option value="6">Tháng 6</option>
+                      <option value="7">Tháng 7</option>
+                      <option value="8">Tháng 8</option>
+                      <option value="9">Tháng 9</option>
+                      <option value="10">Tháng 10</option>
+                      <option value="11">Tháng 11</option>
+                      <option value="12">Tháng 12</option>
+                    </select>
+                  </div>
+              
+                  <!-- Thống kê theo năm -->
+                  <div>
+                    <label for="year">Thống kê theo năm:</label>
+                    <select id="year" style="padding: 5px; margin-left: 10px;">
+                      <option value="2022">2022</option>
+                      <option value="2023">2023</option>
+                      <option value="2024">2024</option>
+                      <option value="2025">2025</option>
+                    </select>
+                  </div>
+              
+                  <!-- Thống kê theo khoảng thời gian -->
+                  <div>
+                    <label for="start-date">Từ:</label>
+                    <input type="date" id="start-date" style="padding: 5px; margin-left: 5px;">
+                    <label for="end-date" style="margin-left: 10px;">Đến:</label>
+                    <input type="date" id="end-date" style="padding: 5px; margin-left: 5px;">
+                  </div>
+              
+                  <!-- Nút lọc -->
+                  <div>
+                    <button style="padding: 10px 20px; background-color: #6c63ff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                      Lọc
+                    </button>
+                  </div>
+                </div>
+              
+                <!-- Bảng thống kê -->
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px; background-color: #fff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 10px;">
+                  <thead>
+                    <tr style="background-color: #6c63ff; color: white; text-align: left;">
+                      <th style="padding: 10px;">Mã Sản Phẩm</th>
+                      <th style="padding: 10px;">Tên Sản Phẩm</th>
+                      <th style="padding: 10px;">Số Lượng Đã Bán</th>
+                      <th style="padding: 10px;">Doanh Thu</th>
+                      <th style="padding: 10px;">Ngày Thống Kê</th>
+                    </tr>
+                  </thead>
+                  <tbody id="statistics-body">
+                    <!-- Thống kê mẫu -->
+                    <tr>
+                      <td style="padding: 10px;">#P001</td>
+                      <td style="padding: 10px;">Laptop X</td>
+                      <td style="padding: 10px;">15</td>
+                      <td style="padding: 10px;">225,000,000 VND</td>
+                      <td style="padding: 10px;">01/01/2023</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 10px;">#P002</td>
+                      <td style="padding: 10px;">Điện Thoại Y</td>
+                      <td style="padding: 10px;">10</td>
+                      <td style="padding: 10px;">200,000,000 VND</td>
+                      <td style="padding: 10px;">02/01/2023</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 10px;">#P003</td>
+                      <td style="padding: 10px;">Tai Nghe Z</td>
+                      <td style="padding: 10px;">50</td>
+                      <td style="padding: 10px;">100,000,000 VND</td>
+                      <td style="padding: 10px;">03/01/2023</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              
+        </div>
+    </div>
+</body>
+
+</html>
