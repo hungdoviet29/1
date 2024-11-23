@@ -9,8 +9,8 @@ router.get('/users/:id', authController.getUserById);
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.put('/update/:id', authController.updateUser);
-router.put('/changePassword', authController.changePassword);
-router.post('/forgot-password', authController.forgotPassword);
+router.put('/changePassword/:id', authController.changePassword);
+router.post('/forgotPassword', authController.forgotPassword);
 router.delete('/delete/:id', authController.deleteUser);
 router.post(
   '/user/:userId/image',

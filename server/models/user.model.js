@@ -14,14 +14,9 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: [true, 'Email là bắt buộc'],
-      unique: true,
-      match: [/^\S+@\S+\.\S+$/, 'Định dạng email không hợp lệ'],
     },
     phone: {
       type: String,
-      required: [true, 'Số điện thoại là bắt buộc'],
-      match: [/^[0-9]{10,12}$/, 'Số điện thoại phải từ 10-12 chữ số'],
     },
     diaChi: {
       type: String,
@@ -33,11 +28,13 @@ const userSchema = new mongoose.Schema(
       default:
         'https://img.myloview.com/stickers/default-avatar-profile-icon-vector-social-media-user-photo-700-205577532.jpg',
     },
-    sanPhamYeuThich: [{ type: mongoose.Schema.Types.ObjectId, ref: 'LapStore', default: [] }],
+    sanPhamYeuThich: [
+      {type: mongoose.Schema.Types.ObjectId, ref: 'LapStore', default: []},
+    ],
   },
-  { timestamps: true, collection: 'users' }
+  {timestamps: true, collection: 'users'},
 );
 
 const UserModel = mongoose.model('User', userSchema);
 
-module.exports = { UserModel };
+module.exports = {UserModel};

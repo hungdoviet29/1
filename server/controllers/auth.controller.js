@@ -2,6 +2,7 @@ const {UserModel} = require('../models/user.model');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
+const nodemailer = require('nodemailer');
 
 // Hàm: Lấy danh sách tất cả người dùng
 exports.getAllUsers = async (req, res) => {
@@ -38,7 +39,7 @@ exports.getUserById = async (req, res) => {
 
 // Hàm: Đăng ký người dùng mới
 exports.register = async (req, res) => {
-  const {tenDangNhap, matKhau, email, phone, diachi} = req.body;
+  const {tenDangNhap, matKhau, email} = req.body;
 
   try {
     const existingUser = await UserModel.findOne({tenDangNhap});
@@ -50,8 +51,6 @@ exports.register = async (req, res) => {
       tenDangNhap,
       matKhau,
       email,
-      phone,
-      diachi,
     });
 
     const savedUser = await newUser.save();
@@ -108,48 +107,177 @@ exports.updateUser = async (req, res) => {
     res.status(500).json({message: 'Lỗi server', error});
   }
 };
-
-// Hàm: Thay đổi mật khẩu
-exports.changePassword = async (req, res) => {
-  const {tenDangNhap, oldPassword, newPassword} = req.body;
-
+// Hàm: quên mật khẩu
+exports.forgotPassword = async (req, res) => {
+  const {email} = req.body;
   try {
-    const user = await UserModel.findOne({tenDangNhap});
+    // Kiểm tra xem người dùng có tồn tại hay không
+    const user = await UserModel.findOne({email});
     if (!user) {
-      return res.status(404).json({message: 'Người dùng không tồn tại.'});
+      return res.status(200).json({
+        message:
+          'Nếu email tồn tại, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu.',
+      });
     }
 
-    if (user.matKhau !== oldPassword) {
-      return res.status(401).json({message: 'Mật khẩu cũ không đúng.'});
+    // Tạo mật khẩu mới
+    const newPassword = Math.random().toString(36).slice(-8);
+    user.matKhau = newPassword; // Lưu trực tiếp mật khẩu mới vào cơ sở dữ liệu
+
+    // Lưu mật khẩu mới
+    try {
+      await user.save();
+    } catch (saveError) {
+      console.error('Lỗi khi lưu mật khẩu mới:', saveError);
+      return res
+        .status(500)
+        .json({message: 'Lỗi server. Không thể cập nhật mật khẩu.'});
     }
 
-    user.matKhau = newPassword;
-    await user.save();
+    // Cấu hình Nodemailer
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'nguyentientai280403@gmail.com', // Email chủ
+        pass: 'hpxf rofh oplt rykx', // Mật khẩu ứng dụng
+      },
+    });
 
-    res.status(200).json({message: 'Đổi mật khẩu thành công.'});
+    // Nội dung email
+    const mailOptions = {
+      from: 'nguyentientai280403@gmail.com',
+      to: email,
+      subject: 'Đặt lại mật khẩu của bạn',
+      html: `
+        <html>
+          <head>
+            <style>
+              body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+              }
+              .email-container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+              }
+              .email-header {
+                text-align: center;
+                padding-bottom: 20px;
+              }
+              .email-header img {
+                width: 100px;
+              }
+              .email-body {
+                text-align: center;
+                padding: 20px;
+              }
+              .email-body h2 {
+                color: #333333;
+                margin-bottom: 20px;
+              }
+              .email-body p {
+                color: #666666;
+                font-size: 16px;
+                line-height: 1.5;
+              }
+              .new-password {
+                font-size: 18px;
+                font-weight: bold;
+                color: #4CAF50;
+                margin-top: 10px;
+              }
+              .footer {
+                text-align: center;
+                padding-top: 20px;
+                font-size: 14px;
+                color: #777777;
+              }
+              .button {
+                display: inline-block;
+                padding: 10px 20px;
+                background-color: #4CAF50;
+                color: #ffffff;
+                text-decoration: none;
+                border-radius: 5px;
+                margin-top: 20px;
+                font-weight: bold;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="email-container">
+              <div class="email-header">
+                <img src="https://png.pngtree.com/png-vector/20190322/ourlarge/pngtree-online-shop-logo-vector-template-design-illustration-png-image_860085.jpg" alt="Logo" />
+              </div>
+              <div class="email-body">
+                <h2>Đặt lại mật khẩu của bạn</h2>
+                <p>Chúng tôi đã nhận được yêu cầu thay đổi mật khẩu cho tài khoản của bạn. Vui lòng sử dụng mật khẩu mới dưới đây để đăng nhập:</p>
+                <div class="new-password">
+                  Mật khẩu mới: <strong>${newPassword}</strong>
+                </div>
+                <p>Bạn có thể đăng nhập lại với mật khẩu mới này. Nếu bạn không yêu cầu thay đổi mật khẩu, vui lòng liên hệ với chúng tôi ngay lập tức.</p>
+                <a href="https://yourapp.com/login" class="button">Đăng nhập ngay</a>
+              </div>
+              <div class="footer">
+                <p>Trân trọng,<br>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+    };
+
+    // Gửi email
+    try {
+      await transporter.sendMail(mailOptions);
+    } catch (mailError) {
+      console.error('Lỗi khi gửi email:', mailError);
+      return res
+        .status(500)
+        .json({message: 'Không thể gửi email. Vui lòng thử lại sau.'});
+    }
+    // Gửi phản hồi thành công
+    res.status(200).json({
+      message: 'Mật khẩu mới đã được gửi qua email.',
+      redirect: 'LoginScreen', // Địa chỉ trang đăng nhập
+    });
   } catch (error) {
-    console.error('Lỗi khi đổi mật khẩu:', error);
+    console.error('Lỗi khi quên mật khẩu:', error);
     res.status(500).json({message: 'Lỗi server', error});
   }
 };
-
-// Hàm: Quên mật khẩu
-exports.forgotPassword = async (req, res) => {
-  const {email} = req.body;
+// Hàm: Thay đổi mật khẩu (Không validate, không mã hóa)
+exports.changePassword = async (req, res) => {
+  const {id} = req.params; // Lấy ID người dùng từ params
+  const {newPassword} = req.body; // Chỉ cần mật khẩu mới từ body
 
   try {
-    const user = await UserModel.findOne({email});
+    // Kiểm tra xem id có hợp lệ không
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({message: 'ID người dùng không hợp lệ.'});
+    }
+
+    // Tìm người dùng trong cơ sở dữ liệu
+    const user = await UserModel.findById(id);
     if (!user) {
       return res.status(404).json({message: 'Không tìm thấy người dùng.'});
     }
 
-    const newPassword = Math.random().toString(36).slice(-8);
+    // Cập nhật mật khẩu mới
     user.matKhau = newPassword;
+
+    // Lưu lại thay đổi trong cơ sở dữ liệu
     await user.save();
 
-    res.status(200).json({message: 'Mật khẩu mới đã được gửi qua email.'});
+    res.status(200).json({message: 'Mật khẩu đã được thay đổi thành công.'});
   } catch (error) {
-    console.error('Lỗi khi quên mật khẩu:', error);
+    console.error('Lỗi khi thay đổi mật khẩu:', error);
     res.status(500).json({message: 'Lỗi server', error});
   }
 };

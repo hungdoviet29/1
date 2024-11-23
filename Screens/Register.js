@@ -8,10 +8,10 @@ import {
   StyleSheet,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const Register = () => {
   const navigation = useNavigation();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -44,7 +44,7 @@ const Register = () => {
     };
 
     try {
-      const response = await fetch('http://192.168.0.4:3000/users/register', {
+      const response = await fetch('http://192.168.1.17:3000/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -64,72 +64,77 @@ const Register = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={require('../acssets/dangky.png')}
-        style={styles.background}
-        imageStyle={{borderBottomLeftRadius: 30, borderBottomRightRadius: 30}}>
-        <Text style={styles.welcomeText}>Get's started with LapStore!</Text>
-        <Text style={styles.subText}>
-          Create your account and start enjoying shopping
-        </Text>
-      </ImageBackground>
+    <ScrollView>
+      <View style={styles.container}>
+        <ImageBackground
+          source={require('../acssets/dangky.png')}
+          style={styles.background}
+          imageStyle={{
+            borderBottomLeftRadius: 30,
+            borderBottomRightRadius: 30,
+          }}>
+          <Text style={styles.welcomeText}>Get's started with LapStore!</Text>
+          <Text style={styles.subText}>
+            Create your account and start enjoying shopping
+          </Text>
+        </ImageBackground>
 
-      <View style={styles.content}>
-        <Text style={styles.title}>SIGN UP</Text>
+        <View style={styles.content}>
+          <Text style={styles.title}>SIGN UP</Text>
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        <View style={styles.formContainer}>
-          <Text style={styles.label}>Your Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Your Full Name"
-            placeholderTextColor="#C1C1C1"
-          />
-          <Text style={styles.label}>Email address</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your email"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-            placeholderTextColor="#C1C1C1"
-          />
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-            placeholderTextColor="#C1C1C1"
-          />
-          <Text style={styles.label}>Confirm Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm your password"
-            secureTextEntry
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            placeholderTextColor="#C1C1C1"
-          />
+          <View style={styles.formContainer}>
+            <Text style={styles.label}>Your Name</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Your Full Name"
+              placeholderTextColor="#C1C1C1"
+            />
+            <Text style={styles.label}>Email address</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+              placeholderTextColor="#C1C1C1"
+            />
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your password"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+              placeholderTextColor="#C1C1C1"
+            />
+            <Text style={styles.label}>Confirm Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm your password"
+              secureTextEntry
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              placeholderTextColor="#C1C1C1"
+            />
 
-          <TouchableOpacity
-            style={styles.registerButton}
-            onPress={handleRegister}>
-            <Text style={styles.registerButtonText}>SIGN UP</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.registerButton}
+              onPress={handleRegister}>
+              <Text style={styles.registerButtonText}>SIGN UP</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.signInText}>
-              Already have an account?{' '}
-              <Text style={styles.signInLink}>Sign in</Text>
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.signInText}>
+                Already have an account?{' '}
+                <Text style={styles.signInLink}>Sign in</Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

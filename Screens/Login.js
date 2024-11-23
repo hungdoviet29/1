@@ -44,26 +44,27 @@ const Login = ({route}) => {
 
     loadCredentials();
   }, []);
-
+  //cmt validate
   const handleLogin = async () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Kiểm tra định dạng email
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/; // Mật khẩu mạnh
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Kiểm tra định dạng email
+    // const passwordRegex =
+    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/; // Mật khẩu mạnh
 
-    if (!emailRegex.test(tenDangNhap)) {
-      setError('Email không hợp lệ. Vui lòng nhập đúng định dạng.');
-      return;
-    }
+    // if (!emailRegex.test(tenDangNhap)) {
+    //   setError('Email không hợp lệ. Vui lòng nhập đúng định dạng.');
+    //   return;
+    // }
 
-    if (!passwordRegex.test(matKhau)) {
-      setError(
-        'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
-      );
-      return;
-    }
+    // if (!passwordRegex.test(matKhau)) {
+    //   setError(
+    //     'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
+    //   );
+    //   return;
+    // }
 
     try {
-      const response = await fetch('http://172.20.10.6:3000/users');
+      const response = await fetch('http://192.168.1.17:3000/users');
+
       const users = await response.json();
       const user = users.find(
         user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau,
@@ -154,6 +155,11 @@ const Login = ({route}) => {
             <Text style={styles.signupText}>Bạn chưa có mật khẩu?</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
               <Text style={styles.signupLink}> Đăng kí.</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.forgotPasswordContainer}
+              onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
           </View>
         </View>

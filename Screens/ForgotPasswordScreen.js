@@ -18,7 +18,7 @@ const ForgotPasswordScreen = ({navigation}) => {
       try {
         // Gọi API gửi yêu cầu đặt lại mật khẩu
         const response = await axios.post(
-          'http://192.168.0.4:3000/users/forgotPassword',
+          'http://192.168.1.17:3000/users/forgotPassword',
           {email},
         );
         setMessage(response.data.message); // Hiển thị thông báo từ server

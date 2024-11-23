@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -6,39 +6,59 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const FixPasswordScreen = ({navigation}) => {
+  const [userId, setUserId] = useState(''); // State lưu userId
   const [username, setUsername] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
+  // Lấy userId từ AsyncStorage khi màn hình được mount
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const storedUserId = await AsyncStorage.getItem('userId');
+      if (storedUserId) {
+        setUserId(storedUserId);
+      } else {
+        Alert.alert('Lỗi', 'Không tìm thấy thông tin người dùng.');
+        navigation.goBack();
+      }
+    };
+    fetchUserId();
+  }, []);
+  // Gửi đi
   const handleSubmit = async () => {
     if (newPassword !== confirmNewPassword) {
       alert('Mật khẩu mới và xác nhận mật khẩu không khớp.');
       return;
     }
+
     try {
       const response = await fetch(
-        'http://192.168.0.4:3000/users/changePassword',
+        `http://192.168.1.17:3000/users/changePassword/${userId}`, // Truyền userId vào URL
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
-            tenDangNhap: username,
             oldPassword,
             newPassword,
+            confirmPassword: newPassword, // Truyền cả confirmPassword
           }),
         },
       );
+
       const data = await response.json();
       if (response.ok) {
         alert(data.message);
         navigation.goBack();
       } else {
+        console.error('Lỗi phản hồi:', data);
         alert(data.message || 'Có lỗi xảy ra');
       }
     } catch (error) {
+      console.error('Lỗi kết nối:', error);
       alert('Lỗi kết nối');
     }
   };
