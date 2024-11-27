@@ -252,6 +252,96 @@
             cursor: pointer;
             font-weight: bold;
         }
+
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .search-container button {
+            padding: 5px 10px;
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        /* Responsive cho các thiết bị nhỏ */
+@media (max-width: 768px) {
+    .summary-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card {
+        width: 90%; /* Thu nhỏ card để vừa màn hình */
+    }
+
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    nav ul li {
+        margin: 5px 0;
+    }
+
+    .table-container {
+        padding: 10px;
+    }
+
+    table th,
+    table td {
+        font-size: 12px; /* Giảm kích thước chữ */
+        padding: 8px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto; /* Thêm cuộn ngang khi bảng quá lớn */
+    }
+}
+
+/* Responsive cho các thiết bị rất nhỏ (điện thoại) */
+@media (max-width: 480px) {
+    header {
+        font-size: 20px; /* Thu nhỏ kích thước tiêu đề */
+    }
+
+    .card {
+        padding: 15px;
+        text-align: left; /* Canh trái nội dung */
+    }
+
+    table th,
+    table td {
+        font-size: 10px; /* Giảm thêm kích thước chữ */
+        padding: 6px;
+    }
+
+    .search-container {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .search-container input {
+        width: 100%;
+    }
+
+    .search-container button {
+        width: 100%;
+    }
+}
+
     </style>
 </head>
 <header>Bảng Điều Khiển Quản Lý</header>
@@ -281,7 +371,7 @@
             <h3>Tổng Đơn Hàng</h3>
             <p>0</p>
         </div>
-        
+
         <div class="card">
             <h3>Tổng Người Dùng</h3>
             <p id="total-orders">0</p>
@@ -290,6 +380,10 @@
 
     <div class="table-container">
         <h3>Danh Sách Người Dùng</h3>
+        <div class="search-container">
+            <input type="text" id="search-box" placeholder="Tìm kiếm theo tên, email hoặc ID người dùng...">
+            <button id="search-button">Tìm kiếm</button>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -349,7 +443,7 @@
 
 
 <script>
-    const apiUrl = "http://192.168.3.106:3000/users";
+    const apiUrl = "http://192.168.101.9:3000/users";
 
     // Fetch và hiển thị danh sách người dùng
     async function fetchUsers() {
@@ -376,12 +470,31 @@
                         </tr>
                     `;
                 tableBody.insertAdjacentHTML("beforeend", row);
-                  // Cập nhật tổng số đơn hàng
-            document.getElementById('total-orders').textContent = users.length;
+                // Cập nhật tổng số đơn hàng
+                document.getElementById('total-orders').textContent = users.length;
             });
         } catch (error) {
             console.error("Lỗi:", error.message);
             alert("Không thể tải danh sách người dùng.");
+        }
+    }
+    document.getElementById('search-button').addEventListener('click', filterUsers);
+
+    function filterUsers() {
+        const searchTerm = document.getElementById('search-box').value.toLowerCase();
+        const tableBody = document.getElementById('user-table-body');
+        const rows = tableBody.getElementsByTagName('tr');
+
+        for (const row of rows) {
+            const id = row.cells[1].textContent.toLowerCase(); // ID Người Dùng
+            const name = row.cells[2].textContent.toLowerCase(); // Tên Người Dùng
+            const email = row.cells[3].textContent.toLowerCase(); // Email
+
+            if (id.includes(searchTerm) || name.includes(searchTerm) || email.includes(searchTerm)) {
+                row.style.display = ""; // Hiển thị
+            } else {
+                row.style.display = "none"; // Ẩn
+            }
         }
     }
 
