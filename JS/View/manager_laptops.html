@@ -157,6 +157,30 @@
             background-color: #f44336;
             color: white;
         }
+        .search-container {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-container input {
+    flex: 1;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.search-container button {
+    padding: 5px 10px;
+    background-color: #6c63ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
     </style>
 </head>
 
@@ -192,6 +216,12 @@
 
         <div class="table-container">
             <h3>Quản lý sản phẩm</h3>
+            <div class="search-container">
+                <input type="text" id="search-box" placeholder="Tìm kiếm theo ID sản phẩm hoặc tên sản phẩm...">
+                <button id="search-button">Tìm kiếm</button>
+            </div>
+            
+            
             <button onclick="showDialog('add-dialog')">Thêm</button>
             <table>
                 <thead>
@@ -287,6 +317,27 @@ function fetchProducts() {
         })
         .catch(error => console.error("Error fetching products:", error));
 }
+document.getElementById('search-button').addEventListener('click', filterProducts);
+
+function filterProducts() {
+    const searchTerm = document.getElementById('search-box').value.toLowerCase();
+    const tableBody = document.getElementById('product-table-body');
+    const rows = tableBody.getElementsByTagName('tr');
+
+    for (const row of rows) {
+        const id = row.cells[0].textContent.toLowerCase();
+        const name = row.cells[1].textContent.toLowerCase();
+
+        if (id.includes(searchTerm) || name.includes(searchTerm)) {
+            row.style.display = ""; // Hiển thị
+        } else {
+            row.style.display = "none"; // Ẩn
+        }
+    }
+}
+
+
+// Fetch products function remains the same
 
 // Add a new product
 function addLaptop() {
