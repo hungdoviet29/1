@@ -4,14 +4,19 @@ const userSchema = new mongoose.Schema(
   {
     tenDangNhap: {
       type: String,
-      required: [true, 'Tên đăng nhập là bắt buộc'],
-      unique: true,
-      trim: true,
+      // required: [true, 'Tên đăng nhập là bắt buộc'],
+      //  unique: true,
+      // trim: true,
     },
     matKhau: {
       type: String,
       required: [true, 'Mật khẩu là bắt buộc'],
     },
+    trangThai: {
+      type: String,
+      enum: ['active', 'inactive'],
+      default: 'active',
+    }, // Thêm trạng thái
     email: {
       type: String,
     },

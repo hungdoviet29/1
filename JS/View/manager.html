@@ -293,7 +293,7 @@ function saveTotalProducts() {
     const endDate = document.getElementById('end-date').value;
     const searchQuery = document.getElementById('search-box').value.toLowerCase();
 
-    fetch('http://192.168.101.9:3000/donhang')
+    fetch('http://192.168.0.4:3000/donhang')
         .then(response => response.json())
         .then(data => {
             const orderList = document.getElementById('order-list');

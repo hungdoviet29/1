@@ -13,23 +13,24 @@ import {ScrollView} from 'react-native-gesture-handler';
 const Register = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
+  const [tenDangNhap, setTenDangNhap] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
   // Kiểm tra độ mạnh của mật khẩu
-  const validatePassword = password => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/;
-    return regex.test(password);
-  };
+  // const validatePassword = password => {
+  //   const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/;
+  //   return regex.test(password);
+  // };
 
   const handleRegister = async () => {
-    if (!validatePassword(password)) {
-      setError(
-        'Mật khẩu cần có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
-      );
-      return;
-    }
+    // if (!validatePassword(password)) {
+    //   setError(
+    //     'Mật khẩu cần có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
+    //   );
+    //   return;
+    // }
 
     if (password !== confirmPassword) {
       setError('Mật khẩu không khớp.');
@@ -37,14 +38,15 @@ const Register = () => {
     }
 
     const newUser = {
-      tenDangNhap: email,
+      tenDangNhap: tenDangNhap,
+      email: email,
       matKhau: password,
       vaiTro: 'user',
       roll: 2,
     };
 
     try {
-      const response = await fetch('http://192.168.1.17:3000/users/register', {
+      const response = await fetch('http://192.168.0.4:3000/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,6 +91,8 @@ const Register = () => {
             <TextInput
               style={styles.input}
               placeholder="Your Full Name"
+              value={tenDangNhap}
+              onChangeText={setTenDangNhap}
               placeholderTextColor="#C1C1C1"
             />
             <Text style={styles.label}>Email address</Text>

@@ -83,30 +83,42 @@ exports.login = async (req, res) => {
 // Hàm: Cập nhật thông tin người dùng
 exports.updateUser = async (req, res) => {
   const {id} = req.params;
-  const {email, phone, diaChi, tenDangNhap} = req.body;
+  const {email, phone, diaChi, tenDangNhap, trangThai} = req.body; // Thêm trangThai vào đây
 
   try {
+    // Kiểm tra xem ID có hợp lệ không
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({message: 'ID không hợp lệ.'});
     }
 
-    const updateData = {email, phone, diaChi, tenDangNhap};
+    // Chuẩn bị dữ liệu để cập nhật
+    const updateData = {
+      email,
+      phone,
+      diaChi,
+      tenDangNhap,
+      trangThai, // Cập nhật trạng thái người dùng
+    };
 
+    // Cập nhật thông tin người dùng trong cơ sở dữ liệu
     const user = await UserModel.findByIdAndUpdate(id, updateData, {
       new: true, // Trả về user đã cập nhật
       runValidators: true, // Đảm bảo dữ liệu tuân theo schema
     });
 
+    // Nếu không tìm thấy người dùng
     if (!user) {
       return res.status(404).json({message: 'Không tìm thấy người dùng.'});
     }
 
+    // Trả về kết quả sau khi cập nhật
     res.status(200).json({message: 'Cập nhật thành công', user});
   } catch (error) {
     console.error('Lỗi khi cập nhật thông tin người dùng:', error);
     res.status(500).json({message: 'Lỗi server', error});
   }
 };
+
 // Hàm: quên mật khẩu
 exports.forgotPassword = async (req, res) => {
   const {email} = req.body;
@@ -499,3 +511,81 @@ exports.updateImage = [
     }
   },
 ];
+
+// Hàm: Kích hoạt tài khoản người dùng
+exports.activateUser = async (req, res) => {
+  const {id} = req.params;
+
+  try {
+    // Kiểm tra ID hợp lệ
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({message: 'ID không hợp lệ.'});
+    }
+
+    // Tìm và cập nhật trạng thái
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      {trangThai: 'active'}, // Cập nhật trạng thái thành "đang hoạt động"
+      {new: true}, // Trả về user đã cập nhật
+    );
+
+    if (!user) {
+      return res.status(404).json({message: 'Không tìm thấy người dùng.'});
+    }
+
+    res.status(200).json({message: 'Tài khoản đã được kích hoạt.', user});
+  } catch (error) {
+    console.error('Lỗi khi kích hoạt tài khoản:', error);
+    res.status(500).json({message: 'Lỗi server', error});
+  }
+};
+
+// Hàm: Vô hiệu hóa tài khoản người dùng
+exports.deactivateUser = async (req, res) => {
+  const {id} = req.params;
+
+  try {
+    // Kiểm tra ID hợp lệ
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({message: 'ID không hợp lệ.'});
+    }
+
+    // Tìm và cập nhật trạng thái
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      {trangThai: 'inactive'}, // Cập nhật trạng thái thành "không hoạt động"
+      {new: true}, // Trả về user đã cập nhật
+    );
+
+    if (!user) {
+      return res.status(404).json({message: 'Không tìm thấy người dùng.'});
+    }
+
+    res.status(200).json({message: 'Tài khoản đã bị vô hiệu hóa.', user});
+  } catch (error) {
+    console.error('Lỗi khi vô hiệu hóa tài khoản:', error);
+    res.status(500).json({message: 'Lỗi server', error});
+  }
+};
+
+// Hàm: Kiểm tra trạng thái tài khoản
+exports.checkUserStatus = async (req, res) => {
+  const {id} = req.params;
+
+  try {
+    // Kiểm tra ID hợp lệ
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({message: 'ID không hợp lệ.'});
+    }
+
+    const user = await UserModel.findById(id);
+    if (!user) {
+      return res.status(404).json({message: 'Không tìm thấy người dùng.'});
+    }
+
+    res.status(200).json({trangThai: user.trangThai});
+  } catch (error) {
+    console.error('Lỗi khi kiểm tra trạng thái tài khoản:', error);
+    res.status(500).json({message: 'Lỗi server', error});
+  }
+};

@@ -1,6 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, FlatList, ActivityIndicator } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 const ProductBrandScreen = () => {
   const navigation = useNavigation();
@@ -18,9 +26,11 @@ const ProductBrandScreen = () => {
   }, [route.params]);
 
   // Hàm gọi API để lấy sản phẩm theo hãng
-  const fetchProducts = async (brand) => {
+  const fetchProducts = async brand => {
     try {
-      const response = await fetch(`http://172.20.10.6:3000/laptops/brand/${brand}`);
+      const response = await fetch(
+        `http://192.168.0.4:3000/laptops/brand/${brand}`,
+      );
       const result = await response.json();
       if (response.ok) {
         setProducts(result.data); // Gán dữ liệu sản phẩm từ API
@@ -37,24 +47,35 @@ const ProductBrandScreen = () => {
   };
 
   const handleAdd = () => {
-    navigation.navigate('ProductAdd', { selectedBrand }); // Truyền tiếp tên hãng sang màn ProductAdd
+    navigation.navigate('ProductAdd', {selectedBrand}); // Truyền tiếp tên hãng sang màn ProductAdd
   };
 
   // Hàm render từng sản phẩm trong danh sách
-  const renderProduct = ({ item }) => (
+  const renderProduct = ({item}) => (
     <View style={styles.productContainer}>
       <TouchableOpacity style={styles.deleteButton}>
         <Text style={styles.deleteIcon}>×</Text>
       </TouchableOpacity>
-      <Image source={{ uri: item.hinhAnh }} style={styles.productImage} />
+      <Image source={{uri: item.hinhAnh}} style={styles.productImage} />
       <View style={styles.productInfo}>
-        <Text style={styles.discountText}>-{item.danhMuc === 'Sale' ? '50%' : ''}</Text>
+        <Text style={styles.discountText}>
+          -{item.danhMuc === 'Sale' ? '50%' : ''}
+        </Text>
         <Text style={styles.productName}>{item.ten}</Text>
-        <Text style={styles.productPrice}>${(item.gia / 1000000).toFixed(2)}M</Text>
-        <Text style={styles.originalPrice}>${((item.gia * 1.5) / 1000000).toFixed(2)}M</Text>
+        <Text style={styles.productPrice}>
+          ${(item.gia / 1000000).toFixed(2)}M
+        </Text>
+        <Text style={styles.originalPrice}>
+          ${((item.gia * 1.5) / 1000000).toFixed(2)}M
+        </Text>
         <View style={styles.ratingContainer}>
           {[...Array(5)].map((_, index) => (
-            <Text key={index} style={[styles.star, index < 4 ? styles.starFilled : styles.starEmpty]}>
+            <Text
+              key={index}
+              style={[
+                styles.star,
+                index < 4 ? styles.starFilled : styles.starEmpty,
+              ]}>
               ★
             </Text>
           ))}
@@ -66,8 +87,13 @@ const ProductBrandScreen = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.backButton}>
+        <Image
+          source={require('../acssets/BackButton.png')}
+          style={styles.backIcon}
+        />
       </TouchableOpacity>
       <Text style={styles.header}>Sản phẩm theo hãng: {selectedBrand}</Text>
       <View style={styles.content}>
@@ -77,13 +103,16 @@ const ProductBrandScreen = () => {
           <FlatList
             data={products}
             renderItem={renderProduct}
-            keyExtractor={(item) => item._id}
+            keyExtractor={item => item._id}
             numColumns={2}
             contentContainerStyle={styles.productList}
           />
         )}
         <TouchableOpacity style={styles.addButton} onPress={handleAdd}>
-          <Image source={require('../acssets/them.png')} style={styles.addIcon} />
+          <Image
+            source={require('../acssets/them.png')}
+            style={styles.addIcon}
+          />
         </TouchableOpacity>
       </View>
     </View>

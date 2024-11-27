@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import axios from 'axios';
 
-const EditProfileScreen = ({ route, navigation }) => {
-  const { userInfo, onUpdate } = route.params || {};
+const EditProfileScreen = ({route, navigation}) => {
+  const {userInfo, onUpdate} = route.params || {};
 
   useEffect(() => {
     console.log('Dữ liệu userInfo:', userInfo);
@@ -36,23 +36,23 @@ const EditProfileScreen = ({ route, navigation }) => {
       Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin.');
       return;
     }
-  
-    const url = `http://192.168.0.104:3000/users/${userInfo._id}`;
+
+    const url = `http://192.168.0.4:3000/users/${userInfo._id}`;
     console.log('Đang gửi yêu cầu PUT đến:', url);
-  
+
     setIsLoading(true);
     try {
-      console.log('Payload gửi đi:', { email, phone, diaChi, tenDangNhap });
-  
+      console.log('Payload gửi đi:', {email, phone, diaChi, tenDangNhap});
+
       const response = await axios.put(url, {
         email,
         phone,
         diaChi, // Đảm bảo trường này được gửi đi
         tenDangNhap,
       });
-  
+
       console.log('Cập nhật thành công:', response.data);
-  
+
       const updatedUserInfo = {
         ...userInfo,
         email,
@@ -60,21 +60,21 @@ const EditProfileScreen = ({ route, navigation }) => {
         diaChi,
         tenDangNhap,
       };
-  
+
       if (onUpdate) {
         onUpdate(updatedUserInfo); // Gọi callback để cập nhật thông tin
       }
-  
+
       Alert.alert('Thành công', 'Thông tin đã được cập nhật.');
       navigation.goBack();
     } catch (error) {
       console.error(
         'Lỗi khi gửi yêu cầu PUT:',
-        error.response?.data || error.message
+        error.response?.data || error.message,
       );
       Alert.alert(
         'Lỗi',
-        error.response?.data?.message || 'Không thể cập nhật thông tin.'
+        error.response?.data?.message || 'Không thể cập nhật thông tin.',
       );
     } finally {
       setIsLoading(false);
@@ -123,8 +123,8 @@ const EditProfileScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
-  label: { fontSize: 16, marginBottom: 8 },
+  container: {flex: 1, padding: 16, backgroundColor: '#fff'},
+  label: {fontSize: 16, marginBottom: 8},
   input: {
     borderWidth: 1,
     borderColor: '#ccc',

@@ -1,15 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
 const PortfolioManagement = () => {
   const navigation = useNavigation();
   const [categories, setCategories] = useState([
-    { name: 'ALL', count: 0, url: 'http://172.20.10.6:3000/LapTop/getListLapTop' },
-    { name: 'Popular', count: 0, url: 'http://172.20.10.6:3000/LapTop/getPopularLapTop' },
-    { name: 'Trending', count: 0, url: 'http://172.20.10.6:3000/LapTop/getTrendingLapTop' },
-    { name: 'Sale', count: 0, url: 'http://172.20.10.6:3000/LapTop/getSaleLapTop' },
-    { name: 'New', count: 0, url: 'http://172.20.10.6:3000/LapTop/getNewsLapTop' },
+    {
+      name: 'ALL',
+      count: 0,
+      url: 'http://192.168.0.4:3000/LapTop/getListLapTop',
+    },
+    {
+      name: 'Popular',
+      count: 0,
+      url: 'http://192.168.0.4:3000/LapTop/getPopularLapTop',
+    },
+    {
+      name: 'Trending',
+      count: 0,
+      url: 'http://192.168.0.4:3000/LapTop/getTrendingLapTop',
+    },
+    {
+      name: 'Sale',
+      count: 0,
+      url: 'http://192.168.0.4:3000/LapTop/getSaleLapTop',
+    },
+    {
+      name: 'New',
+      count: 0,
+      url: 'http://192.168.0.4:3000/LapTop/getNewsLapTop',
+    },
   ]);
   const [loading, setLoading] = useState(true);
 
@@ -20,20 +48,20 @@ const PortfolioManagement = () => {
   const fetchCategoryCounts = async () => {
     setLoading(true);
     const updatedCategories = await Promise.all(
-      categories.map(async (category) => {
+      categories.map(async category => {
         try {
           const response = await fetch(category.url);
           const data = await response.json();
           if (response.ok && data.data) {
-            return { ...category, count: data.data.length };
+            return {...category, count: data.data.length};
           } else {
-            return { ...category, count: 0 };
+            return {...category, count: 0};
           }
         } catch (error) {
           console.error(`Error fetching category ${category.name}:`, error);
-          return { ...category, count: 0 };
+          return {...category, count: 0};
         }
-      })
+      }),
     );
     setCategories(updatedCategories);
     setLoading(false);
@@ -42,8 +70,13 @@ const PortfolioManagement = () => {
   return (
     <View style={styles.container}>
       {/* Nút Quay Lại */}
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Image source={require('../acssets/BackButton.png')} style={styles.backIcon} />
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.backButton}>
+        <Image
+          source={require('../acssets/BackButton.png')}
+          style={styles.backIcon}
+        />
       </TouchableOpacity>
       <Text style={styles.header}>Quản lí danh mục</Text>
       <View style={styles.content}>
@@ -55,10 +88,16 @@ const PortfolioManagement = () => {
               <TouchableOpacity
                 key={index}
                 style={styles.categoryContainer}
-                onPress={() => navigation.navigate('DetailPortfolio', { category: category.name })} // Truyền tên danh mục
+                onPress={() =>
+                  navigation.navigate('DetailPortfolio', {
+                    category: category.name,
+                  })
+                } // Truyền tên danh mục
               >
                 <Text style={styles.categoryName}>{category.name}</Text>
-                <Text style={styles.productCount}>{category.count} Product</Text>
+                <Text style={styles.productCount}>
+                  {category.count} Product
+                </Text>
                 <TouchableOpacity style={styles.deleteButton}>
                   <Image
                     source={require('../acssets/bin.png')} // Đường dẫn tới ảnh icon thùng rác
@@ -71,8 +110,7 @@ const PortfolioManagement = () => {
         )}
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => navigation.navigate('PortfolioAdd')}
-        >
+          onPress={() => navigation.navigate('PortfolioAdd')}>
           <Image
             source={require('../acssets/them.png')} // Đường dẫn tới ảnh icon nút thêm
             style={styles.addIcon}

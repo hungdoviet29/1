@@ -45,32 +45,37 @@ const Login = ({route}) => {
     loadCredentials();
   }, []);
   //cmt validate
+  // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Kiểm tra định dạng email
+  // const passwordRegex =
+  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/; // Mật khẩu mạnh
+
+  // if (!emailRegex.test(tenDangNhap)) {
+  //   setError('Email không hợp lệ. Vui lòng nhập đúng định dạng.');
+  //   return;
+  // }
+
+  // if (!passwordRegex.test(matKhau)) {
+  //   setError(
+  //     'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
+  //   );
+  //   return;
+  // }
   const handleLogin = async () => {
-    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Kiểm tra định dạng email
-    // const passwordRegex =
-    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/; // Mật khẩu mạnh
-
-    // if (!emailRegex.test(tenDangNhap)) {
-    //   setError('Email không hợp lệ. Vui lòng nhập đúng định dạng.');
-    //   return;
-    // }
-
-    // if (!passwordRegex.test(matKhau)) {
-    //   setError(
-    //     'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
-    //   );
-    //   return;
-    // }
-
     try {
-      const response = await fetch('http://192.168.1.17:3000/users');
-
+      const response = await fetch('http://192.168.0.4:3000/users');
       const users = await response.json();
       const user = users.find(
         user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau,
       );
 
       if (user) {
+        if (user.trangThai === 'inactive') {
+          setError(
+            'Tài khoản của bạn đang bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.',
+          );
+          return;
+        }
+
         await AsyncStorage.setItem('userId', user._id);
 
         if (rememberMe) {
@@ -109,13 +114,13 @@ const Login = ({route}) => {
           </ImageBackground>
           <Text style={styles.loginText}>LOG IN</Text>
 
-          <Text style={styles.label}>Email address</Text>
+          <Text style={styles.label}>User name</Text>
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
               value={tenDangNhap}
               onChangeText={setTenDangNhap}
-              placeholder="Enter your email"
+              placeholder="Enter your user name"
               keyboardType="email-address"
               placeholderTextColor="#C1C1C1"
               autoCapitalize="none"

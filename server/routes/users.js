@@ -12,6 +12,7 @@ router.put('/update/:id', authController.updateUser);
 router.put('/changePassword/:id', authController.changePassword);
 router.post('/forgotPassword', authController.forgotPassword);
 router.delete('/delete/:id', authController.deleteUser);
+
 router.post(
   '/user/:userId/image',
   upload.single('avatar'),

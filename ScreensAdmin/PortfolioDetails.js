@@ -1,6 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, FlatList, ActivityIndicator } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 const DetailPortfolio = () => {
   const navigation = useNavigation();
@@ -11,11 +19,11 @@ const DetailPortfolio = () => {
   const [loading, setLoading] = useState(true);
 
   const categoryUrls = {
-    ALL: 'http://172.20.10.6:3000/LapTop/getListLapTop',
-    Popular: 'http://172.20.10.6:3000/LapTop/getPopularLapTop',
-    Trending: 'http://172.20.10.6:3000/LapTop/getTrendingLapTop',
-    Sale: 'http://172.20.10.6:3000/LapTop/getSaleLapTop',
-    New: 'http://172.20.10.6:3000/LapTop/getNewsLapTop',
+    ALL: 'http://192.168.0.4:3000/LapTop/getListLapTop',
+    Popular: 'http://192.168.0.4:3000/LapTop/getPopularLapTop',
+    Trending: 'http://192.168.0.4:3000/LapTop/getTrendingLapTop',
+    Sale: 'http://192.168.0.4:3000/LapTop/getSaleLapTop',
+    New: 'http://192.168.0.4:3000/LapTop/getNewsLapTop',
   };
 
   useEffect(() => {
@@ -26,7 +34,7 @@ const DetailPortfolio = () => {
     }
   }, [route.params]);
 
-  const fetchProductsByCategory = async (categoryName) => {
+  const fetchProductsByCategory = async categoryName => {
     setLoading(true);
     const url = categoryUrls[categoryName] || categoryUrls.ALL;
     try {
@@ -45,25 +53,34 @@ const DetailPortfolio = () => {
     }
   };
 
-  const renderProduct = ({ item }) => (
+  const renderProduct = ({item}) => (
     <View style={styles.productContainer}>
       <TouchableOpacity style={styles.deleteButton}>
         <Text style={styles.deleteIcon}>×</Text>
       </TouchableOpacity>
 
       <Image
-        source={{ uri: item.hinhAnh || 'https://via.placeholder.com/150' }}
+        source={{uri: item.hinhAnh || 'https://via.placeholder.com/150'}}
         style={styles.productImage}
       />
 
       <View style={styles.productInfo}>
         <Text style={styles.discountText}>-{item.discount || 50}%</Text>
         <Text style={styles.productName}>{item.ten || 'Tên sản phẩm'}</Text>
-        <Text style={styles.productPrice}>${(item.gia || 0).toLocaleString()} USD</Text>
-        <Text style={styles.originalPrice}>${((item.gia || 0) * 2).toLocaleString()}</Text>
+        <Text style={styles.productPrice}>
+          ${(item.gia || 0).toLocaleString()} USD
+        </Text>
+        <Text style={styles.originalPrice}>
+          ${((item.gia || 0) * 2).toLocaleString()}
+        </Text>
         <View style={styles.ratingContainer}>
           {[...Array(5)].map((_, index) => (
-            <Text key={index} style={[styles.star, index < item.rating ? styles.starFilled : styles.starEmpty]}>
+            <Text
+              key={index}
+              style={[
+                styles.star,
+                index < item.rating ? styles.starFilled : styles.starEmpty,
+              ]}>
               ★
             </Text>
           ))}
@@ -76,17 +93,19 @@ const DetailPortfolio = () => {
   return (
     <View style={styles.container}>
       {/* Nút Quay Lại */}
-      <TouchableOpacity 
-        onPress={() => navigation.navigate('PortfolioManagement')} 
+      <TouchableOpacity
+        onPress={() => navigation.navigate('PortfolioManagement')}
         style={styles.backButton}>
-        <Image 
-          source={require('../acssets/BackButton.png')} 
-          style={styles.backIcon} 
+        <Image
+          source={require('../acssets/BackButton.png')}
+          style={styles.backIcon}
         />
       </TouchableOpacity>
 
       {/* Header */}
-      <Text style={styles.header}>Danh mục: {category || 'Tất cả sản phẩm'}</Text>
+      <Text style={styles.header}>
+        Danh mục: {category || 'Tất cả sản phẩm'}
+      </Text>
 
       {/* Danh sách sản phẩm */}
       <View style={styles.content}>
@@ -96,7 +115,7 @@ const DetailPortfolio = () => {
           <FlatList
             data={products}
             renderItem={renderProduct}
-            keyExtractor={(item) => item._id}
+            keyExtractor={item => item._id}
             numColumns={2}
             contentContainerStyle={styles.productList}
           />
@@ -104,7 +123,7 @@ const DetailPortfolio = () => {
       </View>
 
       {/* Nút Thêm */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('PortfolioAdd')}>
         <Image

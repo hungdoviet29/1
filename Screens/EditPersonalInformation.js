@@ -39,7 +39,7 @@ const EditPersonalInformation = ({route, navigation}) => {
     const updatedData = {...userData, [editField]: newValue};
     try {
       const response = await axios.put(
-        `http://192.168.1.17:3000/update/${userData._id}`,
+        `http://192.168.0.4:3000/update/${userData._id}`,
         updatedData,
       );
       if (response.status === 200) {
@@ -72,7 +72,7 @@ const EditPersonalInformation = ({route, navigation}) => {
 
     try {
       const response = await axios.post(
-        `http://192.168.1.17:3000/user/${userData._id}/image`, // Sử dụng đúng userId
+        `http://192.168.0.4:3000/user/${userData._id}/image`, // Sử dụng đúng userId
         formData,
         {
           headers: {
@@ -86,7 +86,7 @@ const EditPersonalInformation = ({route, navigation}) => {
 
         const updatedData = {...userData, avatar: avatarUrl};
         const updateResponse = await axios.put(
-          `http://192.168.1.17:3000/update/${userData._id}`,
+          `http://192.168.0.4:3000/update/${userData._id}`,
           updatedData,
         );
 
