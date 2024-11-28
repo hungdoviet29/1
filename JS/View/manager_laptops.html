@@ -289,11 +289,13 @@ function fetchProducts() {
         .then(data => {
             const tableBody = document.getElementById("product-table-body");
             const totalLaptopsElement = document.getElementById("total-laptops");
-            tableBody.innerHTML = ""; // Clear previous rows
-            let totalLaptops = 0; // Biến đếm tổng số lượng laptop
+            tableBody.innerHTML = ""; // Xóa các hàng cũ
+            let totalProducts = 0; // Biến đếm tổng số sản phẩm (không phụ thuộc vào soLuong)
+            
+            // Duyệt qua danh sách sản phẩm
             data.data.forEach(product => {
-                 // Tính tổng số lượng laptop
-                 totalLaptops += product.soLuong;
+                totalProducts++; // Tăng tổng số sản phẩm lên 1 cho mỗi sản phẩm
+
                 const row = `
                     <tr>
                         <td>${product._id}</td>
@@ -312,11 +314,13 @@ function fetchProducts() {
                 `;
                 tableBody.innerHTML += row;
             });
-             // Cập nhật tổng laptop vào giao diện
-             totalLaptopsElement.textContent = totalLaptops;
+
+            // Cập nhật tổng số sản phẩm vào giao diện
+            totalLaptopsElement.textContent = totalProducts;
         })
         .catch(error => console.error("Error fetching products:", error));
 }
+
 document.getElementById('search-button').addEventListener('click', filterProducts);
 
 function filterProducts() {
