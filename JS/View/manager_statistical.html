@@ -129,20 +129,8 @@
 
   <div class="container">
     <!-- Thẻ Tóm Tắt -->
-    <div class="summary-cards">
-      <div class="card">
-        <h3>Tổng Sản Phẩm</h3>
-        <p>120</p>
-      </div>
-      <div class="card">
-        <h3>Tổng Đơn Hàng</h3>
-        <p>75</p>
-      </div>
-      <div class="card">
-        <h3>Tổng Người Dùng</h3>
-        <p>50</p>
-      </div>
-    </div>
+    <div id="summary-cards-container"></div>
+
 
     <!-- Bảng Chi Tiết -->
     <div class="table-container">
@@ -201,6 +189,20 @@
 
   </div>
   <script>
+    // Hàm để tải nội dung từ file summary-cards.html
+async function loadSummaryCards() {
+    try {
+        const response = await fetch('summary-cards.html');
+        const content = await response.text();
+        document.getElementById('summary-cards-container').innerHTML = content;
+    } catch (error) {
+        console.error('Lỗi khi tải component:', error);
+    }
+}
+
+// Gọi hàm khi tải trang
+loadSummaryCards();
+
     document.getElementById("filter-button").addEventListener("click", () => {
       const month = document.getElementById("month").value;
       const year = document.getElementById("year").value;
@@ -211,7 +213,7 @@
       statisticsBody.innerHTML = ""; // Xóa dữ liệu cũ
 
       // Gọi API đơn hàng
-      fetch("http://192.168.0.4:3000/donhang")
+      fetch("http://192.168.101.9:3000/donhang")
         .then(response => response.json())
         .then(orders => {
           // Lọc đơn hàng theo ngày, tháng, và năm

@@ -129,20 +129,8 @@
 
     <div class="container">
         <!-- Thẻ Tóm Tắt -->
-        <div class="summary-cards">
-            <div class="card">
-                <h3>Tổng Sản Phẩm</h3>
-                <p>120</p>
-            </div>
-            <div class="card">
-              <h3>Tổng Đơn Hàng</h3>
-              <p id="total-orders">0</p>
-          </div>
-            <div class="card">
-                <h3>Tổng Người Dùng</h3>
-                <p>50</p>
-            </div>
-        </div>
+        <div id="summary-cards-container"></div>
+
 
         <!-- Bảng Chi Tiết -->
         <div class="table-container">
@@ -221,6 +209,22 @@
               
         </div>
     </div>
+    <script>
+      // Hàm để tải nội dung từ file summary-cards.html
+async function loadSummaryCards() {
+    try {
+        const response = await fetch('summary-cards.html');
+        const content = await response.text();
+        document.getElementById('summary-cards-container').innerHTML = content;
+    } catch (error) {
+        console.error('Lỗi khi tải component:', error);
+    }
+}
+
+// Gọi hàm khi tải trang
+loadSummaryCards();
+
+    </script>
 </body>
 
 </html>
