@@ -24,6 +24,11 @@ const CheckoutScreen = ({ navigation }) => {
         phone: '',
         address: '',
     });
+    const CheckoutScreen = ({ route, navigation }) => {
+        const { selectedItems, totalAmount } = route.params; // Nhận danh sách sản phẩm được chọn và tổng tiền
+        const [cartItems, setCartItems] = useState(selectedItems || []); // Chỉ hiển thị sản phẩm đã chọn
+        const [total, setTotal] = useState(totalAmount || 0);
+    };
 
     useEffect(() => {
         const fetchUserId = async () => {
@@ -175,33 +180,35 @@ const CheckoutScreen = ({ navigation }) => {
 
             {/* Danh sách sản phẩm */}
             <FlatList
-                data={cartItems}
-                keyExtractor={(item) => item.productId?._id || item._id}
-                renderItem={({ item }) => (
-                    <View style={styles.cartItem}>
-                        <Image
-                            source={{ uri: item.productId?.hinhAnh }}
-                            style={styles.itemImage}
-                        />
-                        <View style={styles.itemDetails}>
-                            <Text style={styles.itemName}>
-                                {item.productId?.ten || 'Sản phẩm không xác định'}
-                            </Text>
-                            <Text style={styles.itemPrice}>
-                                {item.productId?.gia
-                                    ? `${item.productId.gia.toLocaleString()} VND`
-                                    : 'Không có giá'}
-                            </Text>
-                            <Text style={styles.itemQuantity}>
-                                Số lượng: {item.quantity}
-                            </Text>
-                        </View>
-                    </View>
-                )}
-                ListEmptyComponent={
-                    <Text style={styles.emptyCartText}>Giỏ hàng của bạn đang trống.</Text>
-                }
+    data={cartItems}
+    keyExtractor={(item) => item.productId?._id || item._id}
+    renderItem={({ item }) => (
+        <View style={styles.cartItem}>
+            <Image
+                source={{ uri: item.productId?.hinhAnh }}
+                style={styles.itemImage}
             />
+            <View style={styles.itemDetails}>
+                <Text style={styles.itemName}>
+                    {item.productId?.ten || 'Sản phẩm không xác định'}
+                </Text>
+                <Text style={styles.itemPrice}>
+                    {item.productId?.gia
+                        ? `${item.productId.gia.toLocaleString()} VND`
+                        : 'Không có giá'}
+                </Text>
+                <Text style={styles.itemQuantity}>
+                    Số lượng: {item.quantity}
+                </Text>
+            </View>
+        </View>
+    )}
+    ListEmptyComponent={
+        <Text style={styles.emptyCartText}>Bạn chưa chọn sản phẩm nào.</Text>
+    }
+/>
+
+
 
             {/* Form nhập thông tin vận chuyển */}
             <View style={styles.shippingContainer}>

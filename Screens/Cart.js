@@ -17,6 +17,7 @@ const CartScreen = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const navigation = useNavigation();
+  const [selectedItems, setSelectedItems] = useState([]);
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -45,10 +46,35 @@ const CartScreen = () => {
       }
     }, [userId]), // Chỉ chạy lại khi `userId` thay đổi
   );
+  const toggleSelectItem = (productId) => {
+    setSelectedItems((prevSelected) => {
+        if (prevSelected.includes(productId)) {
+            return prevSelected.filter((id) => id !== productId); // Bỏ chọn
+        } else {
+            return [...prevSelected, productId]; // Chọn thêm
+        }
+    });
+};
+const calculateSelectedTotal = () => {
+  return cartItems
+      .filter((item) => selectedItems.includes(item.productId?._id))
+      .reduce((sum, item) => {
+          return sum + item.productId.gia * item.quantity;
+      }, 0);
+};
+
+const toggleSelectAll = () => {
+  if (selectedItems.length === cartItems.length) {
+      setSelectedItems([]); // Bỏ chọn tất cả
+  } else {
+      setSelectedItems(cartItems.map((item) => item.productId?._id)); // Chọn tất cả
+  }
+};
+
 
   const fetchCartItems = async id => {
     try {
-      const response = await fetch(`http://172.20.10.6:3000/cart/${id}`);
+      const response = await fetch(`http://192.168.1.171:3000/cart/${id}`);
       const data = await response.json();
       console.log('Cart API Response:', data);
       if (response.ok) {
@@ -92,7 +118,7 @@ const CartScreen = () => {
     calculateTotal(updatedCartItems);
 
     try {
-      const response = await fetch('http://172.20.10.6:3000/cart/update', {
+      const response = await fetch('http://192.168.1.171:3000/cart/update', {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({userId, productId, quantity: newQuantity}),
@@ -110,7 +136,7 @@ const CartScreen = () => {
 
   const handleRemoveItem = async productId => {
     try {
-      const response = await fetch('http://172.20.10.6:3000/cart/remove', {
+      const response = await fetch('http://192.168.1.171:3000/cart/remove', {
         method: 'DELETE',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({userId, productId}),
@@ -135,63 +161,99 @@ const CartScreen = () => {
         <Text style={styles.headerText}>My Cart</Text>
       </View>
       <ScrollView contentContainerStyle={styles.cartContainer}>
-        {cartItems.length > 0 ? (
-          cartItems.map(item => (
+    {cartItems.length > 0 ? (
+        cartItems.map((item) => (
             <View key={item.productId?._id || item._id} style={styles.cartItem}>
-              <Image
-                source={{uri: item.productId?.hinhAnh}}
-                style={styles.itemImage}
-              />
-              <View style={styles.itemDetails}>
-                <Text style={styles.itemName}>
-                  {item.productId?.ten || 'Unknown Product'}
-                </Text>
-                <Text style={styles.itemPrice}>
-                  {item.productId?.gia
-                    ? `${item.productId.gia.toLocaleString()} VND`
-                    : 'Price unavailable'}
-                </Text>
-              </View>
-              <View style={styles.itemActions}>
+                {/* Checkbox */}
                 <TouchableOpacity
-                  onPress={() =>
-                    handleUpdateQuantity(item.productId?._id, item.quantity - 1)
-                  }
-                  style={styles.quantityButton}>
-                  <Text style={styles.quantityText}>-</Text>
+                    style={styles.checkbox}
+                    onPress={() => toggleSelectItem(item.productId?._id)}
+                >
+                    {selectedItems.includes(item.productId?._id) && (
+                        <View style={styles.checkboxSelected} />
+                    )}
                 </TouchableOpacity>
-                <Text style={styles.quantityText}>{item.quantity}</Text>
-                <TouchableOpacity
-                  onPress={() =>
-                    handleUpdateQuantity(item.productId?._id, item.quantity + 1)
-                  }
-                  style={styles.quantityButton}>
-                  <Text style={styles.quantityText}>+</Text>
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity
-                onPress={() => handleRemoveItem(item.productId?._id)}>
-                <Text style={styles.removeItemText}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          ))
-        ) : (
-          <Text style={styles.emptyCartText}>Your cart is empty.</Text>
-        )}
-      </ScrollView>
 
+                {/* Product Details */}
+                <Image
+                    source={{ uri: item.productId?.hinhAnh }}
+                    style={styles.itemImage}
+                />
+                <View style={styles.itemDetails}>
+                    <Text style={styles.itemName}>
+                        {item.productId?.ten || 'Unknown Product'}
+                    </Text>
+                    <Text style={styles.itemPrice}>
+                        {item.productId?.gia
+                            ? `${item.productId.gia.toLocaleString()} VND`
+                            : 'Price unavailable'}
+                    </Text>
+                </View>
+                <View style={styles.itemActions}>
+                    <TouchableOpacity
+                        onPress={() =>
+                            handleUpdateQuantity(
+                                item.productId?._id,
+                                item.quantity - 1
+                            )
+                        }
+                        style={styles.quantityButton}
+                    >
+                        <Text style={styles.quantityText}>-</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.quantityText}>{item.quantity}</Text>
+                    <TouchableOpacity
+                        onPress={() =>
+                            handleUpdateQuantity(
+                                item.productId?._id,
+                                item.quantity + 1
+                            )
+                        }
+                        style={styles.quantityButton}
+                    >
+                        <Text style={styles.quantityText}>+</Text>
+                    </TouchableOpacity>
+                </View>
+                <TouchableOpacity
+                    onPress={() => handleRemoveItem(item.productId?._id)}
+                >
+                    <Text style={styles.removeItemText}>✕</Text>
+                </TouchableOpacity>
+            </View>
+        ))
+    ) : (
+        <Text style={styles.emptyCartText}>Your cart is empty.</Text>
+    )}
+</ScrollView>
+
+<View style={styles.checkoutBa}>
+<TouchableOpacity style={styles.selectAllButton} onPress={toggleSelectAll}>
+    <Text style={styles.selectAllText}>
+        {selectedItems.length === cartItems.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
+    </Text>
+</TouchableOpacity>
+</View>
       <View style={styles.checkoutBar}>
-        <TouchableOpacity
-          style={styles.checkoutButton}
-          onPress={() =>
-            navigation.navigate('Checkout', {cartItems, totalAmount})
-          }>
-          <Text style={styles.checkoutText}>Checkout</Text>
-          <Text
-            style={
-              styles.totalAmount
-            }>{`${totalAmount.toLocaleString()} VND`}</Text>
-        </TouchableOpacity>
+
+
+<TouchableOpacity
+    style={styles.checkoutButton}
+    onPress={() =>
+        navigation.navigate('Checkout', {
+            selectedItems: cartItems.filter((item) =>
+                selectedItems.includes(item.productId?._id)
+            ),
+            totalAmount: calculateSelectedTotal(),
+        })
+    }
+>
+    <Text style={styles.checkoutText}>Checkout</Text>
+    <Text style={styles.totalAmount}>
+        {`${calculateSelectedTotal().toLocaleString()} VND`}
+    </Text>
+</TouchableOpacity>
+
+
       </View>
     </View>
   );
@@ -293,6 +355,14 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 32,
   },
+  checkoutBa: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingVertical: 56,
+    paddingHorizontal: 32,
+  },
   checkoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -303,6 +373,36 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+},
+checkboxSelected: {
+    width: 12,
+    height: 12,
+    backgroundColor: '#f68b1e',
+    borderRadius: 2,
+},
+selectAllButton: {
+  backgroundColor: '#f68b1e',
+  padding: 10,
+  borderRadius: 8,
+  alignItems: 'center',
+  marginVertical: 10,
+},
+selectAllText: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: 'bold',
+},
+
+
 });
 
 export default CartScreen;
