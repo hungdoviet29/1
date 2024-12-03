@@ -18,6 +18,7 @@ const CheckoutScreen = ({ navigation }) => {
     const [totalAmount, setTotalAmount] = useState(0);
     const [loading, setLoading] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+    const [isPaymentDropdownVisible, setPaymentDropdownVisible] = useState(false);
     const [shippingInfo, setShippingInfo] = useState({
         name: '',
         phone: '',
@@ -46,7 +47,7 @@ const CheckoutScreen = ({ navigation }) => {
     const fetchCartItems = async (id) => {
         setLoading(true);
         try {
-            const response = await fetch(`http://172.20.10.6:3000/cart/${id}`);
+            const response = await fetch(`http://192.168.1.171:3000/cart/${id}`);
             const data = await response.json();
             if (response.ok) {
                 setCartItems(data.items || []);
@@ -101,7 +102,7 @@ const CheckoutScreen = ({ navigation }) => {
                         };
 
                         try {
-                            const response = await fetch('http://172.20.10.6:3000/donhang', {
+                            const response = await fetch('http://192.168.1.171:3000/donhang', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(orderData),
@@ -129,10 +130,10 @@ const CheckoutScreen = ({ navigation }) => {
 
     const resetCart = async () => {
         try {
-            const response = await fetch(`http://172.20.10.6:3000/cart/${userId}`);
+            const response = await fetch(`http://192.168.1.171:3000/cart/${userId}`);
             const data = await response.json();
             if (data && data.items && data.items.length > 0) {
-                const deleteResponse = await fetch(`http://172.20.10.6:3000/cart/${userId}`, {
+                const deleteResponse = await fetch(`http://192.168.1.171:3000/cart/${userId}`, {
                     method: 'DELETE',
                 });
                 if (deleteResponse.ok) {
@@ -229,25 +230,59 @@ const CheckoutScreen = ({ navigation }) => {
             {/* Phương thức thanh toán */}
             <View style={styles.paymentContainer}>
                 <Text style={styles.totalAmount}>Tổng tiền: {totalAmount.toLocaleString()} VND</Text>
-                <Text style={styles.paymentTitle}>Chọn phương thức thanh toán</Text>
-                {['Cash', 'CreditCard', 'BankTransfer'].map((method) => (
-                    <TouchableOpacity
-                        key={method}
-                        style={[
-                            styles.paymentOption,
-                            selectedPaymentMethod === method && styles.selectedPaymentOption,
-                        ]}
-                        onPress={() => handleSelectPaymentMethod(method)}
-                    >
-                        <Text style={styles.paymentText}>
-                            {method === 'Cash'
-                                ? 'Thanh toán khi nhận hàng'
-                                : method === 'CreditCard'
-                                ? 'Thanh toán qua thẻ tín dụng'
-                                : 'Chuyển khoản ngân hàng'}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
+                <View style={styles.voucherContainer}>
+    <View style={styles.voucherHeader}>
+        <Text style={styles.voucherLabel}>Lapstore Voucher</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('VoucherScreen')}>
+            <Text style={styles.voucherValue}>Miễn phí vận chuyển</Text>
+        </TouchableOpacity>
+    </View>
+</View>
+
+<View style={styles.paymentContainer}>
+    <TouchableOpacity
+        style={styles.paymentSelector}
+        onPress={() => setPaymentDropdownVisible(!isPaymentDropdownVisible)}
+    >
+        <Text style={styles.paymentSelectedText}>
+            {selectedPaymentMethod
+                ? (selectedPaymentMethod === 'Cash'
+                    ? 'Thanh toán khi nhận hàng'
+                    : selectedPaymentMethod === 'CreditCard'
+                    ? 'Thanh toán qua thẻ tín dụng'
+                    : 'Chuyển khoản ngân hàng')
+                : 'Chọn phương thức thanh toán'}
+        </Text>
+        <Text style={styles.dropdownIcon}>{isPaymentDropdownVisible ? '▲' : '▼'}</Text>
+    </TouchableOpacity>
+
+    {isPaymentDropdownVisible && (
+        <View style={styles.paymentDropdown}>
+            {['Cash', 'CreditCard', 'BankTransfer'].map((method) => (
+                <TouchableOpacity
+                    key={method}
+                    style={[
+                        styles.paymentOption,
+                        selectedPaymentMethod === method && styles.selectedPaymentOption,
+                    ]}
+                    onPress={() => {
+                        setSelectedPaymentMethod(method);
+                        setPaymentDropdownVisible(false);
+                    }}
+                >
+                    <Text style={styles.paymentText}>
+                        {method === 'Cash'
+                            ? 'Thanh toán khi nhận hàng'
+                            : method === 'CreditCard'
+                            ? 'Thanh toán qua thẻ tín dụng'
+                            : 'Chuyển khoản ngân hàng'}
+                    </Text>
+                </TouchableOpacity>
+            ))}
+        </View>
+    )}
+</View>
+
             </View>
 
             {/* Nút thanh toán */}
@@ -421,6 +456,95 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#fff',
     },
+    voucherContainer: {
+        marginVertical: 10,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    voucherHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+    },
+    voucherLabel: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    voucherValue: {
+        fontSize: 14,
+        color: '#f68b1e',
+        fontWeight: '600',
+        textDecorationLine: 'underline',
+    },
+    paymentContainer: {
+        marginVertical: 8,
+        padding: 8,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    paymentSelector: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 6,
+        backgroundColor: '#f9f9f9',
+    },
+    paymentSelectedText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#333',
+    },
+    dropdownIcon: {
+        fontSize: 16,
+        color: '#888',
+    },
+    paymentDropdown: {
+        marginTop: 10,
+        padding: 8,
+        backgroundColor: '#fff',
+        borderRadius: 6,
+        borderWidth: 1,
+        borderColor: '#ddd',
+    },
+    paymentOption: {
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        backgroundColor: '#fff',
+        borderRadius: 6,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: '#ddd',
+    },
+    selectedPaymentOption: {
+        backgroundColor: '#f68b1e',
+        borderColor: '#f68b1e',
+    },
+    paymentText: {
+        fontSize: 14,
+        color: '#333',
+        fontWeight: '500',
+    },
+    
+    
 });
 
 

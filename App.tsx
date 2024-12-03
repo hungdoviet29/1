@@ -76,6 +76,7 @@ import { loadCart } from './redux/cartSlice';
 import { store } from './redux/store';
 import EditPersonalInformation from './Screens/EditPersonalInformation';
 import DetailPortfolio from './ScreensAdmin/PortfolioDetails';
+import VoucherScreen from './Screens/VoucherScreen';
 
 const Stack = createStackNavigator();
 
@@ -182,6 +183,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="ShopContactInfo" component={ShopContactInfo} />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
         <Stack.Screen name="DetailPortfolio" component={DetailPortfolio} />
+        <Stack.Screen name="VoucherScreen" component={VoucherScreen} />
       </Stack.Navigator>
 
       {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}
