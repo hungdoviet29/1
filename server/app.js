@@ -15,6 +15,8 @@ var donHangRouter = require('./routes/donhang_router'); // Route đơn hàng
 var cartRouter = require('./routes/cart_router');
 const favoriteRouter = require('./routes/users');
 const notificationRouter = require('./routes/notification_routes');
+const voucherRouter = require('./routes/voucherRoutes'); // Import voucher routes
+
 
 var app = express();
 
@@ -102,6 +104,8 @@ app.use('/donhang', donHangRouter); // Sử dụng route đơn hàng
 app.use('/cart', cartRouter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/notifications', notificationRouter);
+// Tích hợp route voucher
+app.use('/', voucherRouter);
 
 // Middleware xử lý 404 (Không tìm thấy route)
 app.use((req, res, next) => {

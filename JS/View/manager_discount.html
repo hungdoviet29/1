@@ -27,63 +27,6 @@
             padding: 20px;
         }
 
-        .summary-cards {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            padding: 20px;
-            width: 300px;
-            margin: 10px;
-            text-align: center;
-        }
-
-        .card h3 {
-            margin: 0;
-            color: #333;
-        }
-
-        .card p {
-            font-size: 18px;
-            color: #555;
-        }
-
-        nav {
-            background-color: #fff;
-            padding: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        nav ul li {
-            margin: 0 10px;
-        }
-
-        nav ul li a {
-            text-decoration: none;
-            color: #6c63ff;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        nav ul li a:hover {
-            text-decoration: underline;
-        }
-
         .table-container {
             background-color: white;
             padding: 20px;
@@ -91,21 +34,49 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        #voucher-list {
+            margin-top: 20px;
         }
 
-        table th,
-        table td {
-            padding: 10px;
+        .voucher {
             border: 1px solid #ddd;
-            text-align: center;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
         }
 
-        table th {
+        .voucher h4 {
+            margin: 0;
+        }
+
+        button {
+            padding: 10px 20px;
             background-color: #6c63ff;
             color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #5a54e5;
+        }
+
+        dialog {
+            border: none;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        dialog form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        dialog button {
+            align-self: flex-end;
         }
     </style>
 </head>
@@ -113,117 +84,158 @@
 <body>
     <header>Bảng Điều Khiển Quản Lý</header>
 
-    <nav>
-        <ul>
-            
-          <li><a href="manager.html">Đơn Hàng</a></li>
-          <li>
-              <a href="manager_laptops.html" style="text-decoration: none; color: #6c63ff;">Sản phẩm</a>
-          </li>
-          <li><a href="manager_user.html">Người Dùng</a></li>
-          <li><a href="manager_discount.html">Khuyến mại</a></li>
-          <li><a href="manager_statistical.html">Thống kê</a></li>
-          <li><a href="login.html">Đăng Xuất</a></li>
-        </ul>
-    </nav>
-
     <div class="container">
-        <!-- Thẻ Tóm Tắt -->
-        <div id="summary-cards-container"></div>
+        <button id="add-voucher-button">Thêm Voucher</button>
 
+        <div id="voucher-list"></div>
 
-        <!-- Bảng Chi Tiết -->
-        <div class="table-container">
-            <!-- Sửa từ đoạn này  -->
-            <h3>Quản lý discount</h3>
-            <div style="max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
-               
-              
-                <!-- Chọn loại giảm giá -->
-                <div style="margin-bottom: 20px;">
-                  <label for="discount-type">Chọn loại giảm giá:</label>
-                  <select id="discount-type" style="padding: 5px; margin-left: 10px;">
-                    <option value="10%">10%</option>
-                    <option value="20%">20%</option>
-                    <option value="30%">30%</option>
-                    <option value="50%">50%</option>
-                  </select>
-                </div>
-              
-                <!-- Thời gian bắt đầu -->
-                <div style="margin-bottom: 20px;">
-                  <label for="start-date">Thời gian bắt đầu:</label>
-                  <input type="date" id="start-date" style="padding: 5px; margin-left: 10px;">
-                </div>
-              
-                <!-- Thời gian kết thúc -->
-                <div style="margin-bottom: 20px;">
-                  <label for="end-date">Thời gian kết thúc:</label>
-                  <input type="date" id="end-date" style="padding: 5px; margin-left: 10px;">
-                </div>
-              
-                <!-- Danh sách sản phẩm -->
-                <div>
-                  <h3 style="margin-bottom: 10px;">Chọn sản phẩm:</h3>
-                  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                    <!-- Sản phẩm 1 -->
-                    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; width: 150px; text-align: center;">
-                      <img src="https://via.placeholder.com/100" alt="Product 1" style="width: 100%; border-radius: 5px;">
-                      <p><strong>Laptop X</strong></p>
-                      <p>Giá: <span style="text-decoration: line-through;">20,000,000 VND</span> <strong>15,000,000 VND</strong></p>
-                      <label>
-                        <input type="checkbox"> Chọn
-                      </label>
-                    </div>
-              
-                    <!-- Sản phẩm 2 -->
-                    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; width: 150px; text-align: center;">
-                      <img src="https://via.placeholder.com/100" alt="Product 2" style="width: 100%; border-radius: 5px;">
-                      <p><strong>Điện Thoại Y</strong></p>
-                      <p>Giá: <span style="text-decoration: line-through;">25,000,000 VND</span> <strong>20,000,000 VND</strong></p>
-                      <label>
-                        <input type="checkbox"> Chọn
-                      </label>
-                    </div>
-              
-                    <!-- Sản phẩm 3 -->
-                    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; width: 150px; text-align: center;">
-                      <img src="https://via.placeholder.com/100" alt="Product 3" style="width: 100%; border-radius: 5px;">
-                      <p><strong>Tai Nghe Z</strong></p>
-                      <p>Giá: <span style="text-decoration: line-through;">5,000,000 VND</span> <strong>3,500,000 VND</strong></p>
-                      <label>
-                        <input type="checkbox"> Chọn
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              
-                <!-- Nút áp dụng -->
-                <div style="margin-top: 20px; text-align: center;">
-                  <button style="padding: 10px 20px; background-color: #6c63ff; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    Áp dụng
-                  </button>
-                </div>
-              </div>
-              
-              
-        </div>
+        <!-- Dialog thêm/sửa voucher -->
+        <dialog id="voucher-dialog">
+            <h3 id="dialog-title">Thêm Voucher</h3>
+            <form id="voucher-form">
+
+                 <label for="voucher-type">Loại giảm</label>
+                <input type="text" id="voucher-type" placeholder="Nhập loại" required>
+
+                <label for="voucher-title">Loại giảm giá (%)</label>
+                <input type="number" id="voucher-title" placeholder="Nhập % giảm giá" required>
+
+                <label for="voucher-description">Đơn tối thiểu</label>
+                <input type="text" id="voucher-description" placeholder="Ví dụ: ₫44400k" required>
+
+                <label for="voucher-expiration">Ngày hết hạn</label>
+                <input type="date" id="voucher-expiration" required>
+
+                <input type="hidden" id="voucher-id">
+                <button type="submit">Lưu</button>
+                <button type="button" id="close-dialog">Đóng</button>
+            </form>
+        </dialog>
     </div>
+
     <script>
-      // Hàm để tải nội dung từ file summary-cards.html
-async function loadSummaryCards() {
-    try {
-        const response = await fetch('summary-cards.html');
-        const content = await response.text();
-        document.getElementById('summary-cards-container').innerHTML = content;
-    } catch (error) {
-        console.error('Lỗi khi tải component:', error);
-    }
-}
+        const voucherDialog = document.getElementById('voucher-dialog');
+        const addVoucherButton = document.getElementById('add-voucher-button');
+        const closeDialogButton = document.getElementById('close-dialog');
+        const voucherForm = document.getElementById('voucher-form');
+        const voucherList = document.getElementById('voucher-list');
+        const dialogTitle = document.getElementById('dialog-title');
 
-// Gọi hàm khi tải trang
-loadSummaryCards();
+        let editingVoucherId = null;
 
+        // Hiển thị dialog thêm voucher
+        addVoucherButton.addEventListener('click', () => {
+            dialogTitle.textContent = 'Thêm Voucher';
+            voucherForm.reset();
+            editingVoucherId = null;
+            voucherDialog.showModal();
+        });
+
+        // Đóng dialog
+        closeDialogButton.addEventListener('click', () => {
+            voucherDialog.close();
+        });
+
+        // Gửi form (thêm hoặc sửa voucher)
+        voucherForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const type = document.getElementById('voucher-type').value;
+            const title = document.getElementById('voucher-title').value;
+            const description = document.getElementById('voucher-description').value;
+            const expirationDate = document.getElementById('voucher-expiration').value;
+
+            const voucherData = {
+                type,
+                title,
+                description,
+                expirationDate,
+                isActive: true
+            };
+
+            try {
+                if (editingVoucherId) {
+                    // Sửa voucher
+                    await fetch(`http://192.168.3.106:3000/vouchers/${editingVoucherId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(voucherData),
+                    });
+                    alert('Voucher đã được cập nhật!');
+                } else {
+                    // Thêm voucher
+                    await fetch('http://192.168.3.106:3000/vouchers', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(voucherData),
+                    });
+                    alert('Voucher đã được thêm!');
+                }
+                voucherDialog.close();
+                fetchVouchers();
+            } catch (error) {
+                console.error('Lỗi khi thêm/sửa voucher:', error);
+            }
+        });
+
+        // Hiển thị danh sách voucher
+        async function fetchVouchers() {
+            try {
+                const response = await fetch('http://192.168.3.106:3000/vouchers');
+                const vouchers = await response.json();
+
+                voucherList.innerHTML = '';
+                vouchers.forEach((voucher) => {
+                    const voucherElement = document.createElement('div');
+                    voucherElement.classList.add('voucher');
+                    voucherElement.innerHTML = `
+                        <h4>${voucher.title}</h4>
+                          <h4>${voucher.type}</h4>
+                        <p>Đơn tối thiểu: ${voucher.description}</p>
+                        <p>Ngày hết hạn: ${new Date(voucher.expirationDate).toLocaleDateString()}</p>
+                        <button onclick="editVoucher('${voucher._id}')">Sửa</button>
+                        <button onclick="deleteVoucher('${voucher._id}')">Xóa</button>
+                    `;
+                    voucherList.appendChild(voucherElement);
+                });
+            } catch (error) {
+                console.error('Lỗi khi lấy danh sách voucher:', error);
+            }
+        }
+
+        // Sửa voucher
+        async function editVoucher(voucherId) {
+            try {
+                const response = await fetch(`http://192.168.3.106:3000/vouchers/${voucherId}`);
+                const voucher = await response.json();
+
+                document.getElementById('voucher-type').value = voucher.type;
+                document.getElementById('voucher-title').value = voucher.title;
+                document.getElementById('voucher-description').value = voucher.description;
+                document.getElementById('voucher-expiration').value = new Date(voucher.expirationDate).toISOString().split('T')[0];
+                editingVoucherId = voucherId;
+
+                dialogTitle.textContent = 'Sửa Voucher';
+                voucherDialog.showModal();
+            } catch (error) {
+                console.error('Lỗi khi lấy voucher:', error);
+            }
+        }
+
+        // Xóa voucher
+        async function deleteVoucher(voucherId) {
+            if (confirm('Bạn có chắc chắn muốn xóa voucher này?')) {
+                try {
+                    await fetch(`http://192.168.3.106:3000/vouchers/${voucherId}`, { method: 'DELETE' });
+                    alert('Voucher đã được xóa!');
+                    fetchVouchers();
+                } catch (error) {
+                    console.error('Lỗi khi xóa voucher:', error);
+                }
+            }
+        }
+
+        // Lấy danh sách voucher khi tải trang
+        fetchVouchers();
     </script>
 </body>
 

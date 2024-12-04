@@ -1,558 +1,495 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    Alert,
-    ActivityIndicator,
-    FlatList,
-    Image,
-    TextInput,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  TextInput,
+  Modal,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CheckoutScreen = ({ navigation }) => {
-    const [userId, setUserId] = useState(null);
-    const [cartItems, setCartItems] = useState([]);
-    const [totalAmount, setTotalAmount] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-    const [isPaymentDropdownVisible, setPaymentDropdownVisible] = useState(false);
-    const [shippingInfo, setShippingInfo] = useState({
-        name: '',
-        phone: '',
-        address: '',
-    });
-    const CheckoutScreen = ({ route, navigation }) => {
-        const { selectedItems, totalAmount } = route.params; // Nhận danh sách sản phẩm được chọn và tổng tiền
-        const [cartItems, setCartItems] = useState(selectedItems || []); // Chỉ hiển thị sản phẩm đã chọn
-        const [total, setTotal] = useState(totalAmount || 0);
+const CheckoutScreen = ({navigation, route}) => {
+  const {selectedItems, totalAmount, voucher} = route.params;
+  const [cartItems, setCartItems] = useState(selectedItems || []);
+  const [total, setTotal] = useState(totalAmount || 0);
+  const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [isPaymentDropdownVisible, setPaymentDropdownVisible] = useState(false);
+  const [shippingInfo, setShippingInfo] = useState({
+    name: '',
+    phone: '',
+    address: '',
+  });
+  const [selectedVoucher, setSelectedVoucher] = useState(voucher);
+  const [vouchers, setVouchers] = useState([]);
+  const [isVoucherModalVisible, setVoucherModalVisible] = useState(false);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const id = await AsyncStorage.getItem('userId');
+      if (id) {
+        setUserId(id);
+        fetchCartItems(id);
+      } else {
+        Alert.alert('Lỗi', 'Không tìm thấy User ID. Vui lòng đăng nhập lại.');
+      }
     };
+    fetchUserId();
+  }, []);
 
-    useEffect(() => {
-        const fetchUserId = async () => {
-            try {
-                const id = await AsyncStorage.getItem('userId');
-                if (id) {
-                    setUserId(id);
-                    fetchCartItems(id);
-                } else {
-                    Alert.alert('Lỗi', 'Không tìm thấy User ID. Vui lòng đăng nhập lại.');
-                }
-            } catch (error) {
-                console.error('Lỗi khi lấy User ID:', error);
-                Alert.alert('Lỗi', 'Không thể truy xuất User ID.');
-            }
-        };
-
-        fetchUserId();
-    }, []);
-
-    const fetchCartItems = async (id) => {
-        setLoading(true);
-        try {
-            const response = await fetch(`http://192.168.1.171:3000/cart/${id}`);
-            const data = await response.json();
-            if (response.ok) {
-                setCartItems(data.items || []);
-                calculateTotal(data.items || []);
-            } else {
-                Alert.alert('Lỗi', data.message || 'Không thể tải giỏ hàng.');
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải giỏ hàng:', error);
-            Alert.alert('Lỗi', 'Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
-        } finally {
-            setLoading(false);
+  useEffect(() => {
+    const fetchVouchers = async () => {
+      try {
+        const response = await fetch('http://192.168.3.106:3000/vouchers');
+        const data = await response.json();
+        if (response.ok) {
+          setVouchers(data); // Set the vouchers from the API response
+        } else {
+          Alert.alert('Lỗi', 'Không thể tải voucher.');
         }
+      } catch (error) {
+        Alert.alert('Lỗi', 'Không thể kết nối đến máy chủ.');
+      }
     };
+    fetchVouchers();
+  }, []);
 
-    const calculateTotal = (items) => {
-        const total = items.reduce((sum, item) => {
-            if (item.productId?.gia && item.quantity) {
-                return sum + item.productId.gia * item.quantity;
-            }
-            return sum;
-        }, 0);
-        setTotalAmount(total);
-    };
+  const fetchCartItems = async id => {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://192.168.3.106:3000/cart/${id}`);
+      const data = await response.json();
+      if (response.ok) {
+        setCartItems(data.items || []);
+        calculateTotal(data.items || []);
+      } else {
+        Alert.alert('Lỗi', data.message || 'Không thể tải giỏ hàng.');
+      }
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể kết nối đến máy chủ.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const handleCheckout = async () => {
-        const validCartItems = cartItems.filter((item) => item.productId !== null);
+  const calculateTotal = items => {
+    let newTotal = items.reduce((sum, item) => {
+      if (item.productId?.gia && item.quantity) {
+        return sum + item.productId.gia * item.quantity;
+      }
+      return sum;
+    }, 0);
 
-        if (!validCartItems.length) {
-            Alert.alert('Lỗi', 'Giỏ hàng của bạn có sản phẩm không hợp lệ.');
-            return;
-        }
+    if (selectedVoucher && selectedVoucher.title) {
+      console.log('Voucher đang được áp dụng:', selectedVoucher);
 
-        Alert.alert(
-            'Xác nhận thanh toán',
-            'Bạn có chắc chắn muốn thanh toán với số tiền này?',
-            [
-                {
-                    text: 'Hủy',
-                    onPress: () => console.log('Thanh toán đã bị hủy'),
-                    style: 'cancel',
-                },
-                {
-                    text: 'Tiến hành',
-                    onPress: async () => {
-                        const orderData = {
-                            userId,
-                            cartItems: validCartItems,
-                            totalAmount,
-                            paymentMethod: selectedPaymentMethod,
-                            shippingInfo,
-                        };
+      const discountPercentage = parseFloat(selectedVoucher.title.trim());
+      console.log('Giảm giá phần trăm:', discountPercentage);
 
-                        try {
-                            const response = await fetch('http://192.168.1.171:3000/donhang', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(orderData),
-                            });
-                            const responseBody = await response.json();
-                            if (response.ok && responseBody.success) {
-                                Alert.alert('Thành công', 'Đơn hàng đã được tạo.');
-                                await resetCart(); // Reset giỏ hàng sau khi tạo đơn hàng thành công
-                                navigation.navigate('NotificationScreen', {
-                                    message: 'Đơn hàng của bạn đã được tạo thành công!',
-                                });
-                            } else {
-                                Alert.alert('Lỗi', responseBody.message || 'Không thể tạo đơn hàng.');
-                            }
-                        } catch (error) {
-                            console.error('Lỗi khi gửi dữ liệu:', error);
-                            Alert.alert('Lỗi', 'Lỗi khi tạo đơn hàng. Vui lòng thử lại.');
-                        }
-                    },
-                },
-            ],
-            { cancelable: false }
-        );
-    };
+      if (!isNaN(discountPercentage)) {
+        const discountAmount = (newTotal * discountPercentage) / 100;
+        console.log('Số tiền giảm:', discountAmount);
 
-    const resetCart = async () => {
-        try {
-            const response = await fetch(`http://192.168.1.171:3000/cart/${userId}`);
-            const data = await response.json();
-            if (data && data.items && data.items.length > 0) {
-                const deleteResponse = await fetch(`http://192.168.1.171:3000/cart/${userId}`, {
-                    method: 'DELETE',
-                });
-                if (deleteResponse.ok) {
-                    setCartItems([]); // Empty the cart in UI
-                    setTotalAmount(0); // Reset the total
-                } else {
-                    const errorData = await deleteResponse.json();
-                    console.error('Error deleting cart:', errorData.message);
-                }
-            } else {
-                console.log('Cart is already empty.');
-            }
-        } catch (error) {
-            console.error('Failed to reset cart:', error);
-        }
-    };
-    
-
-    // Chọn phương thức thanh toán
-    const handleSelectPaymentMethod = (method) => {
-        setSelectedPaymentMethod(method);
-    };
-
-    // Hiển thị loading
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#F8B400" />
-                <Text>Đang tải...</Text>
-            </View>
-        );
+        newTotal -= discountAmount;
+      } else {
+        console.log('Không thể chuyển đổi phần trăm giảm giá.');
+      }
     }
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Thanh toán</Text>
-            </View>
+    setTotal(newTotal);
+  };
 
-            {/* Danh sách sản phẩm */}
-            <FlatList
-    data={cartItems}
-    keyExtractor={(item) => item.productId?._id || item._id}
-    renderItem={({ item }) => (
-        <View style={styles.cartItem}>
+  const handleCheckout = async () => {
+    const validCartItems = cartItems.filter(item => item.productId !== null);
+    if (!validCartItems.length) {
+      Alert.alert('Lỗi', 'Giỏ hàng của bạn có sản phẩm không hợp lệ.');
+      return;
+    }
+
+    Alert.alert(
+      'Xác nhận thanh toán',
+      'Bạn có chắc chắn muốn thanh toán với số tiền này?',
+      [
+        {
+          text: 'Hủy',
+          style: 'cancel',
+        },
+        {
+          text: 'Tiến hành',
+          onPress: async () => {
+            const orderData = {
+              userId,
+              cartItems: validCartItems,
+              totalAmount: total,
+              paymentMethod: selectedPaymentMethod,
+              shippingInfo,
+              voucher: selectedVoucher ? selectedVoucher._id : null,
+            };
+
+            try {
+              const response = await fetch(
+                'http://192.168.3.106:3000/donhang',
+                {
+                  method: 'POST',
+                  headers: {'Content-Type': 'application/json'},
+                  body: JSON.stringify(orderData),
+                },
+              );
+              const responseBody = await response.json();
+              if (response.ok && responseBody.success) {
+                Alert.alert('Thành công', 'Đơn hàng đã được tạo.');
+                await resetCart();
+                navigation.navigate('NotificationScreen', {
+                  message: 'Đơn hàng của bạn đã được tạo thành công!',
+                });
+              } else {
+                Alert.alert(
+                  'Lỗi',
+                  responseBody.message || 'Không thể tạo đơn hàng.',
+                );
+              }
+            } catch (error) {
+              Alert.alert('Lỗi', 'Lỗi khi tạo đơn hàng. Vui lòng thử lại.');
+            }
+          },
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
+  const resetCart = async () => {
+    try {
+      const response = await fetch(`http://192.168.3.106:3000/cart/${userId}`);
+      const data = await response.json();
+      if (data && data.items && data.items.length > 0) {
+        const deleteResponse = await fetch(
+          `http://192.168.3.106:3000/cart/${userId}`,
+          {
+            method: 'DELETE',
+          },
+        );
+        if (deleteResponse.ok) {
+          setCartItems([]);
+          setTotal(0);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to reset cart:', error);
+    }
+  };
+
+  const handleSelectPaymentMethod = method => {
+    setSelectedPaymentMethod(method);
+    setPaymentDropdownVisible(false); // Close the dropdown after selection
+  };
+
+  const handleVoucherSelect = voucher => {
+    setSelectedVoucher(voucher);
+    setVoucherModalVisible(false); // Close the modal after selecting the voucher
+    calculateTotal(cartItems); // Recalculate total after selecting voucher
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#F8B400" />
+        <Text>Đang tải...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Thanh toán</Text>
+      </View>
+
+      <FlatList
+        data={cartItems}
+        keyExtractor={item => item.productId?._id || item._id}
+        renderItem={({item}) => (
+          <View style={styles.cartItem}>
             <Image
-                source={{ uri: item.productId?.hinhAnh }}
-                style={styles.itemImage}
+              source={{uri: item.productId?.hinhAnh}}
+              style={styles.itemImage}
             />
             <View style={styles.itemDetails}>
-                <Text style={styles.itemName}>
-                    {item.productId?.ten || 'Sản phẩm không xác định'}
-                </Text>
-                <Text style={styles.itemPrice}>
-                    {item.productId?.gia
-                        ? `${item.productId.gia.toLocaleString()} VND`
-                        : 'Không có giá'}
-                </Text>
-                <Text style={styles.itemQuantity}>
-                    Số lượng: {item.quantity}
-                </Text>
+              <Text style={styles.itemName}>
+                {item.productId?.ten || 'Sản phẩm không xác định'}
+              </Text>
+              <Text style={styles.itemPrice}>
+                {item.productId?.gia
+                  ? `${item.productId.gia.toLocaleString()} VND`
+                  : 'Không có giá'}
+              </Text>
+              <Text style={styles.itemQuantity}>Số lượng: {item.quantity}</Text>
             </View>
-        </View>
-    )}
-    ListEmptyComponent={
-        <Text style={styles.emptyCartText}>Bạn chưa chọn sản phẩm nào.</Text>
-    }
-/>
+          </View>
+        )}
+        ListEmptyComponent={
+          <Text style={styles.emptyCartText}>Bạn chưa chọn sản phẩm nào.</Text>
+        }
+      />
 
+      <View style={styles.shippingContainer}>
+        <Text style={styles.shippingTitle}>Thông tin vận chuyển</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Tên người nhận"
+          value={shippingInfo.name}
+          onChangeText={text => setShippingInfo({...shippingInfo, name: text})}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Số điện thoại"
+          keyboardType="phone-pad"
+          value={shippingInfo.phone}
+          onChangeText={text => setShippingInfo({...shippingInfo, phone: text})}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Địa chỉ"
+          value={shippingInfo.address}
+          onChangeText={text =>
+            setShippingInfo({...shippingInfo, address: text})
+          }
+        />
+      </View>
 
-
-            {/* Form nhập thông tin vận chuyển */}
-            <View style={styles.shippingContainer}>
-                <Text style={styles.shippingTitle}>Thông tin vận chuyển</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Tên người nhận"
-                    value={shippingInfo.name}
-                    onChangeText={(text) => setShippingInfo({ ...shippingInfo, name: text })}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Số điện thoại"
-                    keyboardType="phone-pad"
-                    value={shippingInfo.phone}
-                    onChangeText={(text) => setShippingInfo({ ...shippingInfo, phone: text })}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Địa chỉ"
-                    value={shippingInfo.address}
-                    onChangeText={(text) => setShippingInfo({ ...shippingInfo, address: text })}
-                />
-            </View>
-
-            {/* Phương thức thanh toán */}
-            <View style={styles.paymentContainer}>
-                <Text style={styles.totalAmount}>Tổng tiền: {totalAmount.toLocaleString()} VND</Text>
-                <View style={styles.voucherContainer}>
-    <View style={styles.voucherHeader}>
-        <Text style={styles.voucherLabel}>Lapstore Voucher</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('VoucherScreen')}>
-            <Text style={styles.voucherValue}>Miễn phí vận chuyển</Text>
-        </TouchableOpacity>
-    </View>
-</View>
-
-<View style={styles.paymentContainer}>
-    <TouchableOpacity
-        style={styles.paymentSelector}
-        onPress={() => setPaymentDropdownVisible(!isPaymentDropdownVisible)}
-    >
-        <Text style={styles.paymentSelectedText}>
-            {selectedPaymentMethod
-                ? (selectedPaymentMethod === 'Cash'
-                    ? 'Thanh toán khi nhận hàng'
-                    : selectedPaymentMethod === 'CreditCard'
-                    ? 'Thanh toán qua thẻ tín dụng'
-                    : 'Chuyển khoản ngân hàng')
-                : 'Chọn phương thức thanh toán'}
+      <View style={styles.paymentContainer}>
+        <Text style={styles.totalAmount}>
+          Tổng tiền: {total.toLocaleString()} VND
         </Text>
-        <Text style={styles.dropdownIcon}>{isPaymentDropdownVisible ? '▲' : '▼'}</Text>
-    </TouchableOpacity>
 
-    {isPaymentDropdownVisible && (
-        <View style={styles.paymentDropdown}>
-            {['Cash', 'CreditCard', 'BankTransfer'].map((method) => (
-                <TouchableOpacity
-                    key={method}
-                    style={[
-                        styles.paymentOption,
-                        selectedPaymentMethod === method && styles.selectedPaymentOption,
-                    ]}
-                    onPress={() => {
-                        setSelectedPaymentMethod(method);
-                        setPaymentDropdownVisible(false);
-                    }}
-                >
-                    <Text style={styles.paymentText}>
-                        {method === 'Cash'
-                            ? 'Thanh toán khi nhận hàng'
-                            : method === 'CreditCard'
-                            ? 'Thanh toán qua thẻ tín dụng'
-                            : 'Chuyển khoản ngân hàng'}
-                    </Text>
-                </TouchableOpacity>
-            ))}
-        </View>
-    )}
-</View>
+        <TouchableOpacity
+          style={styles.paymentMethodButton}
+          onPress={() => setPaymentDropdownVisible(!isPaymentDropdownVisible)}>
+          <Text style={styles.paymentMethodText}>
+            {selectedPaymentMethod || 'Chọn phương thức thanh toán'}
+          </Text>
+        </TouchableOpacity>
 
-            </View>
-
-            {/* Nút thanh toán */}
-            <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
-                <Text style={styles.checkoutButtonText}>Tiến hành thanh toán</Text>
+        {isPaymentDropdownVisible && (
+          <View style={styles.paymentDropdown}>
+            <TouchableOpacity
+              style={styles.paymentOption}
+              onPress={() =>
+                handleSelectPaymentMethod('Thanh toán khi nhận hàng')
+              }>
+              <Text style={styles.paymentOptionText}>
+                Thanh toán khi nhận hàng
+              </Text>
             </TouchableOpacity>
-        </View>
-    );
+            <TouchableOpacity
+              style={styles.paymentOption}
+              onPress={() => handleSelectPaymentMethod('Thẻ tín dụng')}>
+              <Text style={styles.paymentOptionText}>Thẻ tín dụng</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.voucherContainer}>
+        <TouchableOpacity
+          onPress={() => setVoucherModalVisible(true)}
+          style={styles.voucherButton}>
+          <Text style={styles.voucherText}>Chọn mã giảm giá</Text>
+        </TouchableOpacity>
+
+        <Modal
+          visible={isVoucherModalVisible}
+          animationType="slide"
+          transparent={true}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <FlatList
+                data={vouchers}
+                keyExtractor={voucher => voucher._id}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    onPress={() => handleVoucherSelect(item)}
+                    style={styles.voucherOption}>
+                    <Text>{item.title}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+              <TouchableOpacity
+                onPress={() => setVoucherModalVisible(false)}
+                style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>Đóng</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
+
+      <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
+        <Text style={styles.checkoutButtonText}>Tiến hành thanh toán</Text>
+      </TouchableOpacity>
+    </View>
+  );
 };
 
-
 const styles = StyleSheet.create({
-    container: { 
-        flex: 1, 
-        backgroundColor: '#f8f9fa', 
-        paddingHorizontal: 8, 
-        paddingVertical: 12 
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  header: {
+    padding: 15,
+    backgroundColor: '#f8b400',
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  cartItem: {
+    flexDirection: 'row',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  itemImage: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
+  },
+  itemDetails: {
+    flex: 1,
+  },
+  itemName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  itemPrice: {
+    fontSize: 14,
+    color: '#888',
+  },
+  itemQuantity: {
+    fontSize: 14,
+    color: '#555',
+  },
+  shippingContainer: {
+    padding: 15,
+  },
+  shippingTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  input: {
+    height: 40,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingLeft: 10,
+    borderRadius: 5,
+  },
+  paymentContainer: {
+    padding: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+  },
+  totalAmount: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  paymentMethodButton: {
+    padding: 10,
+    backgroundColor: '#f8b400',
+    borderRadius: 5,
+  },
+  paymentMethodText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  paymentDropdown: {
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  paymentOption: {
+    padding: 10,
+  },
+  paymentOptionText: {
+    fontSize: 16,
+  },
+  voucherContainer: {
+    padding: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+  },
+  voucherButton: {
+    padding: 10,
+    backgroundColor: '#f8b400',
+    borderRadius: 5,
+  },
+  voucherText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 5,
+    width: '80%',
+  },
+  voucherOption: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  closeButton: {
+    padding: 10,
+    backgroundColor: '#f8b400',
+    borderRadius: 5,
+    marginTop: 15,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  checkoutButton: {
+    padding: 15,
+    backgroundColor: '#f8b400',
+    borderRadius: 5,
+    margin: 20,
+  },
+  checkoutButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  emptyCartText: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
     },
-    header: { 
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        justifyContent: 'space-between', 
-        paddingVertical: 10, 
-        borderBottomWidth: 1, 
-        borderBottomColor: '#ddd', 
-        marginBottom: 8 
-    },
-    headerText: { 
-        fontSize: 18, 
-        fontWeight: 'bold', 
-        color: '#333' 
-    },
-    cartContainer: { 
-        flex: 1, 
-        marginBottom: 80 
-    },
-    cartItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        marginBottom: 10,
-        padding: 8,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    itemImage: { 
-        width: 60, 
-        height: 60, 
-        borderRadius: 8, 
-        marginRight: 10 
-    },
-    itemDetails: { 
-        flex: 1 
-    },
-    itemName: { 
-        fontSize: 14, 
-        fontWeight: '600', 
-        color: '#333' 
-    },
-    itemPrice: { 
-        fontSize: 13, 
-        fontWeight: '500', 
-        color: '#f68b1e', 
-        marginTop: 4 
-    },
-    itemQuantity: { 
-        fontSize: 12, 
-        color: '#888', 
-        marginTop: 4 
-    },
-    emptyCartText: { 
-        textAlign: 'center', 
-        fontSize: 16, 
-        color: '#888' 
-    },
-    shippingContainer: {
-        marginVertical: 1,
-        padding: 5,
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    shippingTitle: { 
-        fontSize: 16, 
-        fontWeight: '600', 
-        marginBottom: 6, 
-        color: '#333' 
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ddd',
-        padding: 5,
-        borderRadius: 6,
-        fontSize: 13,
-        marginBottom: 5,
-        backgroundColor: '#f9f9f9',
-    },
-    paymentContainer: {
-        marginVertical: 8,
-        padding: 8,
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    paymentTitle: { 
-        fontSize: 16, 
-        fontWeight: '600', 
-        marginBottom: 5, 
-        color: '#333' 
-    },
-    paymentOption: {
-        backgroundColor: '#fff',
-        padding: 5,
-        borderRadius: 6,
-        marginBottom: 8,
-        borderWidth: 1,
-        borderColor: '#ddd',
-    },
-    selectedPaymentOption: { 
-        backgroundColor: '#f68b1e', 
-        borderColor: '#f68b1e' 
-    },
-    paymentText: { 
-        fontSize: 13, 
-        color: '#333', 
-        fontWeight: '500' 
-    },
-    totalAmount: {
-        fontSize: 13,
-        fontWeight: 'bold',
-        color: '#333',
-        textAlign: 'right',
-        marginVertical: 12,
-    },
-    checkoutButton: {
-        backgroundColor: '#f68b1e',
-        paddingVertical: 10, // Điều chỉnh chiều cao
-        borderRadius: 7,
-        marginBottom: 40,
-    },
-    checkoutButtonText: {
-        textAlign: 'center',
-        fontSize: 14,
-        color: '#fff',
-        fontWeight: 'bold',
-    },
-    checkoutButton: {
-        backgroundColor: '#f68b1e',
-        paddingVertical: 10, // Điều chỉnh chiều cao
-        borderRadius: 7,
-        marginBottom: 55,
-    },
-    checkoutButtonText: {
-        textAlign: 'center',
-        fontSize: 14,
-        color: '#fff',
-        fontWeight: 'bold',
-    },        
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-    },
-    voucherContainer: {
-        marginVertical: 10,
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    voucherHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%',
-    },
-    voucherLabel: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    voucherValue: {
-        fontSize: 14,
-        color: '#f68b1e',
-        fontWeight: '600',
-        textDecorationLine: 'underline',
-    },
-    paymentContainer: {
-        marginVertical: 8,
-        padding: 8,
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    paymentSelector: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 10,
-        paddingHorizontal: 12,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 6,
-        backgroundColor: '#f9f9f9',
-    },
-    paymentSelectedText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#333',
-    },
-    dropdownIcon: {
-        fontSize: 16,
-        color: '#888',
-    },
-    paymentDropdown: {
-        marginTop: 10,
-        padding: 8,
-        backgroundColor: '#fff',
-        borderRadius: 6,
-        borderWidth: 1,
-        borderColor: '#ddd',
-    },
-    paymentOption: {
-        paddingVertical: 10,
-        paddingHorizontal: 12,
-        backgroundColor: '#fff',
-        borderRadius: 6,
-        marginBottom: 8,
-        borderWidth: 1,
-        borderColor: '#ddd',
-    },
-    selectedPaymentOption: {
-        backgroundColor: '#f68b1e',
-        borderColor: '#f68b1e',
-    },
-    paymentText: {
-        fontSize: 14,
-        color: '#333',
-        fontWeight: '500',
-    },
-    
-    
+  
 });
 
-
-export default CheckoutScreen; 
+export default CheckoutScreen;
