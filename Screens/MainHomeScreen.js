@@ -27,9 +27,9 @@ const MainHome = () => {
     try {
       const [popularResponse, saleResponse, trendingResponse] =
         await Promise.all([
-          axios.get('http://192.168.0.4:3000/LapTop/getPopularLapTop'),
-          axios.get('http://192.168.0.4:3000/LapTop/getSaleLapTop'),
-          axios.get('http://192.168.0.4:3000/LapTop/getTrendingLapTop'),
+          axios.get('http://192.168.101.9:3000/LapTop/getPopularLapTop'),
+          axios.get('http://192.168.101.9:3000/LapTop/getSaleLapTop'),
+          axios.get('http://192.168.101.9:3000/LapTop/getTrendingLapTop'),
         ]);
 
       setPopularLaptops(popularResponse.data.data);
@@ -52,17 +52,13 @@ const MainHome = () => {
           onPress={() =>
             navigation.navigate('ProductScreen', {product: laptop})
           }>
-          {isSale && <Text style={styles.productSale}>-50%</Text>}
+        
           <Image source={{uri: laptop.hinhAnh}} style={styles.productImage} />
           <Text style={styles.productName}>{laptop.ten}</Text>
           <Text style={styles.productPrice}>
             {laptop.gia.toLocaleString()} VND
           </Text>
-          {isSale && (
-            <Text style={styles.productOldPrice}>
-              {(laptop.gia * 2).toLocaleString()} VND
-            </Text>
-          )}
+
           <Text style={styles.productRating}>⭐️ 4.5</Text>
         </TouchableOpacity>
       </View>
