@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+
 import {
   View,
   Text,
@@ -7,9 +8,57 @@ import {
   ScrollView,
   ActivityIndicator,
   StyleSheet,
+  Dimensions ,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
+const screenWidth = Dimensions.get('window').width;
+const banners = [
+  require('../acssets/banner.png'),
+  require('../acssets/Banner2.png'),
+  require('../acssets/Banner3.png'),
+];
+
+const BannerSlider = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollViewRef = useRef(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % banners.length;
+        const offset = nextIndex * (screenWidth * 0.85 + 20); // Thêm khoảng cách
+        scrollViewRef.current.scrollTo({ x: offset, animated: true });
+        return nextIndex;
+      });
+    }, 3000); // Chuyển ảnh sau mỗi 3 giây
+  
+    return () => clearInterval(interval); // Dọn dẹp interval khi component bị unmount
+  }, []);
+  
+
+  return (
+<View style={styles.bannerSliderContainer}>
+<ScrollView
+  ref={scrollViewRef}
+  horizontal
+  pagingEnabled={false} // Không sử dụng paging vì thêm khoảng cách
+  showsHorizontalScrollIndicator={false}
+  style={styles.bannerSlider}
+>
+  {banners.map((banner, index) => (
+    <Image
+      key={index}
+      source={banner}
+      style={styles.banner}
+    />
+  ))}
+</ScrollView>
+
+</View>
+
+  );
+};
 
 const MainHome = () => {
   const navigation = useNavigation();
@@ -101,10 +150,8 @@ const MainHome = () => {
           </View>
 
           {/* Banner */}
-          <Image
-            source={require('../acssets/banner.png')}
-            style={styles.banner}
-          />
+          <BannerSlider />
+
           {/* Popular Section */}
           {/* Popular Section */}
           <View style={styles.fixedCategories}>
@@ -264,6 +311,24 @@ const styles = StyleSheet.create({
     borderTopColor: '#ddd',
   },
   iconNav: {width: 24, height: 24},
+  bannerSlider: {
+    height: 200,
+    marginBottom: 20,
+    width: screenWidth * 0.9, // Chiều rộng nhỏ hơn màn hình
+    marginLeft: screenWidth * 0.05, // Căn giữa slider
+    overflow: 'hidden',
+    
+  },
+  banner: {
+    width: screenWidth * 0.85, // Kích thước banner nhỏ hơn để có khoảng cách
+    height: 170,
+    resizeMode: 'cover',
+    marginHorizontal: 10, // Khoảng cách giữa các banner
+    borderRadius: 10,
+  },
+  
+  
+  
 });
 
 export default MainHome;
