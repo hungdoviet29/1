@@ -81,7 +81,7 @@ const CheckoutScreen = ({ navigation, route }) => {
 
     const calculateTotal = (items, voucher = selectedVoucher) => {
         console.log('Bắt đầu tính tổng tiền...');
-    
+
         let newTotal = items.reduce((sum, item) => {
             if (item.productId?.gia && item.quantity) {
                 console.log(`Sản phẩm: ${item.productId?.ten || 'Không xác định'}, Giá: ${item.productId.gia}, Số lượng: ${item.quantity}`);
@@ -89,19 +89,19 @@ const CheckoutScreen = ({ navigation, route }) => {
             }
             return sum;
         }, 0);
-    
+
         console.log('Tổng tiền trước khi áp dụng giảm giá:', newTotal);
-    
+
         if (voucher && voucher.title) {
             console.log('Voucher đang được áp dụng:', voucher);
-    
+
             const discountPercentage = parseFloat(voucher.title.trim());
             console.log('Phần trăm giảm giá:', discountPercentage);
-    
+
             if (!isNaN(discountPercentage) && discountPercentage > 0) {
                 const discountAmount = (newTotal * discountPercentage) / 100;
                 console.log('Số tiền giảm:', discountAmount);
-    
+
                 newTotal -= discountAmount;
             } else {
                 console.log('Không thể chuyển đổi phần trăm giảm giá.');
@@ -109,13 +109,13 @@ const CheckoutScreen = ({ navigation, route }) => {
         } else {
             console.log('Không có voucher nào được áp dụng.');
         }
-    
+
         console.log('Tổng tiền sau khi áp dụng giảm giá:', newTotal);
-    
+
         setTotal(newTotal);
     };
-    
-    
+
+
 
     const handleCheckout = async () => {
         const validCartItems = cartItems.filter(item => item.productId !== null);
@@ -207,8 +207,8 @@ const CheckoutScreen = ({ navigation, route }) => {
         setVoucherModalVisible(false);
         calculateTotal(cartItems, voucher); // Tính lại tổng tiền ngay lập tức với voucher mới
     };
-    
-    
+
+
 
 
     if (loading) {
@@ -325,11 +325,26 @@ const CheckoutScreen = ({ navigation, route }) => {
                                     <TouchableOpacity
                                         key={item._id}
                                         onPress={() => handleVoucherSelect(item)}
-                                        style={styles.voucherOption}>
-                                        <Text style={styles.voucherText}>Mã giảm giá {item.title}%</Text>
+                                        style={[
+                                            styles.voucherOption,
+                                            selectedVoucher?._id === item._id && { backgroundColor: '#f0f8ff' },
+                                        ]}
+                                    >
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            <View
+                                                style={[
+                                                    styles.checkbox,
+                                                    selectedVoucher?._id === item._id && styles.checkboxSelected,
+                                                ]}
+                                            />
+                                            <Text style={styles.voucherText}>
+                                                {item.title}% giảm giá
+                                            </Text>
+                                        </View>
                                     </TouchableOpacity>
                                 ))}
                             </ScrollView>
+
                             <TouchableOpacity
                                 onPress={() => setVoucherModalVisible(false)}
                                 style={styles.closeButton}>
@@ -511,6 +526,19 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 20,
     },
+    checkbox: {
+        width: 20,
+        height: 20,
+        borderRadius: 5,
+        borderWidth: 2,
+        borderColor: '#ccc',
+        marginRight: 10,
+    },
+    checkboxSelected: {
+        backgroundColor: '#f8b400',
+        borderColor: '#f8b400',
+    },
+    
 
 });
 
