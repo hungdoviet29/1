@@ -118,12 +118,26 @@ const CheckoutScreen = ({ navigation, route }) => {
 
 
     const handleCheckout = async () => {
+        // Kiểm tra tính hợp lệ của thông tin vận chuyển
+        if (!shippingInfo.name.trim()) {
+            Alert.alert('Lỗi', 'Vui lòng nhập tên người nhận.');
+            return;
+        }
+        if (!shippingInfo.phone.trim() || !/^\d+$/.test(shippingInfo.phone)) {
+            Alert.alert('Lỗi', 'Số điện thoại không hợp lệ.');
+            return;
+        }
+        if (!shippingInfo.address.trim()) {
+            Alert.alert('Lỗi', 'Vui lòng nhập địa chỉ giao hàng.');
+            return;
+        }
+    
         const validCartItems = cartItems.filter(item => item.productId !== null);
         if (!validCartItems.length) {
             Alert.alert('Lỗi', 'Giỏ hàng của bạn có sản phẩm không hợp lệ.');
             return;
         }
-
+    
         Alert.alert(
             'Xác nhận thanh toán',
             'Bạn có chắc chắn muốn thanh toán với số tiền này?',
@@ -143,7 +157,7 @@ const CheckoutScreen = ({ navigation, route }) => {
                             shippingInfo,
                             voucher: selectedVoucher ? selectedVoucher._id : null,
                         };
-
+    
                         try {
                             const response = await fetch(
                                 'http://192.168.101.9:3000/donhang',
@@ -175,6 +189,7 @@ const CheckoutScreen = ({ navigation, route }) => {
             { cancelable: false },
         );
     };
+    
 
     const resetCart = async () => {
         try {
@@ -252,27 +267,32 @@ const CheckoutScreen = ({ navigation, route }) => {
             <View style={styles.shippingContainer}>
                 <Text style={styles.shippingTitle}>Thông tin vận chuyển</Text>
                 <TextInput
-                    style={styles.input}
-                    placeholder="Tên người nhận"
-                    value={shippingInfo.name}
-                    onChangeText={text => setShippingInfo({ ...shippingInfo, name: text })}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Số điện thoại"
-                    keyboardType="phone-pad"
-                    value={shippingInfo.phone}
-                    onChangeText={text => setShippingInfo({ ...shippingInfo, phone: text })}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Địa chỉ"
-                    value={shippingInfo.address}
-                    onChangeText={text =>
-                        setShippingInfo({ ...shippingInfo, address: text })
-                    }
-                />
-            </View>
+        style={styles.input}
+        placeholder="Tên người nhận"
+        value={shippingInfo.name}
+        onChangeText={text => setShippingInfo({ ...shippingInfo, name: text })}
+    />
+    {!shippingInfo.name.trim() && <Text style={styles.errorText}>Vui lòng nhập tên người nhận.</Text>}
+
+    <TextInput
+        style={styles.input}
+        placeholder="Số điện thoại"
+        keyboardType="phone-pad"
+        value={shippingInfo.phone}
+        onChangeText={text => setShippingInfo({ ...shippingInfo, phone: text })}
+    />
+    {(!shippingInfo.phone.trim() || !/^\d+$/.test(shippingInfo.phone)) && (
+        <Text style={styles.errorText}>Số điện thoại không hợp lệ.</Text>
+    )}
+
+    <TextInput
+        style={styles.input}
+        placeholder="Địa chỉ"
+        value={shippingInfo.address}
+        onChangeText={text => setShippingInfo({ ...shippingInfo, address: text })}
+    />
+    {!shippingInfo.address.trim() && <Text style={styles.errorText}>Vui lòng nhập địa chỉ giao hàng.</Text>}
+</View>
 
             <View style={styles.paymentContainer}>
                 <Text style={styles.totalAmount}>
@@ -539,7 +559,12 @@ const styles = StyleSheet.create({
         borderColor: '#f8b400',
     },
     
-
+    errorText: {
+        color: 'red',
+        fontSize: 12,
+        marginBottom: 5,
+    },
+    
 });
 
 export default CheckoutScreen;
