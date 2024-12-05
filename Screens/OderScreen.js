@@ -20,15 +20,15 @@ const OrderScreen = ({ navigation }) => {
   const [refreshTrigger, setRefreshTrigger] = useState(false);
 
   const statusMap = {
-    'Tất cả': (id) => `http://172.20.10.6:3000/donhang/user/${id}`,
+    'Tất cả': (id) => `http://192.168.1.171:3000/donhang/user/${id}`,
     'Chờ xác nhận': (id) =>
-      `http://172.20.10.6:3000/donhang/user/${id}/status?status=${encodeURIComponent('Chờ xác nhận')}`,
+      `http://192.168.1.171:3000/donhang/user/${id}/status?status=${encodeURIComponent('Chờ xác nhận')}`,
     'Chờ vận chuyển': (id) =>
-      `http://172.20.10.6:3000/donhang/user/${id}/status?status=${encodeURIComponent('Chờ vận chuyển')}`,
+      `http://192.168.1.171:3000/donhang/user/${id}/status?status=${encodeURIComponent('Chờ vận chuyển')}`,
     'Đang vận chuyển': (id) =>
-      `http://172.20.10.6:3000/donhang/user/${id}/status?status=${encodeURIComponent('Đang vận chuyển')}`,
+      `http://192.168.1.171:3000/donhang/user/${id}/status?status=${encodeURIComponent('Đang vận chuyển')}`,
     'Đã hủy': (id) =>
-      `http://172.20.10.6:3000/donhang/user/${id}/status?status=${encodeURIComponent('Đã hủy')}`,
+      `http://192.168.1.171:3000/donhang/user/${id}/status?status=${encodeURIComponent('Đã hủy')}`,
   };
 
   // Lấy userId từ AsyncStorage
@@ -89,7 +89,7 @@ const OrderScreen = ({ navigation }) => {
 
   const cancelOrder = async (orderId) => {
     try {
-      const response = await fetch(`http://172.20.10.6:3000/donhang/${orderId}`, {
+      const response = await fetch(`http://192.168.1.171:3000/donhang/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'Đã hủy' }),
@@ -110,7 +110,7 @@ const OrderScreen = ({ navigation }) => {
 
   const confirmReceived = async (orderId) => {
     try {
-      const response = await fetch(`http://172.20.10.6:3000/donhang/${orderId}`, {
+      const response = await fetch(`http://192.168.1.171:3000/donhang/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'Hoàn Thành' }),
@@ -198,7 +198,12 @@ const OrderScreen = ({ navigation }) => {
       ) : orders.length === 0 ? (
         <Text style={styles.noOrdersText}>Không có đơn hàng nào.</Text>
       ) : (
-        <FlatList data={orders} keyExtractor={(item) => item._id} renderItem={renderOrderItem} />
+        <FlatList
+          data={orders}
+          keyExtractor={(item) => item._id}
+          renderItem={renderOrderItem}
+          ListFooterComponent={<View style={{ height: 80 }} />} // Thêm khoảng trống 80px
+        />
       )}
     </View>
   );
