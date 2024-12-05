@@ -49,41 +49,135 @@
             margin: 0;
         }
 
-        button {
-            padding: 10px 20px;
-            background-color: #6c63ff;
+        #add-voucher-button {
+            padding: 15px 30px;
+            background-color: #4caf50;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
 
-        button:hover {
-            background-color: #5a54e5;
+        #add-voucher-button:hover {
+            background-color: #45a049;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
         }
+
 
         dialog {
+            width: 400px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #ffffff;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        dialog h3 {
+            margin-top: 0;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            color: #4caf50;
         }
 
         dialog form {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
         }
 
-        dialog button {
-            align-self: flex-end;
+        dialog input[type="text"],
+        dialog input[type="number"],
+        dialog input[type="date"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        dialog button[type="submit"] {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        dialog button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        dialog button[type="button"] {
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        dialog button[type="button"]:hover {
+            background-color: #d32f2f;
+        }
+
+        nav {
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #6c63ff;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
     <header>Bảng Điều Khiển Quản Lý</header>
-
+    <nav>
+        <ul>
+            <li><a href="manager.html">Đơn Hàng</a></li>
+            <li><a href="manager_laptops.html">Sản phẩm</a></li>
+            <li><a href="manager_user.html">Người Dùng</a></li>
+            <li><a href="manager_discount.html" class="active">Voucher</a></li>
+            <li><a href="manager_statistical.html">Thống kê</a></li>
+            <li><a href="login.html">Đăng Xuất</a></li>
+        </ul>
+    </nav>
     <div class="container">
         <button id="add-voucher-button">Thêm Voucher</button>
 
@@ -94,7 +188,7 @@
             <h3 id="dialog-title">Thêm Voucher</h3>
             <form id="voucher-form">
 
-                 <label for="voucher-type">Loại giảm</label>
+                <label for="voucher-type">Loại giảm</label>
                 <input type="text" id="voucher-type" placeholder="Nhập loại" required>
 
                 <label for="voucher-title">Loại giảm giá (%)</label>
@@ -155,7 +249,7 @@
             try {
                 if (editingVoucherId) {
                     // Sửa voucher
-                    await fetch(`http://192.168.3.106:3000/vouchers/${editingVoucherId}`, {
+                    await fetch(`http://192.168.101.9:3000/vouchers/${editingVoucherId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(voucherData),
@@ -163,7 +257,7 @@
                     alert('Voucher đã được cập nhật!');
                 } else {
                     // Thêm voucher
-                    await fetch('http://192.168.3.106:3000/vouchers', {
+                    await fetch('http://192.168.101.9:3000/vouchers', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(voucherData),
@@ -180,7 +274,7 @@
         // Hiển thị danh sách voucher
         async function fetchVouchers() {
             try {
-                const response = await fetch('http://192.168.3.106:3000/vouchers');
+                const response = await fetch('http://192.168.101.9:3000/vouchers');
                 const vouchers = await response.json();
 
                 voucherList.innerHTML = '';
@@ -205,7 +299,7 @@
         // Sửa voucher
         async function editVoucher(voucherId) {
             try {
-                const response = await fetch(`http://192.168.3.106:3000/vouchers/${voucherId}`);
+                const response = await fetch(`http://192.168.101.9:3000/vouchers/${voucherId}`);
                 const voucher = await response.json();
 
                 document.getElementById('voucher-type').value = voucher.type;
@@ -225,7 +319,7 @@
         async function deleteVoucher(voucherId) {
             if (confirm('Bạn có chắc chắn muốn xóa voucher này?')) {
                 try {
-                    await fetch(`http://192.168.3.106:3000/vouchers/${voucherId}`, { method: 'DELETE' });
+                    await fetch(`http://192.168.101.9:3000/vouchers/${voucherId}`, { method: 'DELETE' });
                     alert('Voucher đã được xóa!');
                     fetchVouchers();
                 } catch (error) {
