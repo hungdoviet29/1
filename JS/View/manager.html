@@ -211,7 +211,13 @@ table td:nth-child(10) {
      
 
     <div class="container">
-        <div id="summary-cards-container"></div>
+       <div class="summary-cards">
+        
+            <div class="card">
+                <h3>Tổng Đơn Hàng</h3>
+                <p id="total-orders">0</p>
+            </div>
+            
 <!-- /ưdawd -->
 
         <div class="table-container">
@@ -293,11 +299,11 @@ function saveTotalProducts() {
     const endDate = document.getElementById('end-date').value;
     const searchQuery = document.getElementById('search-box').value.toLowerCase();
 
-    fetch('http://192.168.101.9:3000/donhang')
+    fetch('http://172.20.10.6:3000/donhang')
         .then(response => response.json())
         .then(data => {
             const orderList = document.getElementById('order-list');
-            // const totalOrdersElement = document.getElementById('total-orders');
+            const totalOrdersElement = document.getElementById('total-orders');
             
             orderList.innerHTML = ''; // Xóa dữ liệu cũ trước khi cập nhật
             const filteredData = data.filter(order => {
@@ -314,7 +320,7 @@ function saveTotalProducts() {
             });
 
             // Cập nhật tổng số đơn hàng
-            // totalOrdersElement.textContent = filteredData.length;
+            totalOrdersElement.textContent = filteredData.length;
 
             // Sắp xếp theo ngày mới nhất
             filteredData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -349,11 +355,17 @@ function saveTotalProducts() {
                     shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đang vận chuyển', row));
                     actionCell.appendChild(shipButton);
                 } else if (status === 'đang vận chuyển') {
-                    actionCell.innerHTML = ''; // Ẩn nút, không hiện gì
+                    const shipButton = document.createElement('button');
+                    shipButton.textContent = 'Hoàn hàng';
+                    shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đơn hoàn', row));
+                    actionCell.appendChild(shipButton);
                 } else if (status === 'thành công') {
-                    actionCell.innerHTML = '<span class="status-icon complete">✔</span>';
+                    const shipButton = document.createElement('button');
+                    shipButton.textContent = 'Hoàn hàng';
+                    shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đang hoàn hàng', row));
+                    actionCell.appendChild(shipButton);
                 } else if (status === 'đã hủy') {
-                    actionCell.innerHTML = '<span class="status-icon cancelled">✘</span>';
+                    actionCell.innerHTML = ''; // Ẩn nút, không hiện gì
                 }
 
                 row.appendChild(actionCell);
@@ -376,7 +388,7 @@ setInterval(fetchData, 3000);
 fetchData();
 
 function updateOrderStatus(orderId, newStatus, row) {
-    fetch(`http://192.168.101.9:3000/donhang/${orderId}`, {
+    fetch(`http://172.20.10.6:3000/donhang/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })

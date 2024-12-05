@@ -362,7 +362,14 @@
 
 <div class="container">
 
-    <div id="summary-cards-container"></div>
+    <div class="summary-cards">
+    
+        
+        <div class="card">
+            <h3>Tổng Người Dùng</h3>
+            <p id="total-orders">0</p>
+        </div>
+    </div>
 
 
     <div class="table-container">
@@ -430,7 +437,7 @@
 
 
 <script>
-    const apiUrl = "http://192.168.101.9:3000/users";
+    const apiUrl = "http://192.168.3.106:3000/users";
 // Hàm để tải nội dung từ file summary-cards.html
 async function loadSummaryCards() {
     try {
@@ -446,7 +453,7 @@ async function loadSummaryCards() {
 loadSummaryCards();
 
     // Fetch và hiển thị danh sách người dùng
-    async function fetchUsers() {
+  async function fetchUsers() {
         try {
             const response = await fetch(apiUrl);
             const users = await response.json();
@@ -470,12 +477,25 @@ loadSummaryCards();
                         </tr>
                     `;
                 tableBody.insertAdjacentHTML("beforeend", row);
-               
-                
+                  // Cập nhật tổng số đơn hàng
+            document.getElementById('total-orders').textContent = users.length;
             });
         } catch (error) {
             console.error("Lỗi:", error.message);
             alert("Không thể tải danh sách người dùng.");
+        }
+    }
+
+    // Lấy tổng số người dùng
+    async function fetchTotalUsers() {
+        try {
+            const response = await fetch(apiUrl);
+            const users = await response.json();
+            const totalUsers = users.length; // Lấy số lượng người dùng từ mảng
+            document.getElementById('total-users').textContent = totalUsers;
+        } catch (error) {
+            console.error('Lỗi:', error.message);
+            alert("Không thể lấy tổng số người dùng.");
         }
     }
     document.getElementById('search-button').addEventListener('click', filterUsers);
@@ -499,17 +519,7 @@ loadSummaryCards();
     }
 
     // Lấy tổng số người dùng
-    async function fetchTotalUsers() {
-        try {
-            const response = await fetch(apiUrl);
-            const users = await response.json();
-            const totalUsers = users.length; // Lấy số lượng người dùng từ mảng
-            document.getElementById('total-users').textContent = totalUsers;
-        } catch (error) {
-            console.error('Lỗi:', error.message);
-            alert("Không thể lấy tổng số người dùng.");
-        }
-    }
+    
     // Hiển thị dialog sửa
 function showEditDialog(user) {
     document.getElementById("edit-user-id").value = user._id;
