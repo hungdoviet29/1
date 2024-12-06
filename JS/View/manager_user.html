@@ -387,7 +387,6 @@
                     <th>Email</th>
                     <th>Số Điện Thoại</th>
                     <th>Vai Trò</th>
-                    <th>Mật Khẩu</th>
                     <th>Trạng Thái</th>
                     <th>Hành Động</th>
                 </tr>
@@ -437,7 +436,7 @@
 
 
 <script>
-    const apiUrl = "http://192.168.3.106:3000/users";
+    const apiUrl = "http://192.168.0.7:3000/users";
 // Hàm để tải nội dung từ file summary-cards.html
 async function loadSummaryCards() {
     try {
@@ -469,7 +468,6 @@ loadSummaryCards();
                             <td>${user.email || "Chưa cập nhật"}</td>
                             <td>${user.phone || "Chưa cập nhật"}</td>
                             <td>${user.vaiTro === "admin" ? "Quản trị" : "Người dùng"}</td>
-                            <td>${user.matKhau}</td>
                             <td>${user.trangThai === "active" ? "Hoạt động" : "Ngưng hoạt động"}</td>
                             <td>
                                 <button class="edit-button" onclick='showEditDialog(${JSON.stringify(user)})'>Sửa</button>

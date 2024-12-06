@@ -238,7 +238,7 @@
       statisticsBody.innerHTML = ""; // Xóa dữ liệu cũ
 
       // Gọi API đơn hàng
-      fetch("http://192.168.101.9:3000/donhang")
+      fetch("http://192.168.0.7:3000/donhang")
         .then(response => response.json())
         .then(orders => {
           // Lọc đơn hàng theo ngày, tháng, và năm

@@ -249,7 +249,7 @@
             try {
                 if (editingVoucherId) {
                     // Sửa voucher
-                    await fetch(`http://192.168.101.9:3000/vouchers/${editingVoucherId}`, {
+                    await fetch(`http://192.168.0.7:3000/vouchers/${editingVoucherId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(voucherData),
@@ -257,7 +257,7 @@
                     alert('Voucher đã được cập nhật!');
                 } else {
                     // Thêm voucher
-                    await fetch('http://192.168.101.9:3000/vouchers', {
+                    await fetch('http://192.168.0.7:3000/vouchers', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(voucherData),
@@ -274,7 +274,7 @@
         // Hiển thị danh sách voucher
         async function fetchVouchers() {
             try {
-                const response = await fetch('http://192.168.101.9:3000/vouchers');
+                const response = await fetch('http://192.168.0.7:3000/vouchers');
                 const vouchers = await response.json();
 
                 voucherList.innerHTML = '';
@@ -299,7 +299,7 @@
         // Sửa voucher
         async function editVoucher(voucherId) {
             try {
-                const response = await fetch(`http://192.168.101.9:3000/vouchers/${voucherId}`);
+                const response = await fetch(`http://192.168.0.7:3000/vouchers/${voucherId}`);
                 const voucher = await response.json();
 
                 document.getElementById('voucher-type').value = voucher.type;
@@ -319,7 +319,7 @@
         async function deleteVoucher(voucherId) {
             if (confirm('Bạn có chắc chắn muốn xóa voucher này?')) {
                 try {
-                    await fetch(`http://192.168.101.9:3000/vouchers/${voucherId}`, { method: 'DELETE' });
+                    await fetch(`http://192.168.0.7:3000/vouchers/${voucherId}`, { method: 'DELETE' });
                     alert('Voucher đã được xóa!');
                     fetchVouchers();
                 } catch (error) {

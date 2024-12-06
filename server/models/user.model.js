@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
     },
+    roll: {
+      type: Number,
+      required: true,
+      default: 2,
+    }, // Giá trị mặc định là 2 -> là user
     phone: {
       type: String,
     },

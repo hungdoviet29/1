@@ -3,100 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="/stylesheets/style.css">
+    <title>Login Page</title>
     <style>
+        /* Reset mặc định */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
         }
+
         .login-container {
-            background: #fff;
-            padding: 20px 30px;
+            background-color: white;
+            padding: 30px 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-        }
-        .login-container h1 {
-            margin: 0 0 20px;
+            width: 350px;
             text-align: center;
+        }
+
+        .login-container h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
             color: #333;
         }
+
         .form-group {
             margin-bottom: 15px;
+            text-align: left;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 5px;
-            font-weight: bold;
+            font-size: 14px;
             color: #555;
         }
+
         .form-group input {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
             font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: border-color 0.3s;
         }
+
         .form-group input:focus {
-            border-color: #6c63ff;
+            border-color: #6a11cb;
             outline: none;
-            box-shadow: 0 0 4px rgba(108, 99, 255, 0.4);
         }
+
         .login-btn {
-            width: 100%;
-            padding: 10px;
-            background-color: #6c63ff;
+            background-color: #6a11cb;
+            color: white;
             border: none;
             border-radius: 5px;
-            color: #fff;
+            padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
-            font-weight: bold;
             transition: background-color 0.3s;
         }
+
         .login-btn:hover {
-            background-color: #5753d5;
+            background-color: #2575fc;
         }
-        .login-container p {
-            text-align: center;
-            margin-top: 15px;
+
+        p {
+            margin-top: 10px;
+            font-size: 14px;
             color: #555;
         }
-        .login-container p a {
-            color: #6c63ff;
+
+        p a {
+            color: #6a11cb;
             text-decoration: none;
+            font-weight: bold;
         }
-        .login-container p a:hover {
+
+        p a:hover {
             text-decoration: underline;
+        }
+
+        #error-message {
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: red;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <h1>Login</h1>
-        <form >
-          <div class="form-group">
-              <label for="email">Tên đăng nhập</label>
-              <input type="text" id="email" name="email" placeholder="Nhập tên đăng nhập" required>
-          </div>
-          <div class="form-group">
-              <label for="password">Mật khẩu</label>
-              <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
-          </div>
-          <!-- Hiển thị thông báo lỗi nếu có -->
-          <% if (typeof error !== 'undefined') { %>
-              <p style="color: red;"><%= error %></p>
-          <% } %>
-          <button type="submit" class="login-btn">Đăng nhập</button>
-      </form>
-        <p>Don't have an account? <a href="/users/register">Register here</a></p>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Tên đăng nhập</label>
+                <input type="text" id="username" name="username" placeholder="Nhập tên đăng nhập" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Mật khẩu</label>
+                <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
+            </div>
+            <!-- Hiển thị thông báo lỗi -->
+            <p id="error-message" style="display: none;"></p>
+            <button type="submit" class="login-btn">Đăng nhập</button>
+        </form>
+        <p>Bạn chưa có tài khoản? <a href="https://www.facebook.com/TienTai2804">Liên hệ</a></p>
     </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('error-message');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                // Gửi yêu cầu đăng nhập đến server
+                const response = await fetch('http://192.168.0.7:3000/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ tenDangNhap: username, matKhau: password }),
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    // Hiển thị lỗi nếu đăng nhập thất bại
+                    errorMessage.textContent = result.message;
+                    errorMessage.style.display = 'block';
+                } else {
+                    // Kiểm tra roll
+                    if (result.user.roll === 1) {
+                        // Chuyển đến trang quản trị nếu roll = 1
+                        window.location.href = "/JS/LapStore.html";
+                    } else {
+                        // Thông báo lỗi nếu roll không phải 1
+                        errorMessage.textContent = 'Bạn không có quyền truy cập vào trang quản trị.';
+                        errorMessage.style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('Lỗi khi gửi yêu cầu đăng nhập:', error);
+                errorMessage.textContent = 'Đã xảy ra lỗi. Vui lòng thử lại.';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
 </body>
 </html>
