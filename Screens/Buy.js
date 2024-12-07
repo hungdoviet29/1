@@ -42,7 +42,7 @@ const ProductScreen = () => {
         navigation.navigate('Login');
         return;
       }
-      await axios.post('http://172.20.10.6:3000/cart/add', {
+      await axios.post('http://192.168.0.104:3000/cart/add', {
         userId,
         productId: product._id,
         quantity,
@@ -69,7 +69,7 @@ const ProductScreen = () => {
 
       if (isFavorite) {
         // Xóa sản phẩm khỏi yêu thích
-        await axios.post('http://172.20.10.6:3000/removeFavoriteProduct', {
+        await axios.post('http://192.168.0.104:3000/removeFavoriteProduct', {
           userId,
           productId: product._id,
         });
@@ -77,7 +77,7 @@ const ProductScreen = () => {
         Alert.alert('Thành công', 'Sản phẩm đã bị gỡ khỏi danh sách yêu thích');
       } else {
         // Thêm sản phẩm vào yêu thích
-        await axios.post('http://172.20.10.6:3000/addFavoriteProduct', {
+        await axios.post('http://192.168.0.104:3000/addFavoriteProduct', {
           userId,
           productId: product._id,
         });
@@ -103,9 +103,9 @@ const ProductScreen = () => {
         if (!userId) {
           console.error('User ID không tồn tại');
           return;
-        }
+}
         const response = await axios.get(
-          `http://172.20.10.6:3000/favorites/${userId}`,
+          `http://192.168.0.104:3000/favorites/${userId}`,
         );
         const favoriteList = response.data.favorites || [];
         const isFavorite = favoriteList.some(item => item._id === product._id);
@@ -163,6 +163,21 @@ const ProductScreen = () => {
           <View style={styles.descriptionContainer}>
             <Text style={styles.sectionTitle}>MÔ TẢ</Text>
             <Text style={styles.descriptionText}>{product.moTa}</Text>
+          </View>
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.sectionTitle}>CPU</Text>
+            <Text style={styles.descriptionText}>{product.CPU}</Text>
+          </View>
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.sectionTitle}>RAM</Text>
+            <Text style={styles.descriptionText}>{product.RAM}</Text>
+          </View>
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.sectionTitle}>CardManHinh</Text>
+<Text style={styles.descriptionText}>{product.CardManHinh}</Text>
+          </View><View style={styles.descriptionContainer}>
+            <Text style={styles.sectionTitle}>KichThuocManHinh</Text>
+            <Text style={styles.descriptionText}>{product.KichThuocManHinh}</Text>
           </View>
           <TouchableOpacity
             style={styles.addToCartButton}

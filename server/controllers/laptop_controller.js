@@ -71,7 +71,7 @@ exports.getPopularLapTop = async (req, res) => {
     try {
       console.log('Body:', req.body);
   
-      const { ten, moTa, gia, danhMuc, soLuong, hang ,hinhAnh} = req.body;
+      const { ten, moTa, gia, danhMuc, soLuong, hang ,hinhAnh , CPU, RAM, CardManHinh, KichThuocManHinh} = req.body;
   
       if (!hinhAnh) {
         return res.status(400).json({ message: 'Vui lòng cung cấp đường dẫn hình ảnh' });
@@ -85,6 +85,10 @@ exports.getPopularLapTop = async (req, res) => {
         danhMuc,
         soLuong: Number(soLuong),
         hang,
+        CPU,
+        RAM,
+CardManHinh,
+        KichThuocManHinh
       });
   
       const savedLaptop = await newLaptop.save();
@@ -101,7 +105,7 @@ exports.getPopularLapTop = async (req, res) => {
   exports.updatelaptop = async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { hinhAnh, ten, moTa, gia, danhMuc, soLuong, hang } = req.body;
+      const { hinhAnh, ten, moTa, gia, danhMuc, soLuong, hang, CPU, RAM, CardManHinh, KichThuocManHinh } = req.body;
   
       // Kiểm tra nếu không có `hinhAnh` trong request body
       if (!hinhAnh) {
@@ -116,6 +120,10 @@ exports.getPopularLapTop = async (req, res) => {
         danhMuc,
         soLuong: Number(soLuong),
         hang,
+        CPU,
+        RAM,
+        CardManHinh,
+        KichThuocManHinh
       };
   
       const result = await laptopModel.findByIdAndUpdate(id, updatelaptop, { new: true });
@@ -173,7 +181,7 @@ exports.getLaptopsByBrand = async (req, res) => {
   try {
       const brandLaptops = await laptopModel.find({ hang: brand });
       if (brandLaptops.length === 0) {
-          return res.status(404).json({ message: 'Không có sản phẩm nào thuộc hãng này' });
+return res.status(404).json({ message: 'Không có sản phẩm nào thuộc hãng này' });
       }
 
       res.status(200).json({ status: 200, data: brandLaptops });
@@ -181,4 +189,3 @@ exports.getLaptopsByBrand = async (req, res) => {
       res.status(500).json({ status: "lỗi", result: error.message });
   }
 };
-

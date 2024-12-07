@@ -14,6 +14,11 @@ const laptopSchema = new mongoose.Schema(
     },
     soLuong: { type: Number, required: true },
     hang: { type: String, required: true },
+    // câc trường mới 
+    CPU: { type: String, required: true }, // Thêm trường CPU
+    RAM: { type: String, required: true }, // Thêm trường RAM
+    CardManHinh: { type: String, required: true }, // Thêm trường CardManHinh
+    KichThuocManHinh: { type: String, required: true }, // Thêm trường KichThuocManHinh
   },
   {
     collection: "laptops", // Tên collection trong MongoDB
