@@ -47,7 +47,7 @@ const CheckoutScreen = ({navigation, route}) => {
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
-        const url = `http://192.168.3.106:3000/vouchers?userId=${userId}`;
+        const url = `http://192.168.101.9:3000/vouchers?userId=${userId}`;
         const response = await fetch(url);
         const data = await response.json();
         if (response.ok) {
@@ -65,7 +65,7 @@ const CheckoutScreen = ({navigation, route}) => {
   const fetchCartItems = async id => {
     setLoading(true);
     try {
-      const response = await fetch(`http://192.168.3.106:3000/cart/${id}`);
+      const response = await fetch(`http://192.168.101.9:3000/cart/${id}`);
       const data = await response.json();
       if (response.ok) {
         setCartItems(data.items || []);
@@ -141,7 +141,7 @@ const CheckoutScreen = ({navigation, route}) => {
 
             try {
               const response = await fetch(
-                'http://192.168.3.106:3000/donhang',
+                'http://192.168.101.9:3000/donhang',
                 {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
@@ -184,7 +184,7 @@ const CheckoutScreen = ({navigation, route}) => {
         quantity: selectedVoucher.quantity - 1,
       };
       const response = await fetch(
-        `http://192.168.3.106:3000/vouchers/${voucherId}`,
+        `http://192.168.101.9:3000/vouchers/${voucherId}`,
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
@@ -201,11 +201,11 @@ const CheckoutScreen = ({navigation, route}) => {
 
   const resetCart = async () => {
     try {
-      const response = await fetch(`http://192.168.3.106:3000/cart/${userId}`);
+      const response = await fetch(`http://192.168.101.9:3000/cart/${userId}`);
       const data = await response.json();
       if (data && data.items && data.items.length > 0) {
         const deleteResponse = await fetch(
-          `http://192.168.3.106:3000/cart/${userId}`,
+          `http://192.168.101.9:3000/cart/${userId}`,
           {
             method: 'DELETE',
           },
@@ -369,33 +369,41 @@ const CheckoutScreen = ({navigation, route}) => {
 
       {/* Voucher Modal */}
       <Modal
-        visible={isVoucherModalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setVoucherModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <FlatList
-              data={vouchers}
-              renderItem={({item}) => (
-                <TouchableOpacity
-                  onPress={() => handleVoucherSelect(item)}
-                  style={styles.modalItem}>
-                  <Text style={styles.modalItemText}>
-                    {item.title} - Số lượng còn: {item.quantity}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              keyExtractor={item => item._id}
-            />
+  visible={isVoucherModalVisible}
+  transparent={true}
+  animationType="fade"
+  onRequestClose={() => setVoucherModalVisible(false)}>
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContent}>
+      {/* Lọc danh sách voucher có số lượng > 0 */}
+      {vouchers.filter(v => v.quantity > 0).length === 0 ? (
+        // Nếu không có voucher khả dụng
+        <Text style={styles.noVoucherText}>Không có voucher nào</Text>
+      ) : (
+        // Hiển thị danh sách voucher có số lượng > 0
+        <FlatList
+          data={vouchers.filter(v => v.quantity > 0)}
+          renderItem={({item}) => (
             <TouchableOpacity
-              onPress={() => setVoucherModalVisible(false)}
-              style={styles.modalCloseButton}>
-              <Text style={styles.modalCloseText}>Đóng</Text>
+              onPress={() => handleVoucherSelect(item)}
+              style={styles.modalItem}>
+              <Text style={styles.modalItemText}>
+                {item.title} - Số lượng còn: {item.quantity}
+              </Text>
             </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+          )}
+          keyExtractor={item => item._id}
+        />
+      )}
+      <TouchableOpacity
+        onPress={() => setVoucherModalVisible(false)}
+        style={styles.modalCloseButton}>
+        <Text style={styles.modalCloseText}>Đóng</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
     </ScrollView>
   );
 };
