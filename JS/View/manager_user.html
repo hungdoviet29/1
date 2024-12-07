@@ -402,31 +402,14 @@
 <div id="edit-dialog-overlay"></div>
 <div id="edit-dialog">
     <form id="edit-user-form">
-        <h3>Sửa Thông Tin Người Dùng</h3>
+        <h3>Sửa Trạng Thái Người Dùng</h3>
         <input type="hidden" id="edit-user-id">
-        <label for="edit-user-name">Tên Người Dùng:</label>
-        <input type="text" id="edit-user-name" required>
-        <br>
-        <label for="edit-user-email">Email:</label>
-        <input type="email" id="edit-user-email" required>
-        <br>
-        <label for="edit-user-phone">Số Điện Thoại:</label>
-        <input type="text" id="edit-user-phone">
-        <br>
-        <label for="edit-user-role">Vai Trò:</label>
-        <select id="edit-user-role">
-            <option value="user">Người Dùng</option>
-            <option value="admin">Quản Trị</option>
-        </select>
-        <br>
+        
         <label for="edit-user-status">Trạng Thái:</label>
         <select id="edit-user-status">
             <option value="active">Hoạt Động</option>
             <option value="inactive">Ngưng Hoạt Động</option>
         </select>
-        <label for="edit-user-avatar">Avatar:</label>
-        <input type="text" id="edit-user-avatar" placeholder="Nhập URL ảnh" required>
-
 
         <br><br>
         <button type="submit">Lưu</button>
@@ -435,8 +418,9 @@
 </div>
 
 
+
 <script>
-    const apiUrl = "http://192.168.0.7:3000/users";
+    const apiUrl = "http://192.168.101.9:3000/users";
 // Hàm để tải nội dung từ file summary-cards.html
 async function loadSummaryCards() {
     try {
@@ -519,22 +503,15 @@ loadSummaryCards();
     // Lấy tổng số người dùng
     
     // Hiển thị dialog sửa
-function showEditDialog(user) {
+    function showEditDialog(user) {
     document.getElementById("edit-user-id").value = user._id;
-    document.getElementById("edit-user-name").value = user.tenDangNhap;
-    document.getElementById("edit-user-email").value = user.email || "";
-    document.getElementById("edit-user-phone").value = user.phone || "";
-    document.getElementById("edit-user-role").value = user.vaiTro;
-    
-    // Cập nhật trạng thái trong dialog
-    document.getElementById("edit-user-status").value = user.trangThai;  // Giá trị 'active' hoặc 'inactive'
-    
-    document.getElementById("edit-user-avatar").value = user.avatar || "";
+    document.getElementById("edit-user-status").value = user.trangThai; // Cập nhật trạng thái
 
     // Hiển thị dialog sửa
     document.getElementById("edit-dialog").style.display = "block";
     document.getElementById("edit-dialog-overlay").style.display = "block";
 }
+
 
 // Đóng dialog
 function closeDialog() {
@@ -549,15 +526,7 @@ document.getElementById("edit-user-form").addEventListener("submit", function (e
     const userId = document.getElementById("edit-user-id").value;
 
     const updatedData = {
-        tenDangNhap: document.getElementById("edit-user-name").value,
-        email: document.getElementById("edit-user-email").value,
-        phone: document.getElementById("edit-user-phone").value,
-        vaiTro: document.getElementById("edit-user-role").value,
-        
-        // Lấy giá trị trạng thái từ form (active hoặc inactive)
-        trangThai: document.getElementById("edit-user-status").value,
-        
-        avatar: document.getElementById("edit-user-avatar").value,
+        trangThai: document.getElementById("edit-user-status").value, // Chỉ cập nhật trạng thái
     };
 
     fetch(`${apiUrl}/update/${userId}`, {
@@ -569,10 +538,10 @@ document.getElementById("edit-user-form").addEventListener("submit", function (e
     })
     .then(response => {
         if (response.ok) {
-            alert("Sửa thông tin thành công!");
-            fetchUsers();  // Làm mới danh sách người dùng
+            alert("Cập nhật trạng thái thành công!");
+            fetchUsers(); // Làm mới danh sách người dùng
         } else {
-            alert("Lỗi khi sửa thông tin.");
+            alert("Lỗi khi cập nhật trạng thái.");
         }
     })
     .catch(error => {
@@ -580,8 +549,9 @@ document.getElementById("edit-user-form").addEventListener("submit", function (e
         alert("Đã có lỗi xảy ra.");
     });
 
-    closeDialog();  // Đóng dialog sau khi lưu thành công
+    closeDialog(); // Đóng dialog sau khi lưu
 });
+
 
 
 
