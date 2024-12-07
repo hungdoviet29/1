@@ -250,7 +250,7 @@ table td:nth-child(10) {
                 <thead>
                     <tr>
                         <th>ID đơn hàng</th>
-                        <th>Người Dùng</th>
+                        <th>ID Người Dùng</th>
                         <th>Sản Phẩm</th>
                         <th>Tổng tiền</th>
                         <th>Địa chỉ</th>
@@ -299,7 +299,7 @@ function saveTotalProducts() {
     const endDate = document.getElementById('end-date').value;
     const searchQuery = document.getElementById('search-box').value.toLowerCase();
 
-    fetch('http://192.168.101.9:3000/donhang')
+    fetch('http://172.20.10.6:3000/donhang')
         .then(response => response.json())
         .then(data => {
             const orderList = document.getElementById('order-list');
@@ -331,7 +331,7 @@ function saveTotalProducts() {
                 // Populate cells
                 row.innerHTML = `
                     <td>${order._id}</td>
-                    <td>${order.shippingInfo.name}</td>
+                    <td>${order.userId}</td>
                     <td>${order.cartItems.map(item => item.productId ? `${item.productId.ten} (x${item.quantity})` : 'Sản phẩm không tồn tại').join('<br>')}</td>
                     <td>${order.totalAmount.toLocaleString()} VND</td>
                     <td>${order.shippingInfo.address}</td>
@@ -343,30 +343,36 @@ function saveTotalProducts() {
 
                 const actionCell = document.createElement('td');
                 const status = order.status.toLowerCase();
-
                 if (status === 'chờ xác nhận') {
-                    const confirmButton = document.createElement('button');
-                    confirmButton.textContent = 'Xác nhận';
-                    confirmButton.addEventListener('click', () => updateOrderStatus(order._id, 'Chờ vận chuyển', row));
-                    actionCell.appendChild(confirmButton);
-                } else if (status === 'chờ vận chuyển') {
-                    const shipButton = document.createElement('button');
-                    shipButton.textContent = 'Gửi hàng';
-                    shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đang vận chuyển', row));
-                    actionCell.appendChild(shipButton);
-                } else if (status === 'đang vận chuyển') {
-                    const shipButton = document.createElement('button');
-                    shipButton.textContent = 'Hoàn hàng';
-                    shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đơn hoàn', row));
-                    actionCell.appendChild(shipButton);
-                } else if (status === 'thành công') {
-                    const shipButton = document.createElement('button');
-                    shipButton.textContent = 'Hoàn hàng';
-                    shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đang hoàn hàng', row));
-                    actionCell.appendChild(shipButton);
-                } else if (status === 'đã hủy') {
-                    actionCell.innerHTML = ''; // Ẩn nút, không hiện gì
-                }
+    const confirmButton = document.createElement('button');
+    confirmButton.textContent = 'Xác nhận';
+    confirmButton.addEventListener('click', () => updateOrderStatus(order._id, 'Chờ vận chuyển', row));
+    actionCell.appendChild(confirmButton);
+} else if (status === 'chờ vận chuyển') {
+    const shipButton = document.createElement('button');
+    shipButton.textContent = 'Gửi hàng';
+    shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đang vận chuyển', row));
+    actionCell.appendChild(shipButton);
+} else if (status === 'đang vận chuyển') {
+    // Tạo hai nút "Thành công" và "Hủy đơn"
+    const successButton = document.createElement('button');
+    successButton.textContent = 'Thành công';
+    successButton.addEventListener('click', () => updateOrderStatus(order._id, 'Thành công', row));
+    actionCell.appendChild(successButton);
+
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'Hủy đơn';
+    cancelButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã hủy', row));
+    actionCell.appendChild(cancelButton);
+} else if (status === 'thành công') {
+    const shipButton = document.createElement('button');
+    shipButton.textContent = 'Hủy đơn';
+    shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã hủy', row));
+    actionCell.appendChild(shipButton);
+} else if (status === 'đã hủy') {
+    actionCell.innerHTML = ''; // Ẩn nút, không hiện gì
+}
+
 
                 row.appendChild(actionCell);
                 orderList.appendChild(row);
