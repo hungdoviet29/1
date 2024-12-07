@@ -17,9 +17,10 @@
         header {
             background-color: #6c63ff;
             color: white;
-            padding: 15px;
+            padding: 15px 20px;
             text-align: center;
             font-size: 24px;
+            font-weight: bold;
         }
 
         .container {
@@ -91,71 +92,75 @@
             background-color: #6c63ff;
             color: white;
         }
+
         nav {
-      background-color: #fff;
-      padding: 10px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-    }
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
 
-    nav ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-    }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
 
-    nav ul li {
-      margin: 0 10px;
-    }
+        nav ul li {
+            margin: 0 10px;
+        }
 
-    nav ul li a {
-      text-decoration: none;
-      color: #6c63ff;
-      font-size: 16px;
-      font-weight: bold;
-    }
+        nav ul li a {
+            text-decoration: none;
+            color: #6c63ff;
+            font-size: 16px;
+            font-weight: bold;
+        }
 
-    nav ul li a:hover {
-      text-decoration: underline;
-    }
-    .button-container {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin: 20px 0;
-  }
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
 
-  .button-container button {
-    padding: 10px 20px;
-    background-color: #6c63ff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-  }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
 
-  .button-container button:hover {
-    background-color: #5a54d6;
-  }
-  .button-container .highlight-button {
-    background-color: #ff5722 !important; /* Màu cam nổi bật */
-    color: white !important;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
+        .button-container button {
+            padding: 10px 20px;
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
 
-.button-container .highlight-button:hover {
-    background-color: #e64a19 !important; /* Màu cam đậm hơn khi hover */
-}
+        .button-container button:hover {
+            background-color: #5a54d6;
+        }
 
+        .button-container .highlight-button {
+            background-color: #ff5722 !important;
+            /* Màu cam nổi bật */
+            color: white !important;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .button-container .highlight-button:hover {
+            background-color: #e64a19 !important;
+            /* Màu cam đậm hơn khi hover */
+        }
     </style>
 </head>
 
@@ -163,22 +168,23 @@
     <header>Bảng Điều Khiển Quản Lý</header>
     <nav>
         <ul>
-    
-          <li><a href="manager.html">Đơn Hàng</a></li>
-          <li>
-            <a href="manager_laptops.html" style="text-decoration: none; color: #6c63ff;">Sản phẩm</a>
-          </li>
-          <li><a href="manager_user.html">Người Dùng</a></li>
-          <li><a href="manager_discount.html">Voucher</a></li>
-          <li><a href="manager_statistical.html">Thống kê</a></li>
-          <li><a href="login.html">Đăng Xuất</a></li>
+
+            <li><a href="manager.html">Đơn Hàng</a></li>
+            <li>
+                <a href="manager_laptops.html" style="text-decoration: none; color: #6c63ff;">Sản phẩm</a>
+            </li>
+            <li><a href="manager_user.html">Người Dùng</a></li>
+            <li><a href="manager_discount.html">Voucher</a></li>
+            <li><a href="manager_statistical.html">Thống kê</a></li>
+            <li><a href="login.html">Đăng Xuất</a></li>
         </ul>
-      </nav>
-      <div class="button-container">
-        <button class="highlight-button" onclick="location.href='manager_statiscal_oder.html'">Thống Kê Đơn hàng</button>
+    </nav>
+    <div class="button-container">
+        <button class="highlight-button" onclick="location.href='manager_statiscal_oder.html'">Thống Kê Đơn
+            hàng</button>
         <button onclick="location.href='manager_statistical.html'">Thống Kê Sản Phẩm</button>
         <button onclick="location.href='user_statistics.html'">Thống Kê Người Dùng</button>
-      </div>
+    </div>
     <div class="container">
         <!-- Tổng quan -->
         <div class="summary-section">
