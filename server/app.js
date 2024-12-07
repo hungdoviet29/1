@@ -105,7 +105,7 @@ app.use('/cart', cartRouter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/notifications', notificationRouter);
 // Tích hợp route voucher
-app.use('/', voucherRouter);
+app.use('/vouchers', voucherRouter);
 
 // Middleware xử lý 404 (Không tìm thấy route)
 app.use((req, res, next) => {
