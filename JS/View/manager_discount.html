@@ -139,7 +139,7 @@
             <form id="createVoucherForm">
                 <input type="text" id="userId" placeholder="userId" required>
                 <input type="text" id="type" placeholder="Loại voucher" required>
-                <input type="text" id="title" placeholder="Tiêu đề" required>
+                <input type="text" id="title" placeholder="Phần trăm giảm" required>
                 <input type="text" id="description" placeholder="Mô tả" required>
                 <input type="date" id="startDate" required>
                 <input type="date" id="expirationDate" required>
@@ -157,7 +157,7 @@
                 <thead>
                     <tr>
                         <th>Id người dùng</th>
-                        <th>Tiêu đề</th>
+                        <th>Phần trăm giảm</th>
                         <th>Loại</th>
                         <th>Mô tả</th>
                         <th>Ngày bắt đầu</th>
@@ -241,9 +241,9 @@
 
     const title = document.getElementById('title').value;
 
-    // Kiểm tra tiêu đề chỉ cho phép số và nằm trong khoảng từ 1 đến 99
+    // Kiểm tra Phần trăm giảm chỉ cho phép số và nằm trong khoảng từ 1 đến 99
     if (!/^\d+$/.test(title) || parseInt(title) <= 0 || parseInt(title) >= 100) {
-        alert('Tiêu đề phải là một số lớn hơn 0 và nhỏ hơn 100');
+        alert('Phần trăm giảm phải là một số lớn hơn 0 và nhỏ hơn 100');
         return;
     }
 
