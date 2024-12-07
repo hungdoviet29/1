@@ -186,8 +186,12 @@ const useVoucher = async (req, res) => {
       return res.status(400).json({message: 'Voucher này đã hết hạn sử dụng'});
     }
 
-    // Giảm số lượng voucher đi 1
+    // Giảm số lượng voucher đi 1 và kiểm tra số lượng có hợp lệ không
     voucher.quantity -= 1;
+    if (voucher.quantity < 0) {
+      return res.status(400).json({message: 'Số lượng voucher không hợp lệ'});
+    }
+
     const updatedVoucher = await voucher.save();
 
     return res.status(200).json({
@@ -199,6 +203,7 @@ const useVoucher = async (req, res) => {
     return res.status(500).json({message: 'Lỗi khi sử dụng voucher', error});
   }
 };
+
 
 module.exports = {
   getAllVouchers,
