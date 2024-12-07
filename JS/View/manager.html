@@ -242,7 +242,7 @@ table td:nth-child(10) {
                 <button id="filter-button">Lọc</button>
             </div>
             <div class="search-container">
-                <input type="text" id="search-box" placeholder="Tìm kiếm ID đơn hàng hoặc tên người nhận...">
+                <input type="text" id="search-box" placeholder="Tìm kiếm ID đơn hàng, SĐT hoặc tên người nhận...">
                 <button id="search-button">Tìm kiếm</button>
             </div>
             
@@ -299,7 +299,7 @@ function saveTotalProducts() {
     const endDate = document.getElementById('end-date').value;
     const searchQuery = document.getElementById('search-box').value.toLowerCase();
 
-    fetch('http://192.168.0.7:3000/donhang')
+    fetch('http://192.168.101.9:3000/donhang')
         .then(response => response.json())
         .then(data => {
             const orderList = document.getElementById('order-list');
@@ -313,7 +313,7 @@ function saveTotalProducts() {
                 const isStartMatch = startDate ? orderDate >= new Date(startDate) : true;
                 const isEndMatch = endDate ? orderDate <= new Date(endDate) : true;
                 const isSearchMatch = searchQuery
-                    ? order._id.toLowerCase().includes(searchQuery) || order.shippingInfo.name.toLowerCase().includes(searchQuery)
+                    ? order._id.toLowerCase().includes(searchQuery) || order.shippingInfo.name.toLowerCase().includes(searchQuery) || order.shippingInfo.phone.includes(searchQuery)
                     : true;
 
                 return isStatusMatch && isStartMatch && isEndMatch && isSearchMatch;
