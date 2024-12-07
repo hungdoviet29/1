@@ -233,7 +233,7 @@ const CheckoutScreen = ({navigation, route}) => {
       );
       return;
     }
-    const updatedVoucher = {...voucher, quantity: voucher.quantity - 1};
+    const updatedVoucher = {...voucher, quantity: voucher.quantity};
     setSelectedVoucher(updatedVoucher); // Cập nhật voucher đã chọn
 
     // Cập nhật lại số lượng trong danh sách vouchers
