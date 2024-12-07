@@ -189,7 +189,7 @@ const ProductScreen = () => {
     </View>
   );
 };
-
+//fdgsdfsgt
 const styles = StyleSheet.create({
   container: {
     flex: 1,

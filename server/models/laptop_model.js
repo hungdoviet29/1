@@ -25,7 +25,7 @@ const laptopSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
+//sgdsyugds
 const laptopModel = mongoose.model("LapStore", laptopSchema);
 
 module.exports = { laptopModel };
