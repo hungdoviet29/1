@@ -25,7 +25,7 @@ const AccountManagement = () => {
           return;
         }
         const response = await axios.get(
-          `http://192.168.0.4:3000/users/${userId}`,
+          `http://192.168.0.104:3000/users/${userId}`,
         );
         setUserInfo(response.data);
       } catch (error) {
@@ -101,7 +101,7 @@ const AccountManagement = () => {
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.optionItem}
           onPress={() =>
             navigation.navigate('DirectMessaging', {userData: userInfo})
@@ -109,7 +109,7 @@ const AccountManagement = () => {
           <Text style={styles.optionIcon}>💬</Text>
           <Text style={styles.optionText}>Nhắn tin trực tiếp</Text>
           <Text style={styles.arrow}>›</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       {/* Nút đăng xuất */}

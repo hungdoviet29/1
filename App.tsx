@@ -108,7 +108,8 @@ const AppNavigator = ({ navigationRef }) => {
     'ProductCategoryScreen',
     ,'PortfolioDetails',
     'ShopContactInfo',
-    'EditProfileScreen'
+    'EditProfileScreen',
+    'CustomDrawerContent'
     
   ];
 

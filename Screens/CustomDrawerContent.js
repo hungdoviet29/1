@@ -1,17 +1,62 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CustomDrawerContent = () => {
+  const [userInfo, setUserInfo] = useState(null);
   const navigation = useNavigation();
 
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const userId = await AsyncStorage.getItem('userId');
+        if (!userId) {
+          Alert.alert('Lỗi', 'Không tìm thấy thông tin đăng nhập.');
+          return;
+        }
+        const response = await axios.get(`http://192.168.0.104:3000/users/${userId}`);
+        setUserInfo(response.data);
+      } catch (error) {
+        console.error('Lỗi khi lấy thông tin người dùng:', error);
+        Alert.alert('Lỗi', 'Không thể tải thông tin người dùng.');
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('userId');
+      // Redirect to login screen after logout
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error('Lỗi khi đăng xuất:', error);
+    }
+  };
+
+  if (!userInfo) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007BFF" />
+        <Text style={styles.loadingText}>Đang tải thông tin...</Text>
+      </View>
+    );
+  }
+
   return (
+    
     <View style={styles.drawerContainer}>
       {/* Profile Section */}
       <View style={styles.profileSection}>
-        <Image source={require('../acssets/profile1.png')} style={styles.profileImage} />
-        <Text style={styles.profileName}>Tien Tai</Text>
-        <Text style={styles.profileEmail}>tai2804@gmail.com</Text>
+        <Image
+          source={{ uri: userInfo.avatar || 'https://via.placeholder.com/100' }}
+          style={styles.profileImage}
+        />
+        <Text style={styles.profileName}>{userInfo.tenDangNhap}</Text>
+        <Text style={styles.profileEmail}>{userInfo.email}</Text>
       </View>
 
       {/* Menu Items */}
@@ -28,9 +73,8 @@ const CustomDrawerContent = () => {
 
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('OderScreen')}>
           <Image source={require('../acssets/Caricon.png')} style={styles.menuIcon} />
-          <Text style={styles.menuText}>Order status</Text>
+          <Text style={styles.menuText}>Order Status</Text>
         </TouchableOpacity>
-
 
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('NotificationScreen')}>
           <Image source={require('../acssets/Bellicon.png')} style={styles.menuIcon} />
@@ -49,8 +93,8 @@ const CustomDrawerContent = () => {
       </View>
 
       {/* Logout Button */}
-      <TouchableOpacity style={styles.logoutButton}>
-        <Image source={require('../acssets/Group6893.png')} style={styles.menuIcon} />
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Image source={require('../acssets/Group6893.png')} />
         <Text style={styles.logoutText}>LOG OUT</Text>
       </TouchableOpacity>
     </View>
@@ -80,6 +124,7 @@ const styles = StyleSheet.create({
   profileEmail: {
     color: '#fff',
     fontSize: 14,
+    marginTop: 5,
   },
   menuItems: {
     marginTop: 20,
@@ -89,6 +134,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     paddingHorizontal: 20,
+    marginBottom: 10,
   },
   menuIcon: {
     width: 24,
@@ -105,11 +151,24 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     paddingVertical: 15,
     paddingHorizontal: 20,
+    
+    marginBottom: 20,
+    borderRadius: 8,
   },
   logoutText: {
     fontSize: 16,
     color: '#FFFFFF',
     marginLeft: 15,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#007BFF',
+    marginTop: 10,
   },
 });
 

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,8 @@ import {
   ImageBackground,
   StyleSheet,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {ScrollView} from 'react-native-gesture-handler';
+import { useNavigation } from '@react-navigation/native';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const Register = () => {
   const navigation = useNavigation();
@@ -16,26 +16,83 @@ const Register = () => {
   const [tenDangNhap, setTenDangNhap] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errorName, setErrorName] = useState('');
+  const [errorEmail, setErrorEmail] = useState('');
+  const [errorPassword, setErrorPassword] = useState('');
+  const [errorConfirmPassword, setErrorConfirmPassword] = useState('');
 
-  // Kiểm tra độ mạnh của mật khẩu
-  // const validatePassword = password => {
-  //   const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/;
-  //   return regex.test(password);
-  // };
+  const isValidEmail = email => {
+    if (!email.trim()) {
+      return 'Email không được để trống.'; // Kiểm tra nếu email rỗng
+    }
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (!emailPattern.test(email)) {
+      return 'Địa chỉ email không hợp lệ. Vui lòng nhập lại email hợp lệ.';
+    }
+    return ''; // Email hợp lệ
+  };
+
+  const validatePassword = password => {
+    const errors = [];
+
+    // Kiểm tra độ dài mật khẩu
+    if (password.length < 8) {
+      errors.push('Mật khẩu phải có ít nhất 8 ký tự.');
+    }
+
+    // Kiểm tra chữ hoa
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Mật khẩu phải chứa ít nhất 1 chữ hoa.');
+    }
+
+    // Kiểm tra chữ số
+    if (!/\d/.test(password)) {
+      errors.push('Mật khẩu phải chứa ít nhất 1 chữ số.');
+    }
+
+    // Kiểm tra ký tự đặc biệt
+    if (!/[@$!%*?&]/.test(password)) {
+      errors.push('Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt (@, $, !, %, *, ?, &).');
+    }
+
+    return errors;
+  };
 
   const handleRegister = async () => {
-    // if (!validatePassword(password)) {
-    //   setError(
-    //     'Mật khẩu cần có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
-    //   );
-    //   return;
-    // }
+    let valid = true;
+    
+    setErrorName('');
+    setErrorEmail('');
+    setErrorPassword('');
+    setErrorConfirmPassword('');
 
-    if (password !== confirmPassword) {
-      setError('Mật khẩu không khớp.');
-      return;
+    // Kiểm tra tên đăng nhập
+    if (!tenDangNhap.trim()) {
+      setErrorName('Tên đăng nhập không được bỏ trống.');
+      valid = false;
     }
+
+    // Kiểm tra email
+    const emailError = isValidEmail(email);
+    if (emailError) {
+      setErrorEmail(emailError);
+      valid = false;
+    }
+
+    // Kiểm tra mật khẩu
+    const passwordErrors = validatePassword(password);
+    if (passwordErrors.length > 0) {
+      setErrorPassword(passwordErrors.join(' ')); // Gộp các thông báo lỗi thành 1 chuỗi
+      valid = false;
+    }
+
+    // Kiểm tra mật khẩu xác nhận
+    if (password !== confirmPassword) {
+      setErrorConfirmPassword('Mật khẩu và xác nhận mật khẩu không khớp.');
+      valid = false;
+    }
+
+    if (!valid) return;
 
     const newUser = {
       tenDangNhap: tenDangNhap,
@@ -46,7 +103,7 @@ const Register = () => {
     };
 
     try {
-      const response = await fetch('http://192.168.0.4:3000/users/register', {
+      const response = await fetch('http://192.168.0.104:3000/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,10 +114,10 @@ const Register = () => {
       if (response.ok) {
         navigation.navigate('Login');
       } else {
-        setError('Đăng ký không thành công. Vui lòng thử lại.');
+        setErrorName('Đăng ký không thành công. Vui lòng thử lại.');
       }
     } catch (error) {
-      setError('Lỗi kết nối mạng. Vui lòng thử lại.');
+      setErrorName('Lỗi kết nối mạng. Vui lòng thử lại.');
       console.error('Lỗi trong quá trình đăng ký:', error);
     }
   };
@@ -84,8 +141,6 @@ const Register = () => {
         <View style={styles.content}>
           <Text style={styles.title}>SIGN UP</Text>
 
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
           <View style={styles.formContainer}>
             <Text style={styles.label}>Your Name</Text>
             <TextInput
@@ -95,6 +150,8 @@ const Register = () => {
               onChangeText={setTenDangNhap}
               placeholderTextColor="#C1C1C1"
             />
+            {errorName ? <Text style={styles.errorText}>{errorName}</Text> : null}
+
             <Text style={styles.label}>Email address</Text>
             <TextInput
               style={styles.input}
@@ -104,6 +161,8 @@ const Register = () => {
               onChangeText={setEmail}
               placeholderTextColor="#C1C1C1"
             />
+            {errorEmail ? <Text style={styles.errorText}>{errorEmail}</Text> : null}
+
             <Text style={styles.label}>Password</Text>
             <TextInput
               style={styles.input}
@@ -113,6 +172,8 @@ const Register = () => {
               onChangeText={setPassword}
               placeholderTextColor="#C1C1C1"
             />
+            {errorPassword ? <Text style={styles.errorText}>{errorPassword}</Text> : null}
+
             <Text style={styles.label}>Confirm Password</Text>
             <TextInput
               style={styles.input}
@@ -122,6 +183,7 @@ const Register = () => {
               onChangeText={setConfirmPassword}
               placeholderTextColor="#C1C1C1"
             />
+            {errorConfirmPassword ? <Text style={styles.errorText}>{errorConfirmPassword}</Text> : null}
 
             <TouchableOpacity
               style={styles.registerButton}
@@ -219,11 +281,10 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
-    textAlign: 'center',
+    textAlign: 'left',
     marginBottom: 10,
     fontSize: 14,
   },
 });
-//sgfdtsfd
 
 export default Register;

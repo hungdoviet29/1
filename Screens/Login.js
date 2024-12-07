@@ -44,25 +44,9 @@ const Login = ({route}) => {
 
     loadCredentials();
   }, []);
-  //cmt validate
-  // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Kiểm tra định dạng email
-  // const passwordRegex =
-  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/; // Mật khẩu mạnh
-
-  // if (!emailRegex.test(tenDangNhap)) {
-  //   setError('Email không hợp lệ. Vui lòng nhập đúng định dạng.');
-  //   return;
-  // }
-
-  // if (!passwordRegex.test(matKhau)) {
-  //   setError(
-  //     'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
-  //   );
-  //   return;
-  // }
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://192.168.0.7:3000/users');
+      const response = await fetch('http://192.168.0.104:3000/users');
       const users = await response.json();
       const user = users.find(
         user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau,
@@ -100,7 +84,7 @@ const Login = ({route}) => {
   };
 
   return (
-    <ScrollView>
+    
       <View style={styles.container}>
         <View style={styles.form}>
           <ImageBackground
@@ -169,7 +153,7 @@ const Login = ({route}) => {
           </View>
         </View>
       </View>
-    </ScrollView>
+    
   );
 };
 
@@ -279,7 +263,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 40,
     marginHorizontal: 20,
   },
   loginButtonText: {
