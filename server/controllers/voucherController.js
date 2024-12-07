@@ -1,5 +1,18 @@
 const Voucher = require('../models/voucher');
 
+
+// Lấy tất cả danh sách voucher
+const getAllVouchers = async (req, res) => {
+  try {
+    const vouchers = await Voucher.find(); // Lấy tất cả voucher trong cơ sở dữ liệu
+    return res.status(200).json(vouchers);
+  } catch (error) {
+    console.error('Error fetching all vouchers:', error);
+    return res.status(500).json({message: 'Lỗi khi lấy tất cả danh sách voucher', error});
+  }
+};
+
+
 // Tạo mới voucher
 const createVoucherByUser = async (req, res) => {
   try {
@@ -14,10 +27,34 @@ const createVoucherByUser = async (req, res) => {
       quantity,
     } = req.body;
 
-    if (!userId) {
+    // Kiểm tra nếu thiếu bất kỳ trường nào
+    if (
+      !userId ||
+      !type ||
+      !title ||
+      !description ||
+      !startDate ||
+      !expirationDate ||
+      !quantity
+    ) {
+      return res.status(400).json({
+        message:
+          'Thiếu thông tin cần thiết. Vui lòng cung cấp đầy đủ thông tin: userId, type, title, description, startDate, expirationDate, quantity.',
+      });
+    }
+
+    // Chuyển đổi startDate và expirationDate sang kiểu Date nếu chúng là chuỗi
+    const parsedStartDate = new Date(startDate);
+    const parsedExpirationDate = new Date(expirationDate);
+
+    // Kiểm tra nếu startDate và expirationDate không hợp lệ
+    if (
+      isNaN(parsedStartDate.getTime()) ||
+      isNaN(parsedExpirationDate.getTime())
+    ) {
       return res
         .status(400)
-        .json({message: 'Thiếu userId. Vui lòng cung cấp userId.'});
+        .json({message: 'Ngày bắt đầu hoặc ngày hết hạn không hợp lệ.'});
     }
 
     const newVoucher = new Voucher({
@@ -25,21 +62,23 @@ const createVoucherByUser = async (req, res) => {
       type,
       title,
       description,
-      startDate,
-      expirationDate,
+      startDate: parsedStartDate,
+      expirationDate: parsedExpirationDate,
       isActive,
       quantity,
     });
 
     const savedVoucher = await newVoucher.save();
-    return res
-      .status(201)
-      .json({message: 'Tạo voucher thành công', voucher: savedVoucher});
+    return res.status(201).json({
+      message: 'Tạo voucher thành công',
+      voucher: savedVoucher,
+    });
   } catch (error) {
     console.error('Error creating voucher:', error);
     return res.status(500).json({message: 'Lỗi khi tạo voucher', error});
   }
 };
+
 
 // Lấy danh sách voucher theo userId
 const getVouchersByUser = async (req, res) => {
@@ -157,6 +196,7 @@ const useVoucher = async (req, res) => {
 };
 
 module.exports = {
+  getAllVouchers,
   createVoucherByUser,
   getVouchersByUser,
   getVoucherByIdAndUser,

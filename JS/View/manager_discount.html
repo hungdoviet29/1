@@ -1,336 +1,215 @@
 <!DOCTYPE html>
-<html lang="vi">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bảng Điều Khiển Quản Lý</title>
-    <link rel="stylesheet" href="/stylesheets/style.css">
+    <title>Manager Discount</title>
+</head>
+<body>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-        }
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+}
 
-        header {
-            background-color: #6c63ff;
-            color: white;
-            padding: 15px 20px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-        .container {
-            padding: 20px;
-        }
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-        .table-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+.voucher-form {
+    margin-bottom: 30px;
+}
 
-        #voucher-list {
-            margin-top: 20px;
-        }
+.voucher-form input,
+.voucher-form button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
 
-        .voucher {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
+button {
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
 
-        .voucher h4 {
-            margin: 0;
-        }
+button:hover {
+    background-color: #45a049;
+}
 
-        #add-voucher-button {
-            padding: 15px 30px;
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
+#voucherTable {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        #add-voucher-button:hover {
-            background-color: #45a049;
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
-            transform: translateY(-2px);
-        }
+#voucherTable th,
+#voucherTable td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
 
+#voucherTable th {
+    background-color: #f2f2f2;
+}
 
-        dialog {
-            width: 400px;
-            border: none;
-            border-radius: 12px;
-            padding: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            position: relative;
-        }
+#voucherTable td button {
+    padding: 5px 10px;
+    background-color: #ff6347;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
 
-        dialog h3 {
-            margin-top: 0;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            color: #4caf50;
-        }
+#voucherTable td button:hover {
+    background-color: #e53e3e;
+}
 
-        dialog form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        dialog input[type="text"],
-        dialog input[type="number"],
-        dialog input[type="date"] {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        dialog button[type="submit"] {
-            background-color: #4caf50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        dialog button[type="submit"]:hover {
-            background-color: #45a049;
-        }
-
-        dialog button[type="button"] {
-            background-color: #f44336;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        dialog button[type="button"]:hover {
-            background-color: #d32f2f;
-        }
-
-        nav {
-            background-color: #fff;
-            padding: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        nav ul li {
-            margin: 0 10px;
-        }
-
-        nav ul li a {
-            text-decoration: none;
-            color: #6c63ff;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        nav ul li a:hover {
-            text-decoration: underline;
-        }
     </style>
-</head>
-
-<body>
-    <header>Bảng Điều Khiển Quản Lý</header>
-    <nav>
-        <ul>
-            <li><a href="manager.html">Đơn Hàng</a></li>
-            <li><a href="manager_laptops.html">Sản phẩm</a></li>
-            <li><a href="manager_user.html">Người Dùng</a></li>
-            <li><a href="manager_discount.html" class="active">Voucher</a></li>
-            <li><a href="manager_statistical.html">Thống kê</a></li>
-            <li><a href="login.html">Đăng Xuất</a></li>
-        </ul>
-    </nav>
     <div class="container">
-        <button id="add-voucher-button">Thêm Voucher</button>
+        <h1>Quản lý Voucher</h1>
 
-        <div id="voucher-list"></div>
-
-        <!-- Dialog thêm/sửa voucher -->
-        <dialog id="voucher-dialog">
-            <h3 id="dialog-title">Thêm Voucher</h3>
-            <form id="voucher-form">
-
-                <label for="voucher-type">Loại giảm</label>
-                <input type="text" id="voucher-type" placeholder="Nhập loại" required>
-
-                <label for="voucher-title">Loại giảm giá (%)</label>
-                <input type="number" id="voucher-title" placeholder="Nhập % giảm giá" required>
-
-                <label for="voucher-description">Đơn tối thiểu</label>
-                <input type="text" id="voucher-description" placeholder="Ví dụ: ₫44400k" required>
-
-                <label for="voucher-expiration">Ngày hết hạn</label>
-                <input type="date" id="voucher-expiration" required>
-
-                <input type="hidden" id="voucher-id">
-                <button type="submit">Lưu</button>
-                <button type="button" id="close-dialog">Đóng</button>
+        <!-- Form tạo voucher mới -->
+        <div class="voucher-form">
+            <h2>Tạo Voucher Mới</h2>
+            <form id="createVoucherForm">
+                <input type="text" id="userId" placeholder="userId" required>
+                <input type="text" id="type" placeholder="Loại voucher" required>
+                <input type="text" id="title" placeholder="Tiêu đề" required>
+                <input type="text" id="description" placeholder="Mô tả" required>
+                <input type="date" id="startDate" required>
+                <input type="date" id="expirationDate" required>
+                <input type="number" id="quantity" placeholder="Số lượng" required>
+                <button type="submit">Tạo Voucher</button>
             </form>
-        </dialog>
+        </div>
+
+        <hr>
+
+        <!-- Danh sách voucher -->
+        <div id="voucherList">
+            <h2>Danh sách Voucher</h2>
+            <table id="voucherTable">
+                <thead>
+                    <tr>
+                        <th>Id người dùng</th>
+                        <th>Tiêu đề</th>
+                        <th>Loại</th>
+                        <th>Mô tả</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày hết hạn</th>
+                        <th>Số lượng</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Các voucher sẽ được hiển thị tại đây -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <script>
-        const voucherDialog = document.getElementById('voucher-dialog');
-        const addVoucherButton = document.getElementById('add-voucher-button');
-        const closeDialogButton = document.getElementById('close-dialog');
-        const voucherForm = document.getElementById('voucher-form');
-        const voucherList = document.getElementById('voucher-list');
-        const dialogTitle = document.getElementById('dialog-title');
+    <script>const apiUrl = 'http://192.168.3.106:3000/vouchers/all'; // Địa chỉ API để lấy tất cả các voucher
 
-        let editingVoucherId = null;
+document.addEventListener('DOMContentLoaded', fetchVouchers);
 
-        // Hiển thị dialog thêm voucher
-        addVoucherButton.addEventListener('click', () => {
-            dialogTitle.textContent = 'Thêm Voucher';
-            voucherForm.reset();
-            editingVoucherId = null;
-            voucherDialog.showModal();
+// Hàm lấy tất cả danh sách voucher
+async function fetchVouchers() {
+    try {
+        const response = await fetch(apiUrl);
+        const vouchers = await response.json();
+        displayVouchers(vouchers);
+    } catch (error) {
+        console.error('Error fetching vouchers:', error);
+    }
+}
+
+// Hàm hiển thị danh sách voucher lên bảng
+function displayVouchers(vouchers) {
+    const voucherTableBody = document.querySelector('#voucherTable tbody');
+    voucherTableBody.innerHTML = '';
+
+    vouchers.forEach(voucher => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${voucher.userId}</td>
+            <td>${voucher.title}</td>
+            <td>${voucher.type}</td>
+            <td>${voucher.description}</td>
+            <td>${new Date(voucher.startDate).toLocaleDateString()}</td>
+            <td>${new Date(voucher.expirationDate).toLocaleDateString()}</td>
+            <td>${voucher.quantity}</td>
+            <td>
+                <button onclick="deleteVoucher('${voucher._id}')">Xóa</button>
+            </td>
+        `;
+        voucherTableBody.appendChild(row);
+    });
+}
+
+// Hàm xóa voucher
+async function deleteVoucher(voucherId) {
+    try {
+        const response = await fetch(`http://192.168.3.106:3000/vouchers/${voucherId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
         });
 
-        // Đóng dialog
-        closeDialogButton.addEventListener('click', () => {
-            voucherDialog.close();
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message);
+            fetchVouchers(); // Reload danh sách voucher
+        } else {
+            alert(result.message);
+        }
+    } catch (error) {
+        console.error('Error deleting voucher:', error);
+    }
+}
+
+// Hàm tạo voucher mới
+document.getElementById('createVoucherForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const newVoucher = {
+        userId: document.getElementById('userId').value,
+        type: document.getElementById('type').value,
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        startDate: new Date(document.getElementById('startDate').value).toISOString(),
+        expirationDate: new Date(document.getElementById('expirationDate').value).toISOString(),
+        quantity: parseInt(document.getElementById('quantity').value),
+    };
+
+    try {
+        const response = await fetch('http://192.168.3.106:3000/vouchers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newVoucher),
         });
 
-        // Gửi form (thêm hoặc sửa voucher)
-        voucherForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const type = document.getElementById('voucher-type').value;
-            const title = document.getElementById('voucher-title').value;
-            const description = document.getElementById('voucher-description').value;
-            const expirationDate = document.getElementById('voucher-expiration').value;
-
-            const voucherData = {
-                type,
-                title,
-                description,
-                expirationDate,
-                isActive: true
-            };
-
-            try {
-                if (editingVoucherId) {
-                    // Sửa voucher
-                    await fetch(`http://192.168.0.7:3000/vouchers/${editingVoucherId}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(voucherData),
-                    });
-                    alert('Voucher đã được cập nhật!');
-                } else {
-                    // Thêm voucher
-                    await fetch('http://192.168.0.7:3000/vouchers', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(voucherData),
-                    });
-                    alert('Voucher đã được thêm!');
-                }
-                voucherDialog.close();
-                fetchVouchers();
-            } catch (error) {
-                console.error('Lỗi khi thêm/sửa voucher:', error);
-            }
-        });
-
-        // Hiển thị danh sách voucher
-        async function fetchVouchers() {
-            try {
-                const response = await fetch('http://192.168.0.7:3000/vouchers');
-                const vouchers = await response.json();
-
-                voucherList.innerHTML = '';
-                vouchers.forEach((voucher) => {
-                    const voucherElement = document.createElement('div');
-                    voucherElement.classList.add('voucher');
-                    voucherElement.innerHTML = `
-                        <h4>${voucher.title}</h4>
-                          <h4>${voucher.type}</h4>
-                        <p>Đơn tối thiểu: ${voucher.description}</p>
-                        <p>Ngày hết hạn: ${new Date(voucher.expirationDate).toLocaleDateString()}</p>
-                        <button onclick="editVoucher('${voucher._id}')">Sửa</button>
-                        <button onclick="deleteVoucher('${voucher._id}')">Xóa</button>
-                    `;
-                    voucherList.appendChild(voucherElement);
-                });
-            } catch (error) {
-                console.error('Lỗi khi lấy danh sách voucher:', error);
-            }
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message);
+            fetchVouchers(); // Reload danh sách voucher
+        } else {
+            alert(result.message);
         }
-
-        // Sửa voucher
-        async function editVoucher(voucherId) {
-            try {
-                const response = await fetch(`http://192.168.0.7:3000/vouchers/${voucherId}`);
-                const voucher = await response.json();
-
-                document.getElementById('voucher-type').value = voucher.type;
-                document.getElementById('voucher-title').value = voucher.title;
-                document.getElementById('voucher-description').value = voucher.description;
-                document.getElementById('voucher-expiration').value = new Date(voucher.expirationDate).toISOString().split('T')[0];
-                editingVoucherId = voucherId;
-
-                dialogTitle.textContent = 'Sửa Voucher';
-                voucherDialog.showModal();
-            } catch (error) {
-                console.error('Lỗi khi lấy voucher:', error);
-            }
-        }
-
-        // Xóa voucher
-        async function deleteVoucher(voucherId) {
-            if (confirm('Bạn có chắc chắn muốn xóa voucher này?')) {
-                try {
-                    await fetch(`http://192.168.0.7:3000/vouchers/${voucherId}`, { method: 'DELETE' });
-                    alert('Voucher đã được xóa!');
-                    fetchVouchers();
-                } catch (error) {
-                    console.error('Lỗi khi xóa voucher:', error);
-                }
-            }
-        }
-
-        // Lấy danh sách voucher khi tải trang
-        fetchVouchers();
-    </script>
+    } catch (error) {
+        console.error('Error creating voucher:', error);
+    }
+});
+</script>
 </body>
-
 </html>

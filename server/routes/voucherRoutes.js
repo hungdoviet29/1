@@ -1,5 +1,6 @@
 const express = require('express');
 const {
+  getAllVouchers,
   createVoucherByUser,
   getVouchersByUser,
   getVoucherByIdAndUser,
@@ -9,6 +10,8 @@ const {
 } = require('../controllers/voucherController');
 
 const router = express.Router();
+// Route lấy tất cả danh sách voucher
+router.get('/all', getAllVouchers); // Thêm route mới để lấy tất cả voucher
 
 // Route tạo voucher mới (theo userId)
 router.post('/', createVoucherByUser); // Đảm bảo route đúng là "/"
