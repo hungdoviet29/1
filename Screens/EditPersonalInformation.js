@@ -39,7 +39,7 @@ const EditPersonalInformation = ({route, navigation}) => {
     const updatedData = {...userData, [editField]: newValue};
     try {
       const response = await axios.put(
-        `http://192.168.0.4:3000/update/${userData._id}`,
+        `http://192.168.1.19:3000/update/${userData._id}`,
         updatedData,
       );
       if (response.status === 200) {
@@ -72,7 +72,7 @@ const EditPersonalInformation = ({route, navigation}) => {
 
     try {
       const response = await axios.post(
-        `http://192.168.0.4:3000/user/${userData._id}/image`, // Sử dụng đúng userId
+        `http://192.168.1.19:3000/user/${userData._id}/image`,
         formData,
         {
           headers: {
@@ -86,7 +86,7 @@ const EditPersonalInformation = ({route, navigation}) => {
 
         const updatedData = {...userData, avatar: avatarUrl};
         const updateResponse = await axios.put(
-          `http://192.168.0.4:3000/update/${userData._id}`,
+          `http://192.168.1.19:3000/update/${userData._id}`,
           updatedData,
         );
 
@@ -184,8 +184,8 @@ const EditPersonalInformation = ({route, navigation}) => {
 
         {/* Hiển thị avatar */}
         <TouchableOpacity style={styles.infoItem} onPress={handleAvatarChange}>
-          <Text style={styles.label}>Ảnh đại diện</Text>
           <Image source={{uri: avatar}} style={styles.avatar} />
+          <Text style={styles.label}>Thay đổi ảnh đại diện</Text>
         </TouchableOpacity>
 
         {/* Hiển thị tên đăng nhập */}
@@ -211,9 +211,10 @@ const EditPersonalInformation = ({route, navigation}) => {
           <Text style={styles.label}>Số điện thoại</Text>
           <Text style={styles.value}>{phone}</Text>
         </TouchableOpacity>
-        {/*Pass*/}
+
+        {/* Mật khẩu */}
         <TouchableOpacity
-          style={styles.infoItem5}
+          style={styles.infoItem}
           onPress={() => navigation.navigate('FixPasswordScreen')}>
           <Text style={styles.label}>Mật khẩu</Text>
           <Text style={styles.value}>******</Text>
@@ -246,25 +247,57 @@ const EditPersonalInformation = ({route, navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#F8F8F8', padding: 20},
-  headerContainer: {flexDirection: 'row', alignItems: 'center', padding: 10},
-  backButton: {marginRight: 10},
-  backIcon: {fontSize: 24, color: '#333'},
-  header: {fontSize: 22, fontWeight: 'bold'},
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F8F8',
+    padding: 20,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  backIcon: {
+    fontSize: 24,
+    color: '#333',
+  },
+  header: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+  },
   infoItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-    paddingVertical: 15,
     backgroundColor: '#FFFFFF',
+    padding: 15,
+    borderRadius: 8,
     marginBottom: 15,
-    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: {width: 0, height: 2},
+    elevation: 2,
   },
-  label: {fontSize: 16, color: '#333'},
-  value: {fontSize: 16, color: '#666'},
-  avatar: {width: 50, height: 50, borderRadius: 25},
+  label: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
+  value: {
+    fontSize: 16,
+    color: '#666',
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 15,
+  },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -272,20 +305,33 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
-    width: '80%',
+    width: '90%',
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    shadowOffset: {width: 0, height: 2},
+    elevation: 5,
   },
-  modalTitle: {fontSize: 18, marginBottom: 10},
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#333',
+  },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
     padding: 10,
     borderRadius: 5,
-    marginBottom: 10,
+    marginBottom: 15,
   },
-  modalButtons: {flexDirection: 'row', justifyContent: 'space-between'},
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
 });
 
 export default EditPersonalInformation;

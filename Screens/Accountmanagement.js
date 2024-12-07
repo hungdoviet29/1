@@ -25,7 +25,7 @@ const AccountManagement = () => {
           return;
         }
         const response = await axios.get(
-          `http://192.168.0.104:3000/users/${userId}`,
+          `http://192.168.1.19:3000/users/${userId}`,
         );
         setUserInfo(response.data);
       } catch (error) {
@@ -48,7 +48,7 @@ const AccountManagement = () => {
   if (!userInfo) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007BFF" />
+        <ActivityIndicator size="large" color="#3498DB" />
         <Text style={styles.loadingText}>Đang tải thông tin...</Text>
       </View>
     );
@@ -62,7 +62,7 @@ const AccountManagement = () => {
         <Text style={styles.backIcon}>←</Text>
       </TouchableOpacity>
 
-      <Text style={styles.header}>Account Management</Text>
+      <Text style={styles.header}>Quản lý tài khoản</Text>
 
       {/* Header thông tin người dùng */}
       <View style={styles.headerContainer}>
@@ -73,9 +73,7 @@ const AccountManagement = () => {
         <Text style={styles.name}>
           {userInfo.tenDangNhap || 'Nguyễn Văn A'}
         </Text>
-        <Text style={styles.userId}>
-          ID: {userInfo._id || 'Không xác định'}
-        </Text>
+        <Text style={styles.userId}>ID: {userInfo._id || 'Không xác định'}</Text>
       </View>
 
       {/* Danh sách tùy chọn */}
@@ -84,8 +82,7 @@ const AccountManagement = () => {
           style={styles.optionItem}
           onPress={() =>
             navigation.navigate('EditPersonalInformation', {userData: userInfo})
-          } // Truyền userInfo sang màn tiếp theo
-        >
+          }>
           <Text style={styles.optionIcon}>👤</Text>
           <Text style={styles.optionText}>Chỉnh sửa thông tin</Text>
           <Text style={styles.arrow}>›</Text>
@@ -100,16 +97,6 @@ const AccountManagement = () => {
           <Text style={styles.optionText}>Thông tin liên hệ</Text>
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
-
-        {/* <TouchableOpacity
-          style={styles.optionItem}
-          onPress={() =>
-            navigation.navigate('DirectMessaging', {userData: userInfo})
-          }>
-          <Text style={styles.optionIcon}>💬</Text>
-          <Text style={styles.optionText}>Nhắn tin trực tiếp</Text>
-          <Text style={styles.arrow}>›</Text>
-        </TouchableOpacity> */}
       </View>
 
       {/* Nút đăng xuất */}
@@ -123,31 +110,36 @@ const AccountManagement = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#F4F6F9',
     padding: 20,
   },
   backButton: {
     position: 'absolute',
     top: 20,
     left: 10,
+    padding: 10,
   },
   backIcon: {
     fontSize: 24,
-    color: '#333',
+    color: '#34495E',
   },
   header: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
+    color: '#2C3E50',
     marginVertical: 20,
   },
   headerContainer: {
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 5,
     marginBottom: 20,
   },
   avatar: {
@@ -159,17 +151,21 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#34495E',
   },
   userId: {
     fontSize: 14,
-    color: '#888',
+    color: '#7F8C8D',
     marginTop: 5,
   },
   optionList: {
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 5,
     paddingVertical: 10,
   },
   optionItem: {
@@ -178,24 +174,24 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: '#ECECEC',
   },
   optionIcon: {
     fontSize: 22,
-    color: '#007BFF',
+    color: '#3498DB',
     marginRight: 15,
   },
   optionText: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
+    color: '#2C3E50',
   },
   arrow: {
     fontSize: 18,
-    color: '#888',
+    color: '#7F8C8D',
   },
   logoutButton: {
-    backgroundColor: '#FF4B4B',
+    backgroundColor: '#E74C3C',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
@@ -215,7 +211,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 18,
-    color: '#555',
+    color: '#7F8C8D',
   },
 });
 
