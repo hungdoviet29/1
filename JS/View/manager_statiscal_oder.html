@@ -141,6 +141,21 @@
   .button-container button:hover {
     background-color: #5a54d6;
   }
+  .button-container .highlight-button {
+    background-color: #ff5722 !important; /* Màu cam nổi bật */
+    color: white !important;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.button-container .highlight-button:hover {
+    background-color: #e64a19 !important; /* Màu cam đậm hơn khi hover */
+}
+
     </style>
 </head>
 
@@ -160,7 +175,7 @@
         </ul>
       </nav>
       <div class="button-container">
-        <button onclick="location.href='manager_statiscal_oder.html'">Thống Kê Đơn Hàng</button>
+        <button class="highlight-button" onclick="location.href='manager_statiscal_oder.html'">Thống Kê Đơn hàng</button>
         <button onclick="location.href='manager_statistical.html'">Thống Kê Sản Phẩm</button>
         <button onclick="location.href='user_statistics.html'">Thống Kê Người Dùng</button>
       </div>
