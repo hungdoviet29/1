@@ -120,7 +120,8 @@ button:hover {
         </div>
     </div>
 
-    <script>const apiUrl = 'http://192.168.3.106:3000/vouchers/all'; // Địa chỉ API để lấy tất cả các voucher
+    <script>
+const apiUrl = 'http://192.168.3.106:3000/vouchers/all'; // Địa chỉ API để lấy tất cả các voucher
 
 document.addEventListener('DOMContentLoaded', fetchVouchers);
 
@@ -151,7 +152,7 @@ function displayVouchers(vouchers) {
             <td>${new Date(voucher.expirationDate).toLocaleDateString()}</td>
             <td>${voucher.quantity}</td>
             <td>
-                <button onclick="deleteVoucher('${voucher._id}')">Xóa</button>
+                <button onclick="deleteVoucher('${voucher._id}', '${voucher.userId}')">Xóa</button>
             </td>
         `;
         voucherTableBody.appendChild(row);
@@ -159,11 +160,14 @@ function displayVouchers(vouchers) {
 }
 
 // Hàm xóa voucher
-async function deleteVoucher(voucherId) {
+async function deleteVoucher(voucherId, userId) {
     try {
         const response = await fetch(`http://192.168.3.106:3000/vouchers/${voucherId}`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId }), // Gửi userId trong body
         });
 
         const result = await response.json();
@@ -211,5 +215,6 @@ document.getElementById('createVoucherForm').addEventListener('submit', async (e
     }
 });
 </script>
+
 </body>
 </html>

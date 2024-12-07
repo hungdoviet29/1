@@ -148,23 +148,28 @@ const updateVoucherByUser = async (req, res) => {
 };
 
 // Xóa voucher theo ID và userId
+// Xóa voucher theo ID và userId
 const deleteVoucherByUser = async (req, res) => {
   try {
     const {id} = req.params;
-    const {userId} = req.body;
+    const {userId} = req.body;  // Lấy userId từ body của yêu cầu DELETE
 
-    const deletedVoucher = await Voucher.findOneAndDelete({_id: id, userId});
-    if (!deletedVoucher) {
-      return res
-        .status(404)
-        .json({message: 'Voucher không tồn tại hoặc không thuộc về user này'});
+    if (!userId) {
+      return res.status(400).json({message: 'Thiếu userId'});
     }
+
+    const deletedVoucher = await Voucher.findOneAndDelete({ _id: id, userId });
+    if (!deletedVoucher) {
+      return res.status(404).json({message: 'Voucher không tồn tại hoặc không thuộc về user này'});
+    }
+
     return res.status(200).json({message: 'Voucher đã bị xóa'});
   } catch (error) {
     console.error('Error deleting voucher:', error);
     return res.status(500).json({message: 'Lỗi khi xóa voucher', error});
   }
 };
+
 
 // Cập nhật số lượng voucher khi đã sử dụng
 const useVoucher = async (req, res) => {
