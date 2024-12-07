@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống Kê Người Dùng</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background-color: #6c63ff;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filters label,
+        .filters select,
+        .filters input,
+        .filters button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .filters button {
+            background-color: #6c63ff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        .filters button:hover {
+            background-color: #5a54d6;
+        }
+
+        .table-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #6c63ff;
+            color: white;
+        }
+        nav {
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #6c63ff;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .button-container button {
+            padding: 10px 20px;
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .button-container button:hover {
+            background-color: #5a54d6;
+        }
+
+        .button-container .highlight-button {
+            background-color: #ff5722 !important;
+            /* Màu cam nổi bật */
+            color: white !important;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .button-container .highlight-button:hover {
+            background-color: #e64a19 !important;
+            /* Màu cam đậm hơn khi hover */
+        }
+    </style>
+</head>
+
+<body>
+    <header>Bảng Điều Khiển Quản Lý</header>
+    <nav>
+        <ul>
+
+            <li><a href="manager.html">Đơn Hàng</a></li>
+            <li>
+                <a href="manager_laptops.html" style="text-decoration: none; color: #6c63ff;">Sản phẩm</a>
+            </li>
+            <li><a href="manager_user.html">Người Dùng</a></li>
+            <li><a href="manager_discount.html">Voucher</a></li>
+            <li><a href="manager_statistical.html">Thống kê</a></li>
+            <li><a href="login.html">Đăng Xuất</a></li>
+        </ul>
+    </nav>
+    <div class="button-container">
+        <button onclick="location.href='manager_statiscal_oder.html'">Thống Kê Đơn Hàng</button>
+
+        <button onclick="location.href='manager_statistical.html'">Thống Kê Sản Phẩm</button>
+        <button class="highlight-button" onclick="location.href='user_statistics.html'">Thống Kê Người Dùng</button>
+    </div>
+    <div class="container">
+        <div class="filters">
+            <label for="year">Năm:</label>
+            <select id="year">
+                <option value="">Tất cả</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+            </select>
+
+            <label for="month">Tháng:</label>
+            <select id="month">
+                <option value="">Tất cả</option>
+                <option value="1">Tháng 1</option>
+                <option value="2">Tháng 2</option>
+                <option value="3">Tháng 3</option>
+                <option value="4">Tháng 4</option>
+                <option value="5">Tháng 5</option>
+                <option value="6">Tháng 6</option>
+                <option value="7">Tháng 7</option>
+                <option value="8">Tháng 8</option>
+                <option value="9">Tháng 9</option>
+                <option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option>
+                <option value="12">Tháng 12</option>
+            </select>
+
+            <label for="start-date">Từ ngày:</label>
+            <input type="date" id="start-date">
+
+            <label for="end-date">Đến ngày:</label>
+            <input type="date" id="end-date">
+
+            <button id="filter-button">Lọc</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Người Dùng</th>
+                        <th>Tên Người Dùng</th>
+                        <th>Email</th>
+                        <th>Số Điện Thoại</th>
+                        <th>Tổng Số Đơn Hàng</th>
+                        <th>Tổng Doanh Thu</th>
+                    </tr>
+                </thead>
+                <tbody id="user-statistics-body">
+                    <!-- Dữ liệu thống kê sẽ được hiển thị tại đây -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("filter-button").addEventListener("click", () => {
+            const startDate = document.getElementById("start-date").value;
+            const endDate = document.getElementById("end-date").value;
+            const year = document.getElementById("year").value;
+            const month = document.getElementById("month").value;
+            const userStatisticsBody = document.getElementById("user-statistics-body");
+
+            fetch("http://192.168.101.9:3000/donhang")
+                .then(response => response.json())
+                .then(orders => {
+                    // Tính toán thống kê người dùng
+                    const userStatistics = {};
+
+                    orders.forEach(order => {
+                        const orderDate = new Date(order.createdAt);
+
+                        const isYearMatch = year ? orderDate.getFullYear() === parseInt(year) : true;
+                        const isMonthMatch = month ? (orderDate.getMonth() + 1) === parseInt(month) : true;
+                        const isStartDateMatch = startDate ? orderDate >= new Date(startDate) : true;
+                        const isEndDateMatch = endDate ? orderDate <= new Date(new Date(endDate).setHours(23, 59, 59, 999)) : true;
+
+                        if (
+                            order.status.toLowerCase() === "thành công" &&
+                            isYearMatch &&
+                            isMonthMatch &&
+                            isStartDateMatch &&
+                            isEndDateMatch
+                        ) {
+                            const userId = order.userId;
+                            const userName = order.shippingInfo.name || "Không xác định";
+                            const userEmail = order.shippingInfo.email || "Không xác định";
+                            const userPhone = order.shippingInfo.phone || "Không xác định";
+
+                            if (!userStatistics[userId]) {
+                                userStatistics[userId] = {
+                                    name: userName,
+                                    email: userEmail,
+                                    phone: userPhone,
+                                    orders: 0,
+                                    revenue: 0,
+                                };
+                            }
+
+                            userStatistics[userId].orders += 1;
+                            userStatistics[userId].revenue += order.totalAmount;
+                        }
+                    });
+
+                    // Sắp xếp theo doanh thu
+                    const sortedStatistics = Object.entries(userStatistics)
+                        .sort(([, a], [, b]) => b.revenue - a.revenue);
+
+                    // Hiển thị dữ liệu
+                    userStatisticsBody.innerHTML = "";
+                    sortedStatistics.forEach(([userId, stats]) => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${userId}</td>
+                            <td>${stats.name}</td>
+                            <td>${stats.email}</td>
+                            <td>${stats.phone}</td>
+                            <td>${stats.orders}</td>
+                            <td>${stats.revenue.toLocaleString()} VND</td>
+                        `;
+                        userStatisticsBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error("Lỗi khi tải dữ liệu:", error));
+        });
+    </script>
+</body>
+
+</html>
