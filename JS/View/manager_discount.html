@@ -1,83 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Discount</title>
 </head>
+
 <body>
     <style>
         body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f9;
-}
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
 
-.container {
-    width: 80%;
-    margin: 0 auto;
-    padding: 20px;
-}
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-}
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-.voucher-form {
-    margin-bottom: 30px;
-}
+        .voucher-form {
+            margin-bottom: 30px;
+        }
 
-.voucher-form input,
-.voucher-form button {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
+        .voucher-form input,
+        .voucher-form button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
 
-button {
-    background-color: #4CAF50;
-    color: white;
-    cursor: pointer;
-}
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
 
-button:hover {
-    background-color: #45a049;
-}
+        button:hover {
+            background-color: #45a049;
+        }
 
-#voucherTable {
-    width: 100%;
-    border-collapse: collapse;
-}
+        #voucherTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-#voucherTable th,
-#voucherTable td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-}
+        #voucherTable th,
+        #voucherTable td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
 
-#voucherTable th {
-    background-color: #f2f2f2;
-}
+        #voucherTable th {
+            background-color: #f2f2f2;
+        }
 
-#voucherTable td button {
-    padding: 5px 10px;
-    background-color: #ff6347;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
+        #voucherTable td button {
+            padding: 5px 10px;
+            background-color: #ff6347;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
 
-#voucherTable td button:hover {
-    background-color: #e53e3e;
-}
+        #voucherTable td button:hover {
+            background-color: #e53e3e;
+        }
 
+        header {
+            background-color: #6c63ff;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav {
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #6c63ff;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
     </style>
-    <div class="container">
+    <header>Bảng Điều Khiển Quản Lý</header>
+   
+        
+        <nav>
+            <ul>
+                <li><a href="manager.html">Đơn Hàng</a></li>
+                <li><a href="manager_laptops.html">Sản phẩm</a></li>
+                <li><a href="manager_user.html">Người Dùng</a></li>
+                <li><a href="manager_discount.html">Khuyến mại</a></li>
+                <li><a href="manager_statistical.html">Thống kê</a></li>
+                <li><a href="login.html">Đăng Xuất</a></li>
+            </ul>
+        </nav>
+        <div class="container">
         <h1>Quản lý Voucher</h1>
 
         <!-- Form tạo voucher mới -->
@@ -121,29 +174,29 @@ button:hover {
     </div>
 
     <script>
-const apiUrl = 'http://192.168.3.106:3000/vouchers/all'; // Địa chỉ API để lấy tất cả các voucher
+        const apiUrl = 'http://192.168.101.9:3000/vouchers/all'; // Địa chỉ API để lấy tất cả các voucher
 
-document.addEventListener('DOMContentLoaded', fetchVouchers);
+        document.addEventListener('DOMContentLoaded', fetchVouchers);
 
-// Hàm lấy tất cả danh sách voucher
-async function fetchVouchers() {
-    try {
-        const response = await fetch(apiUrl);
-        const vouchers = await response.json();
-        displayVouchers(vouchers);
-    } catch (error) {
-        console.error('Error fetching vouchers:', error);
-    }
-}
+        // Hàm lấy tất cả danh sách voucher
+        async function fetchVouchers() {
+            try {
+                const response = await fetch(apiUrl);
+                const vouchers = await response.json();
+                displayVouchers(vouchers);
+            } catch (error) {
+                console.error('Error fetching vouchers:', error);
+            }
+        }
 
-// Hàm hiển thị danh sách voucher lên bảng
-function displayVouchers(vouchers) {
-    const voucherTableBody = document.querySelector('#voucherTable tbody');
-    voucherTableBody.innerHTML = '';
+        // Hàm hiển thị danh sách voucher lên bảng
+        function displayVouchers(vouchers) {
+            const voucherTableBody = document.querySelector('#voucherTable tbody');
+            voucherTableBody.innerHTML = '';
 
-    vouchers.forEach(voucher => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
+            vouchers.forEach(voucher => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
             <td>${voucher.userId}</td>
             <td>${voucher.title}</td>
             <td>${voucher.type}</td>
@@ -155,41 +208,49 @@ function displayVouchers(vouchers) {
                 <button onclick="deleteVoucher('${voucher._id}', '${voucher.userId}')">Xóa</button>
             </td>
         `;
-        voucherTableBody.appendChild(row);
-    });
-}
-
-// Hàm xóa voucher
-async function deleteVoucher(voucherId, userId) {
-    try {
-        const response = await fetch(`http://192.168.3.106:3000/vouchers/${voucherId}`, {
-            method: 'DELETE',
-            headers: { 
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId }), // Gửi userId trong body
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-            alert(result.message);
-            fetchVouchers(); // Reload danh sách voucher
-        } else {
-            alert(result.message);
+                voucherTableBody.appendChild(row);
+            });
         }
-    } catch (error) {
-        console.error('Error deleting voucher:', error);
-    }
-}
 
-// Hàm tạo voucher mới
-document.getElementById('createVoucherForm').addEventListener('submit', async (event) => {
+        // Hàm xóa voucher
+        async function deleteVoucher(voucherId, userId) {
+            try {
+                const response = await fetch(`http://192.168.101.9:3000/vouchers/${voucherId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId }), // Gửi userId trong body
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                    fetchVouchers(); // Reload danh sách voucher
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error('Error deleting voucher:', error);
+            }
+        }
+
+        // Hàm tạo voucher mới
+        document.getElementById('createVoucherForm').addEventListener('submit', async (event) => {
     event.preventDefault();
+
+    const title = document.getElementById('title').value;
+
+    // Kiểm tra tiêu đề chỉ cho phép số và nằm trong khoảng từ 1 đến 99
+    if (!/^\d+$/.test(title) || parseInt(title) <= 0 || parseInt(title) >= 100) {
+        alert('Tiêu đề phải là một số lớn hơn 0 và nhỏ hơn 100');
+        return;
+    }
 
     const newVoucher = {
         userId: document.getElementById('userId').value,
         type: document.getElementById('type').value,
-        title: document.getElementById('title').value,
+        title: title,
         description: document.getElementById('description').value,
         startDate: new Date(document.getElementById('startDate').value).toISOString(),
         expirationDate: new Date(document.getElementById('expirationDate').value).toISOString(),
@@ -197,7 +258,7 @@ document.getElementById('createVoucherForm').addEventListener('submit', async (e
     };
 
     try {
-        const response = await fetch('http://192.168.3.106:3000/vouchers', {
+        const response = await fetch('http://192.168.101.9:3000/vouchers', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newVoucher),
@@ -214,7 +275,9 @@ document.getElementById('createVoucherForm').addEventListener('submit', async (e
         console.error('Error creating voucher:', error);
     }
 });
-</script>
+
+    </script>
 
 </body>
+
 </html>
