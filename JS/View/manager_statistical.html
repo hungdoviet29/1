@@ -107,6 +107,27 @@
       background-color: #6c63ff;
       color: white;
     }
+    .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+  }
+
+  .button-container button {
+    padding: 10px 20px;
+    background-color: #6c63ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .button-container button:hover {
+    background-color: #5a54d6;
+  }
   </style>
 </head>
 
@@ -126,7 +147,11 @@
       <li><a href="login.html">Đăng Xuất</a></li>
     </ul>
   </nav>
-
+  <div class="button-container">
+    <button onclick="location.href='manager_statiscal_oder.html'">Thống Kê Đơn Hàng</button>
+    <button onclick="location.href='manager_statistical.html'">Thống Kê Sản Phẩm</button>
+    <button onclick="location.href='user_statistics.html'">Thống Kê Người Dùng</button>
+  </div>
   <div class="container">
     <!-- Thẻ Tóm Tắt -->
     <div id="summary-cards-container"></div>
@@ -134,7 +159,7 @@
 
     <!-- Bảng Chi Tiết -->
     <div class="table-container">
-      <h3>Thống kê</h3>
+      <h3>Thống kê sản phẩm bán chạy</h3>
       <div class="filters">
         <label for="month">Tháng:</label>
         <select id="month">
@@ -229,68 +254,70 @@
     });
 
     document.getElementById("filter-button").addEventListener("click", () => {
-      const month = document.getElementById("month").value;
-      const year = document.getElementById("year").value;
-      const startDate = document.getElementById("start-date").value;
-      const endDate = document.getElementById("end-date").value;
+    const month = document.getElementById("month").value;
+    const year = document.getElementById("year").value;
+    const startDate = document.getElementById("start-date").value;
+    const endDate = document.getElementById("end-date").value;
 
-      const statisticsBody = document.getElementById("statistics-body");
-      statisticsBody.innerHTML = ""; // Xóa dữ liệu cũ
+    const statisticsBody = document.getElementById("statistics-body");
+    statisticsBody.innerHTML = ""; // Xóa dữ liệu cũ
 
-      // Gọi API đơn hàng
-      fetch("http://192.168.0.7:3000/donhang")
+    // Gọi API đơn hàng
+    fetch("http://192.168.101.9:3000/donhang")
         .then(response => response.json())
         .then(orders => {
-          // Lọc đơn hàng theo ngày, tháng, và năm
-          const filteredOrders = orders.filter(order => {
-            const orderDate = new Date(order.createdAt);
+            // Lọc đơn hàng theo trạng thái "Thành công" và các bộ lọc khác
+            const filteredOrders = orders.filter(order => {
+                const orderDate = new Date(order.createdAt);
 
-            const isMonthMatch = month ? orderDate.getMonth() + 1 === parseInt(month) : true;
-            const isYearMatch = year ? orderDate.getFullYear() === parseInt(year) : true;
-            const isStartMatch = startDate ? orderDate >= new Date(startDate) : true;
-            const isEndMatch = endDate ? orderDate <= new Date(endDate) : true;
+                const isStatusSuccess = order.status.toLowerCase() === "thành công";
+                const isMonthMatch = month ? orderDate.getMonth() + 1 === parseInt(month) : true;
+                const isYearMatch = year ? orderDate.getFullYear() === parseInt(year) : true;
+                const isStartMatch = startDate ? orderDate >= new Date(startDate) : true;
+                const isEndMatch = endDate ? orderDate <= new Date(endDate) : true;
 
-            return isMonthMatch && isYearMatch && isStartMatch && isEndMatch;
-          });
-
-          // Tính toán thống kê
-          const statistics = {};
-          filteredOrders.forEach(order => {
-            order.cartItems.forEach(item => {
-              const productId = item.productId?._id || "unknown";
-              const productName = item.productId?.ten || "Sản phẩm không xác định";
-              const productPrice = item.productId?.gia || 0;
-
-              if (!statistics[productId]) {
-                statistics[productId] = {
-                  id: productId,
-                  name: productName,
-                  sold: 0,
-                  revenue: 0,
-                };
-              }
-              statistics[productId].sold += item.quantity;
-              statistics[productId].revenue += item.quantity * productPrice;
+                return isStatusSuccess && isMonthMatch && isYearMatch && isStartMatch && isEndMatch;
             });
-          });
 
-          // Hiển thị dữ liệu thống kê
-          const sortedStatistics = Object.values(statistics).sort((a, b) => b.sold - a.sold);
+            // Tính toán thống kê sản phẩm
+            const statistics = {};
+            filteredOrders.forEach(order => {
+                order.cartItems.forEach(item => {
+                    const productId = item.productId?._id || "unknown";
+                    const productName = item.productId?.ten || "Sản phẩm không xác định";
+                    const productPrice = item.productId?.gia || 0;
 
-          sortedStatistics.forEach(stat => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                        <td>${stat.id}</td>
-                        <td>${stat.name}</td>
-                        <td>${stat.sold}</td>
-                        <td>${stat.revenue.toLocaleString()} VND</td>
-                        <td>${startDate || "Toàn thời gian"}</td>
-                    `;
-            statisticsBody.appendChild(row);
-          });
+                    if (!statistics[productId]) {
+                        statistics[productId] = {
+                            id: productId,
+                            name: productName,
+                            sold: 0,
+                            revenue: 0,
+                        };
+                    }
+                    statistics[productId].sold += item.quantity;
+                    statistics[productId].revenue += item.quantity * productPrice;
+                });
+            });
+
+            // Hiển thị dữ liệu thống kê
+            const sortedStatistics = Object.values(statistics).sort((a, b) => b.sold - a.sold);
+
+            sortedStatistics.forEach(stat => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${stat.id}</td>
+                    <td>${stat.name}</td>
+                    <td>${stat.sold}</td>
+                    <td>${stat.revenue.toLocaleString()} VND</td>
+                    <td>${startDate || "Toàn thời gian"}</td>
+                `;
+                statisticsBody.appendChild(row);
+            });
         })
         .catch(error => console.error("Lỗi khi tải dữ liệu thống kê:", error));
-    });
+});
+
   </script>
 
 

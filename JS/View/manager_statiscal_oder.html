@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống Kê Doanh Thu</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background-color: #6c63ff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .summary-section {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            width: 300px;
+            margin: 10px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .summary-card p {
+            font-size: 18px;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filters label {
+            font-weight: bold;
+        }
+
+        .filters select,
+        .filters input {
+            padding: 5px;
+        }
+
+        canvas {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #6c63ff;
+            color: white;
+        }
+        nav {
+      background-color: #fff;
+      padding: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    nav ul li {
+      margin: 0 10px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: #6c63ff;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    nav ul li a:hover {
+      text-decoration: underline;
+    }
+    .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+  }
+
+  .button-container button {
+    padding: 10px 20px;
+    background-color: #6c63ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .button-container button:hover {
+    background-color: #5a54d6;
+  }
+    </style>
+</head>
+
+<body>
+    <header>Bảng Điều Khiển Quản Lý</header>
+    <nav>
+        <ul>
+    
+          <li><a href="manager.html">Đơn Hàng</a></li>
+          <li>
+            <a href="manager_laptops.html" style="text-decoration: none; color: #6c63ff;">Sản phẩm</a>
+          </li>
+          <li><a href="manager_user.html">Người Dùng</a></li>
+          <li><a href="manager_discount.html">Voucher</a></li>
+          <li><a href="manager_statistical.html">Thống kê</a></li>
+          <li><a href="login.html">Đăng Xuất</a></li>
+        </ul>
+      </nav>
+      <div class="button-container">
+        <button onclick="location.href='manager_statiscal_oder.html'">Thống Kê Đơn Hàng</button>
+        <button onclick="location.href='manager_statistical.html'">Thống Kê Sản Phẩm</button>
+        <button onclick="location.href='user_statistics.html'">Thống Kê Người Dùng</button>
+      </div>
+    <div class="container">
+        <!-- Tổng quan -->
+        <div class="summary-section">
+            <div class="summary-card">
+                <h3>Tổng Doanh Thu</h3>
+                <p id="total-revenue">0 VND</p>
+            </div>
+            <div class="summary-card">
+                <h3>Tổng Lợi Nhuận</h3>
+                <p id="total-profit">0 VND</p>
+            </div>
+            <div class="summary-card">
+                <h3>Số Lượng Đơn Hàng</h3>
+                <p id="total-orders">0</p>
+            </div>
+        </div>
+
+        <!-- Bộ lọc -->
+        <div class="filters">
+            <label for="time-range">Khoảng thời gian:</label>
+            <select id="time-range">
+                <option value="today">Hôm nay</option>
+                <option value="yesterday">Hôm qua</option>
+                <option value="last-month">1 tháng trước</option>
+                <option value="last-year">1 năm trước</option>
+            </select>
+            <label for="start-date">Từ ngày:</label>
+            <input type="date" id="start-date">
+            <label for="end-date">Đến ngày:</label>
+            <input type="date" id="end-date">
+            <label for="chart-type">Hiển thị theo:</label>
+            <select id="chart-type">
+                <option value="day">Ngày</option>
+                <option value="month">Tháng</option>
+                <option value="year">Năm</option>
+            </select>
+
+            <button id="filter-button">Lọc</button>
+        </div>
+
+        <!-- Biểu đồ -->
+        <canvas id="revenueChart" width="400" height="200"></canvas>
+
+        <!-- Bảng -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Đơn Hàng</th>
+                    <th>Tên Người Nhận</th>
+                    <th>Doanh Thu (VND)</th>
+                    <th>Lợi Nhuận (VND)</th>
+                    <th>Ngày Tạo</th>
+                </tr>
+            </thead>
+            <tbody id="order-table-body"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Lắng nghe thay đổi trong dropdown "Khoảng thời gian"
+        document.getElementById("time-range").addEventListener("change", () => {
+            const timeRange = document.getElementById("time-range").value;
+            const startDateInput = document.getElementById("start-date");
+            const endDateInput = document.getElementById("end-date");
+
+            const now = new Date();
+            let start, end;
+
+            switch (timeRange) {
+                case "today":
+                    start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+                    break;
+                case "yesterday":
+                    start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                    end = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 59, 59);
+                    break;
+                case "last-month":
+                    start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59); // Ngày cuối cùng của tháng trước
+                    break;
+                case "last-year":
+                    start = new Date(now);
+                    start.setDate(now.getDate() - 365); // Lùi lại 365 ngày
+                    end = now; // Ngày hiện tại
+                    break;
+                default:
+                    start = null;
+                    end = null;
+                    break;
+            }
+
+            // Điền giá trị vào ô "Từ ngày" và "Đến ngày"
+            startDateInput.value = start ? start.toISOString().split("T")[0] : "";
+            endDateInput.value = end ? end.toISOString().split("T")[0] : "";
+        });
+
+        // Lắng nghe sự kiện nút "Lọc"
+        document.getElementById("filter-button").addEventListener("click", () => {
+            const startDate = document.getElementById("start-date").value;
+            const endDate = document.getElementById("end-date").value;
+
+            // Kiểm tra ngày nhập vào
+            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+                alert("Ngày bắt đầu không được lớn hơn ngày kết thúc.");
+                return;
+            }
+
+            fetch("http://192.168.101.9:3000/donhang")
+                .then(response => response.json())
+                .then(orders => {
+                    const filteredOrders = orders.filter(order => {
+                        if (!order.createdAt || order.status.toLowerCase() !== "thành công") return false;
+
+                        const orderDate = new Date(order.createdAt);
+                        const start = new Date(startDate + "T00:00:00");
+                        const end = new Date(endDate + "T23:59:59");
+                        return orderDate >= start && orderDate <= end;
+                    });
+
+                    if (filteredOrders.length === 0) {
+                        alert("Không tìm thấy đơn hàng nào trong trạng thái 'Thành công' trong khoảng thời gian này.");
+                        return;
+                    }
+
+                    updateSummary(filteredOrders);
+                    displayChart(filteredOrders);
+                    populateTable(filteredOrders);
+                })
+                .catch(error => console.error("Lỗi khi tải dữ liệu:", error));
+        });
+
+        // Hàm cập nhật tổng quan
+        function updateSummary(orders) {
+            const totalRevenue = orders.reduce((sum, order) => sum + order.totalAmount, 0);
+            const totalProfit = totalRevenue * 0.2; // Giả định lợi nhuận là 20%
+
+            document.getElementById("total-revenue").textContent = `${totalRevenue.toLocaleString()} VND`;
+            document.getElementById("total-profit").textContent = `${totalProfit.toLocaleString()} VND`;
+            document.getElementById("total-orders").textContent = orders.length;
+        }
+
+        // Hàm hiển thị biểu đồ
+        function displayChart(orders) {
+            const chartType = document.getElementById("chart-type").value;
+            const labels = [];
+            const data = [];
+
+            orders.forEach(order => {
+                const date = new Date(order.createdAt);
+                const label = chartType === "day"
+                    ? date.toLocaleDateString("vi-VN")
+                    : chartType === "month"
+                        ? `${date.getMonth() + 1}/${date.getFullYear()}`
+                        : date.getFullYear();
+
+                if (!labels.includes(label)) {
+                    labels.push(label);
+                    data.push(order.totalAmount);
+                } else {
+                    const index = labels.indexOf(label);
+                    data[index] += order.totalAmount;
+                }
+            });
+
+            if (window.chart) window.chart.destroy();
+            window.chart = new Chart(document.getElementById("revenueChart").getContext("2d"), {
+                type: "bar",
+                data: {
+                    labels,
+                    datasets: [{ label: "Doanh Thu (VND)", data, backgroundColor: "rgba(75, 192, 192, 0.6)" }]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        // Hàm hiển thị bảng
+        function populateTable(orders) {
+            const tableBody = document.getElementById("order-table-body");
+            tableBody.innerHTML = "";
+
+            orders.forEach(order => {
+                const profit = order.totalAmount * 0.2;
+                tableBody.innerHTML += `
+            <tr>
+                <td>${order._id}</td>
+                <td>${order.shippingInfo.name}</td>
+                <td>${order.totalAmount.toLocaleString()} VND</td>
+                <td>${profit.toLocaleString()} VND</td>
+                <td>${new Date(order.createdAt).toLocaleDateString("vi-VN")}</td>
+            </tr>`;
+            });
+        }
+
+
+    </script>
+</body>
+
+</html>
