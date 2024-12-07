@@ -293,7 +293,7 @@
             const isMonthMatch = month ? orderDate.getMonth() + 1 === parseInt(month) : true;
             const isYearMatch = year ? orderDate.getFullYear() === parseInt(year) : true;
             const isStartMatch = startDate ? orderDate >= new Date(startDate) : true;
-            const isEndMatch = endDate ? orderDate <= new Date(endDate) : true;
+            const isEndDateMatch = endDate ? orderDate <= new Date(new Date(endDate).setHours(23, 59, 59, 999)) : true;
 
             return isStatusSuccess && isMonthMatch && isYearMatch && isStartMatch && isEndMatch;
           });
