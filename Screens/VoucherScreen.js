@@ -21,7 +21,7 @@ const VoucherScreen = ({navigation, route}) => {
     const fetchVouchers = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://192.168.3.106:3000/vouchers');
+        const response = await fetch('http://192.168.0.245:3000/vouchers');
         const data = await response.json();
         setVouchers(data);
       } catch (error) {

@@ -47,7 +47,7 @@ const CheckoutScreen = ({navigation, route}) => {
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
-        const url = `http://192.168.101.9:3000/vouchers?userId=${userId}`;
+        const url = `http://192.168.0.245:3000/vouchers?userId=${userId}`;
         const response = await fetch(url);
         const data = await response.json();
         if (response.ok) {
@@ -65,7 +65,7 @@ const CheckoutScreen = ({navigation, route}) => {
   const fetchCartItems = async id => {
     setLoading(true);
     try {
-      const response = await fetch(`http://192.168.101.9:3000/cart/${id}`);
+      const response = await fetch(`http://192.168.0.245:3000/cart/${id}`);
       const data = await response.json();
       if (response.ok) {
         setCartItems(data.items || []);
@@ -141,7 +141,7 @@ const CheckoutScreen = ({navigation, route}) => {
 
             try {
               const response = await fetch(
-                'http://192.168.101.9:3000/donhang',
+                'http://192.168.0.245:3000/donhang',
                 {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
@@ -184,7 +184,7 @@ const CheckoutScreen = ({navigation, route}) => {
         quantity: selectedVoucher.quantity - 1,
       };
       const response = await fetch(
-        `http://192.168.101.9:3000/vouchers/${voucherId}`,
+        `http://192.168.0.245:3000/vouchers/${voucherId}`,
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
@@ -201,11 +201,11 @@ const CheckoutScreen = ({navigation, route}) => {
 
   const resetCart = async () => {
     try {
-      const response = await fetch(`http://192.168.101.9:3000/cart/${userId}`);
+      const response = await fetch(`http://192.168.0.245:3000/cart/${userId}`);
       const data = await response.json();
       if (data && data.items && data.items.length > 0) {
         const deleteResponse = await fetch(
-          `http://192.168.101.9:3000/cart/${userId}`,
+          `http://192.168.0.245:3000/cart/${userId}`,
           {
             method: 'DELETE',
           },

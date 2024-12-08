@@ -37,7 +37,7 @@ const FixPasswordScreen = ({navigation}) => {
 
     try {
       const response = await fetch(
-        `http://192.168.1.17:3000/users/changePassword/${userId}`, // Truyền userId vào URL
+        `http://192.168.0.245:3000/users/changePassword/${userId}`, // Truyền userId vào URL
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
