@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import { Linking } from 'react-native';
+
 
 const screenWidth = Dimensions.get('window').width;
 const banners = [
@@ -107,7 +109,19 @@ const MainHome = () => {
         </TouchableOpacity>
       </View>
     ));
-
+    const openZalo = () => {
+      // Chuyển đến cuộc trò chuyện Zalo với số điện thoại hoặc tài khoản Zalo
+      const zaloUrl = 'https://zalo.me/0357103658'; // Đổi số điện thoại theo ý muốn
+      Linking.canOpenURL(zaloUrl)
+        .then((supported) => {
+          if (supported) {
+            Linking.openURL(zaloUrl);
+          } else {
+            console.log('Không thể mở Zalo');
+          }
+        })
+        .catch((err) => console.error('Lỗi khi mở Zalo:', err));
+    };
   return (
     <View style={styles.container}>
       {loading ? (
@@ -306,7 +320,15 @@ const MainHome = () => {
     </View>
   </View>
 </Modal>
-
+<TouchableOpacity
+  style={styles.zaloButton}
+  onPress={openZalo}
+>
+  <Image
+    source={require('../acssets/zalo1.png')}
+    style={styles.zaloIcon}
+  />
+</TouchableOpacity>
           {/* Product Categories */}
           <View style={styles.fixedCategories}>
             <TouchableOpacity onPress={() => navigation.navigate('Home', { category: 'Popular' })}>
@@ -365,15 +387,6 @@ const MainHome = () => {
                 style={styles.iconNav}
               />
             </TouchableOpacity>
-            <TouchableOpacity
-  style={styles.zaloButton}
-  onPress={() => console.log("Nút Zalo được nhấn") /* Thực hiện hành động khi nhấn nút Zalo */}
->
-  <Image
-    source={require('../acssets/zalo1.png')} // Đường dẫn tới icon Zalo
-    style={styles.zaloIcon}
-  />
-</TouchableOpacity>
           </View>
         </ScrollView>
       )}
@@ -405,16 +418,20 @@ const styles = StyleSheet.create({
     height: 30,  // Chỉnh kích thước icon (có thể thay đổi theo yêu cầu)
   },
 
-  zaloButton: {
-    position: 'absolute',
-    right: 10,
-    bottom: 70,  // Cách từ dưới lên 70 đơn vị
-    zIndex: 1,
-  },
-  zaloIcon: {
-    width: 50,
-    height: 50,
-  },
+
+    // Các style khác...
+    zaloButton: {
+      position: 'absolute', // Đặt vị trí tuyệt đối
+      right: 10,            // Cách từ phải 10 đơn vị
+      bottom:'50%',           // Cách từ dưới lên 20 đơn vị (có thể thay đổi tùy nhu cầu)
+      zIndex: 1,            // Đảm bảo nút nổi lên trên các thành phần khác
+    },
+    zaloIcon: {
+      width: 50,   // Kích thước icon Zalo
+      height: 50,
+    },
+    // Các style khác...
+
   
   iconButton: {
     marginHorizontal: 5,           // Khoảng cách 5 đơn vị giữa các icon
