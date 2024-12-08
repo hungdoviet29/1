@@ -16,22 +16,21 @@ const OrderScreen = ({ navigation }) => {
   const [userId, setUserId] = useState(null);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState('Tất cả');
+  const [selectedTab, setSelectedTab] = useState('All');
   const [refreshTrigger, setRefreshTrigger] = useState(false);
 
   const statusMap = {
-    'Tất cả': (id) => `http://192.168.101.9:3000/donhang/user/${id}`,
-    'Chờ xác nhận': (id) =>
-      `http://192.168.101.9:3000/donhang/user/${id}/status?status=${encodeURIComponent('Chờ xác nhận')}`,
-    'Chờ vận chuyển': (id) =>
-      `http://192.168.101.9:3000/donhang/user/${id}/status?status=${encodeURIComponent('Chờ vận chuyển')}`,
-    'Đang vận chuyển': (id) =>
-      `http://192.168.101.9:3000/donhang/user/${id}/status?status=${encodeURIComponent('Đang vận chuyển')}`,
-    'Đã hủy': (id) =>
-      `http://192.168.101.9:3000/donhang/user/${id}/status?status=${encodeURIComponent('Đã hủy')}`,
+    'All': (id) => `http://192.168.0.245:3000/donhang/user/${id}`,
+    'Pending Confirmation': (id) =>
+      `http://192.168.0.245:3000/donhang/user/${id}/status?status=${encodeURIComponent('Pending Confirmation')}`,
+    'Pending Shipment': (id) =>
+      `http://192.168.0.245:3000/donhang/user/${id}/status?status=${encodeURIComponent('Pending Shipment')}`,
+    'In Transit': (id) =>
+      `http://192.168.0.245:3000/donhang/user/${id}/status?status=${encodeURIComponent('In Transit')}`,
+    'Cancelled': (id) =>
+      `http://192.168.0.245:3000/donhang/user/${id}/status?status=${encodeURIComponent('Cancelled')}`,
   };
 
-  // Lấy userId từ AsyncStorage
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -39,11 +38,11 @@ const OrderScreen = ({ navigation }) => {
         if (id) {
           setUserId(id);
         } else {
-          Alert.alert('Lỗi', 'Không tìm thấy User ID. Vui lòng đăng nhập lại.');
+          Alert.alert('Error', 'User ID not found. Please log in again.');
         }
       } catch (error) {
-        console.error('Lỗi khi lấy User ID:', error);
-        Alert.alert('Lỗi', 'Không thể truy xuất User ID.');
+        console.error('Error fetching User ID:', error);
+        Alert.alert('Error', 'Unable to retrieve User ID.');
       } finally {
         setLoading(false);
       }
@@ -51,7 +50,6 @@ const OrderScreen = ({ navigation }) => {
     fetchUserId();
   }, []);
 
-  // Gọi API lấy danh sách đơn hàng
   const fetchOrders = async () => {
     if (!userId) return;
 
@@ -63,24 +61,23 @@ const OrderScreen = ({ navigation }) => {
       const response = await fetch(url);
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Lỗi khi tải đơn hàng: ${errorText}`);
+        throw new Error(`Error loading orders: ${errorText}`);
       }
 
       const data = await response.json();
       if (Array.isArray(data)) {
         setOrders(data);
       } else {
-        throw new Error('Dữ liệu trả về từ API không hợp lệ.');
+        throw new Error('Invalid data returned from API.');
       }
     } catch (error) {
-      console.error('Lỗi khi tải đơn hàng:', error.message);
-      Alert.alert('Lỗi', error.message);
+      console.error('Error loading orders:', error.message);
+      Alert.alert('Error', error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Theo dõi thay đổi tab hoặc refresh
   useEffect(() => {
     if (userId) {
       fetchOrders();
@@ -89,54 +86,54 @@ const OrderScreen = ({ navigation }) => {
 
   const cancelOrder = async (orderId) => {
     try {
-      const response = await fetch(`http://192.168.101.9:3000/donhang/${orderId}`, {
+      const response = await fetch(`http://192.168.0.245:3000/donhang/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Đã hủy' }),
+        body: JSON.stringify({ status: 'Cancelled' }),
       });
 
       if (!response.ok) {
-        throw new Error('Không thể hủy đơn hàng. Vui lòng thử lại.');
+        throw new Error('Unable to cancel order. Please try again.');
       }
 
       const data = await response.json();
-      Alert.alert('Thành công', data.message);
+      Alert.alert('Success', data.message);
       setRefreshTrigger((prev) => !prev);
     } catch (error) {
-      console.error('Lỗi khi hủy đơn hàng:', error.message);
-      Alert.alert('Lỗi', error.message);
+      console.error('Error cancelling order:', error.message);
+      Alert.alert('Error', error.message);
     }
   };
 
   const confirmReceived = async (orderId) => {
     try {
-      const response = await fetch(`http://192.168.101.9:3000/donhang/${orderId}`, {
+      const response = await fetch(`http://192.168.0.245:3000/donhang/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Thành công' }),
+        body: JSON.stringify({ status: 'Completed' }),
       });
 
       if (!response.ok) {
-        throw new Error('Không thể xác nhận đơn hàng. Vui lòng thử lại.');
+        throw new Error('Unable to confirm order. Please try again.');
       }
 
       const data = await response.json();
-      Alert.alert('Thành công', data.message);
+      Alert.alert('Success', data.message);
       setRefreshTrigger((prev) => !prev);
     } catch (error) {
-      console.error('Lỗi khi xác nhận đơn hàng:', error.message);
-      Alert.alert('Lỗi', error.message);
+      console.error('Error confirming order:', error.message);
+      Alert.alert('Error', error.message);
     }
   };
 
   const renderOrderItem = ({ item: order }) => (
     <View style={styles.orderItem}>
-      <Text style={styles.productName}>{`Tên người nhận: ${order.shippingInfo?.name || ''}`}</Text>
-      <Text style={styles.productBrand}>{`Số điện thoại: ${order.shippingInfo?.phone || ''}`}</Text>
-      <Text style={styles.productBrand}>{`Địa chỉ: ${order.shippingInfo?.address || ''}`}</Text>
-      <Text style={styles.productPrice}>Tổng tiền: {order.totalAmount?.toLocaleString()} VND</Text>
-      <Text style={styles.orderStatus}>Trạng thái: {order.status}</Text>
-      <Text style={styles.productsTitle}>Sản phẩm trong đơn hàng:</Text>
+      <Text style={styles.productName}>{`Recipient: ${order.shippingInfo?.name || ''}`}</Text>
+      <Text style={styles.productBrand}>{`Phone: ${order.shippingInfo?.phone || ''}`}</Text>
+      <Text style={styles.productBrand}>{`Address: ${order.shippingInfo?.address || ''}`}</Text>
+      <Text style={styles.productPrice}>Total: {order.totalAmount?.toLocaleString()} VND</Text>
+      <Text style={styles.orderStatus}>Status: {order.status}</Text>
+      <Text style={styles.productsTitle}>Products in Order:</Text>
       {order.cartItems?.map((item) => (
         <View key={item._id} style={styles.cartItem}>
           <Image
@@ -145,23 +142,23 @@ const OrderScreen = ({ navigation }) => {
           />
           <View style={styles.itemDetails}>
             <Text style={styles.itemName}>
-              {item.productId?.ten || 'Sản phẩm không xác định'}
+              {item.productId?.ten || 'Unknown Product'}
             </Text>
             <Text style={styles.itemPrice}>
-              {item.productId?.gia ? `${item.productId.gia.toLocaleString()} VND` : 'Không có giá'}
+              {item.productId?.gia ? `${item.productId.gia.toLocaleString()} VND` : 'No price'}
             </Text>
-            <Text style={styles.itemQuantity}>Số lượng: {item.quantity}</Text>
+            <Text style={styles.itemQuantity}>Quantity: {item.quantity}</Text>
           </View>
         </View>
       ))}
-      {order.status === 'Chờ xác nhận' && (
+      {order.status === 'Pending Confirmation' && (
         <TouchableOpacity style={styles.cancelButton} onPress={() => cancelOrder(order._id)}>
-          <Text style={styles.buttonText}>Hủy đơn</Text>
+          <Text style={styles.buttonText}>Cancel Order</Text>
         </TouchableOpacity>
       )}
-      {order.status === 'Đang vận chuyển' && (
+      {order.status === 'In Transit' && (
         <TouchableOpacity style={styles.confirmButton} onPress={() => confirmReceived(order._id)}>
-          <Text style={styles.buttonText}>Đã nhận hàng</Text>
+          <Text style={styles.buttonText}>Confirm Received</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -173,7 +170,7 @@ const OrderScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image source={require('../acssets/BackButton.png')} style={styles.icon} />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Đơn Hàng</Text>
+        <Text style={styles.headerText}>Order Screen</Text>
       </View>
 
       <View style={styles.tabsContainer}>
@@ -193,24 +190,21 @@ const OrderScreen = ({ navigation }) => {
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#6C63FF" />
-          <Text>Đang tải...</Text>
+          <Text>Loading...</Text>
         </View>
       ) : orders.length === 0 ? (
-        <Text style={styles.noOrdersText}>Không có đơn hàng nào.</Text>
+        <Text style={styles.noOrdersText}>No orders found.</Text>
       ) : (
         <FlatList
           data={orders}
           keyExtractor={(item) => item._id}
           renderItem={renderOrderItem}
-          ListFooterComponent={<View style={{ height: 80 }} />} // Thêm khoảng trống 80px
+          ListFooterComponent={<View style={{ height: 80 }} />}
         />
       )}
     </View>
   );
 };
-
-
-
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
@@ -226,8 +220,8 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center', // Căn giữa nội dung văn bản
-    flex: 1, // Đảm bảo chiếm không gian giữa
+    textAlign: 'center',
+    flex: 1,
   },
   tabsContainer: {
     marginHorizontal: 16,
@@ -252,46 +246,40 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  ordersList: { padding: 16 },
   orderItem: {
     backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    marginBottom: 20,
     padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
   },
-  productInfo: { flex: 1 },
-  productName: { fontSize: 16, fontWeight: 'bold' },
-  productBrand: { fontSize: 14, color: '#888' },
-  productPrice: { fontSize: 16, fontWeight: 'bold', color: '#333', marginVertical: 5 },
-  orderStatus: { fontSize: 12, color: '#aaa' },
-  productsTitle: { fontSize: 14, fontWeight: 'bold', marginTop: 10 },
-  cartItem: { flexDirection: 'row', marginBottom: 16, padding: 12, backgroundColor: '#fff' },
-  itemImage: { width: 60, height: 60, borderRadius: 8, marginRight: 12 },
-  itemDetails: { justifyContent: 'center', flex: 1 },
-  itemName: { fontSize: 14, fontWeight: 'bold', color: '#333' },
-  itemPrice: { fontSize: 12, color: '#666' },
+  productName: { fontSize: 16, fontWeight: 'bold', marginBottom: 4 },
+  productBrand: { fontSize: 14, color: '#555' },
+  productPrice: { fontSize: 14, color: '#333', marginVertical: 8 },
+  orderStatus: { fontSize: 14, color: '#888' },
+  productsTitle: { fontSize: 14, fontWeight: 'bold', marginTop: 8 },
+  cartItem: { flexDirection: 'row', marginVertical: 8 },
+  itemImage: { width: 60, height: 60, borderRadius: 8 },
+  itemDetails: { marginLeft: 12, flex: 1 },
+  itemName: { fontSize: 14, fontWeight: 'bold' },
+  itemPrice: { fontSize: 12, color: '#888' },
   itemQuantity: { fontSize: 12, color: '#888' },
-  noOrdersText: { textAlign: 'center', fontSize: 16, color: '#999' },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   cancelButton: {
-    marginTop: 10,
+    marginTop: 12,
     paddingVertical: 10,
-    borderRadius: 5,
-    backgroundColor: '#FF4C4C',
+    backgroundColor: '#FF6347',
+    borderRadius: 8,
     alignItems: 'center',
   },
   confirmButton: {
-    marginTop: 10,
+    marginTop: 12,
     paddingVertical: 10,
-    borderRadius: 5,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#32CD32',
+    borderRadius: 8,
     alignItems: 'center',
   },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
+  buttonText: { color: '#fff', fontWeight: 'bold' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  noOrdersText: { textAlign: 'center', marginTop: 20, fontSize: 16, color: '#888' },
 });
 
 export default OrderScreen;
