@@ -7,7 +7,7 @@ const NotificationScreen = ({ route, navigation }) => {
     const { message } = route.params || {};
     const [userId, setUserId] = useState(null);
 
-    // Lấy userId từ AsyncStorage khi màn hình được hiển thị
+    // Fetch userId from AsyncStorage when the screen loads
     useEffect(() => {
         const fetchUserId = async () => {
             try {
@@ -15,20 +15,20 @@ const NotificationScreen = ({ route, navigation }) => {
                 if (id) {
                     setUserId(id);
                 } else {
-                    Alert.alert('Lỗi', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+                    Alert.alert('Error', 'User information not found. Please log in again.');
                 }
             } catch (error) {
-                console.error('Lỗi khi lấy userId:', error);
+                console.error('Error fetching userId:', error);
             }
         };
 
         fetchUserId();
     }, []);
 
-    // Load thông báo từ AsyncStorage khi màn hình được hiển thị
+    // Load notifications from AsyncStorage when the screen loads
     useEffect(() => {
         const loadNotifications = async () => {
-            if (!userId) return; // Chỉ tải khi có userId
+            if (!userId) return;
 
             try {
                 const storedNotifications = await AsyncStorage.getItem(`notifications_${userId}`);
@@ -36,36 +36,33 @@ const NotificationScreen = ({ route, navigation }) => {
                     setNotifications(JSON.parse(storedNotifications));
                 }
             } catch (error) {
-                console.error('Lỗi khi tải thông báo:', error);
+                console.error('Error loading notifications:', error);
             }
         };
 
         loadNotifications();
     }, [userId]);
 
-    // Lưu thông báo mới khi có
+    // Add new notification when a message is received
     useEffect(() => {
         if (message && userId) {
             const addNotification = async () => {
                 try {
-                    // Lấy thông báo cũ từ AsyncStorage theo userId
                     const storedNotifications = await AsyncStorage.getItem(`notifications_${userId}`);
                     const currentNotifications = storedNotifications ? JSON.parse(storedNotifications) : [];
 
-                    // Tạo danh sách thông báo mới
                     const newNotifications = [
-                        ...currentNotifications, // Thêm thông báo cũ
-                        { id: Date.now(), text: message }, // Thêm thông báo mới
+                        ...currentNotifications,
+                        { id: Date.now(), text: message },
                     ];
 
-                    // Cập nhật state và lưu vào AsyncStorage
                     setNotifications(newNotifications);
                     await AsyncStorage.setItem(
-                        `notifications_${userId}`, // Lưu thông báo theo userId
+                        `notifications_${userId}`,
                         JSON.stringify(newNotifications)
                     );
                 } catch (error) {
-                    console.error('Lỗi khi lưu thông báo:', error);
+                    console.error('Error saving notification:', error);
                 }
             };
 
@@ -73,23 +70,23 @@ const NotificationScreen = ({ route, navigation }) => {
         }
     }, [message, userId]);
 
-    // Xóa tất cả thông báo
+    // Clear all notifications
     const clearNotifications = async () => {
         if (!userId) return;
 
         Alert.alert(
-            'Xóa tất cả thông báo',
-            'Bạn có chắc chắn muốn xóa tất cả thông báo?',
+            'Clear All Notifications',
+            'Are you sure you want to clear all notifications?',
             [
-                { text: 'Hủy', style: 'cancel' },
+                { text: 'Cancel', style: 'cancel' },
                 {
-                    text: 'Đồng ý',
+                    text: 'Confirm',
                     onPress: async () => {
                         try {
                             await AsyncStorage.removeItem(`notifications_${userId}`);
-                            setNotifications([]); // Cập nhật state
+                            setNotifications([]);
                         } catch (error) {
-                            console.error('Lỗi khi xóa thông báo:', error);
+                            console.error('Error clearing notifications:', error);
                         }
                     },
                 },
@@ -100,7 +97,7 @@ const NotificationScreen = ({ route, navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Thông báo của bạn</Text>
+            <Text style={styles.title}>Your Notifications</Text>
             {notifications.length > 0 ? (
                 <FlatList
                     data={notifications}
@@ -112,20 +109,20 @@ const NotificationScreen = ({ route, navigation }) => {
                     )}
                 />
             ) : (
-                <Text style={styles.noNotifications}>Không có thông báo nào</Text>
+                <Text style={styles.noNotifications}>No notifications available</Text>
             )}
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity
                     style={styles.backButton}
                     onPress={() => navigation.navigate('Home')}
                 >
-                    <Text style={styles.backButtonText}>Quay lại trang chủ</Text>
+                    <Text style={styles.buttonText}>Back to Home</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.clearButton}
                     onPress={clearNotifications}
                 >
-                    <Text style={styles.clearButtonText}>Xóa tất cả thông báo</Text>
+                    <Text style={styles.buttonText}>Clear All</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -139,17 +136,23 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     title: {
-        fontSize: 24,
+        fontSize: 26,
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 20,
         color: '#333',
     },
     notificationItem: {
-        backgroundColor: '#e9ecef',
-        padding: 15,
-        borderRadius: 8,
-        marginBottom: 10,
+        backgroundColor: '#ffffff',
+        padding: 16,
+        borderRadius: 12,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 3,
     },
     notificationText: {
         fontSize: 16,
@@ -159,7 +162,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#aaa',
         textAlign: 'center',
-        marginTop: 20,
+        marginTop: 30,
     },
     buttonsContainer: {
         flexDirection: 'row',
@@ -167,29 +170,26 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     backButton: {
-        backgroundColor: '#f68b1e',
-        padding: 10,
-        borderRadius: 5,
+        backgroundColor: '#4CAF50',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
         flex: 1,
-        marginRight: 5,
+        marginRight: 10,
         alignItems: 'center',
-    },
-    backButtonText: {
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: 'bold',
     },
     clearButton: {
-        backgroundColor: '#dc3545',
-        padding: 10,
-        borderRadius: 5,
+        backgroundColor: '#f44336',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
         flex: 1,
-        marginLeft: 5,
+        marginLeft: 10,
         alignItems: 'center',
     },
-    clearButtonText: {
+    buttonText: {
         color: '#fff',
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: 'bold',
     },
 });
