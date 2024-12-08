@@ -160,10 +160,7 @@ const ProductScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.sectionTitle}>MÔ TẢ</Text>
-            <Text style={styles.descriptionText}>{product.moTa}</Text>
-          </View>
+          
           <View style={styles.descriptionContainer}>
             <Text style={styles.sectionTitle}>CPU</Text>
             <Text style={styles.descriptionText}>{product.CPU}</Text>
@@ -178,6 +175,10 @@ const ProductScreen = () => {
           </View><View style={styles.descriptionContainer}>
             <Text style={styles.sectionTitle}>KichThuocManHinh</Text>
             <Text style={styles.descriptionText}>{product.KichThuocManHinh}</Text>
+          </View>
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.sectionTitle}>MÔ TẢ</Text>
+            <Text style={styles.descriptionText}>{product.moTa}</Text>
           </View>
           <TouchableOpacity
             style={styles.addToCartButton}
