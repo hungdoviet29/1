@@ -47,7 +47,7 @@ const CheckoutScreen = ({navigation, route}) => {
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
-        const url = `http://192.168.0.245:3000/vouchers?userId=${userId}`;
+        const url = `http://192.168.1.19:3000/vouchers?userId=${userId}`;
         const response = await fetch(url);
         const data = await response.json();
         if (response.ok) {
@@ -65,7 +65,7 @@ const CheckoutScreen = ({navigation, route}) => {
   const fetchCartItems = async id => {
     setLoading(true);
     try {
-      const response = await fetch(`http://192.168.0.245:3000/cart/${id}`);
+      const response = await fetch(`http://192.168.1.19:3000/cart/${id}`);
       const data = await response.json();
       if (response.ok) {
         setCartItems(data.items || []);
@@ -141,7 +141,7 @@ const CheckoutScreen = ({navigation, route}) => {
 
             try {
               const response = await fetch(
-                'http://192.168.0.245:3000/donhang',
+                'http://192.168.1.19:3000/donhang',
                 {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
@@ -184,7 +184,7 @@ const CheckoutScreen = ({navigation, route}) => {
         quantity: selectedVoucher.quantity - 1,
       };
       const response = await fetch(
-        `http://192.168.0.245:3000/vouchers/${voucherId}`,
+        `http://192.168.1.19:3000/vouchers/${voucherId}`,
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
@@ -201,11 +201,11 @@ const CheckoutScreen = ({navigation, route}) => {
 
   const resetCart = async () => {
     try {
-      const response = await fetch(`http://192.168.0.245:3000/cart/${userId}`);
+      const response = await fetch(`http://192.168.1.19:3000/cart/${userId}`);
       const data = await response.json();
       if (data && data.items && data.items.length > 0) {
         const deleteResponse = await fetch(
-          `http://192.168.0.245:3000/cart/${userId}`,
+          `http://192.168.1.19:3000/cart/${userId}`,
           {
             method: 'DELETE',
           },
@@ -407,127 +407,157 @@ const CheckoutScreen = ({navigation, route}) => {
     </ScrollView>
   );
 };
+const colors = {
+  primary: '#F8B400',
+  textPrimary: '#000',
+  textSecondary: '#555',
+  border: '#ccc',
+  error: 'red',
+  background: '#fff',
+};
+
+const sizes = {
+  padding: 15,
+  margin: 10,
+  borderRadius: 5,
+  inputHeight: 50,
+  fontSize: 16,
+};
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: sizes.margin,
+    backgroundColor: colors.background,
+    flex: 1,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: sizes.margin * 2,
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: colors.textPrimary,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
   cartItem: {
     flexDirection: 'row',
-    marginBottom: 10,
+    marginBottom: sizes.margin,
   },
   itemImage: {
     width: 60,
     height: 60,
-    marginRight: 10,
+    marginRight: sizes.margin,
   },
   itemDetails: {
     justifyContent: 'center',
   },
   itemName: {
-    fontSize: 16,
+    fontSize: sizes.fontSize,
+    color: colors.textPrimary,
   },
   itemPrice: {
-    fontSize: 14,
-    color: 'gray',
+    fontSize: sizes.fontSize - 2,
+    color: colors.textSecondary,
   },
   itemQuantity: {
-    fontSize: 14,
-    color: 'gray',
+    fontSize: sizes.fontSize - 2,
+    color: colors.textSecondary,
   },
   shippingContainer: {
-    marginBottom: 20,
+    marginBottom: sizes.margin * 2,
   },
   shippingTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: sizes.margin,
+    color: colors.textPrimary,
   },
   input: {
+    height: sizes.inputHeight,
     borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
+    borderColor: colors.border,
+    padding: sizes.padding,
+    marginBottom: sizes.margin,
+    borderRadius: sizes.borderRadius,
   },
   errorText: {
-    color: 'red',
+    color: colors.error,
     fontSize: 12,
-    marginBottom: 10,
+    marginBottom: sizes.margin,
   },
   paymentContainer: {
-    marginBottom: 20,
+    marginBottom: sizes.margin * 2,
   },
   paymentTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: sizes.margin,
+    color: colors.textPrimary,
   },
   paymentMethod: {
-    fontSize: 16,
-    padding: 10,
+    fontSize: sizes.fontSize,
+    padding: sizes.padding,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    borderColor: colors.border,
+    borderRadius: sizes.borderRadius,
+    color: colors.textPrimary,
   },
   paymentDropdown: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    marginTop: 10,
-    padding: 5,
-    borderRadius: 5,
+    borderColor: colors.border,
+    marginTop: sizes.margin,
+    padding: sizes.padding,
+    borderRadius: sizes.borderRadius,
   },
   dropdownItem: {
-    padding: 10,
-    fontSize: 16,
+    padding: sizes.padding,
+    fontSize: sizes.fontSize,
+    color: colors.textPrimary,
   },
   voucherContainer: {
-    marginBottom: 20,
+    marginBottom: sizes.margin * 2,
   },
   voucherTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: sizes.margin,
+    color: colors.textPrimary,
   },
   voucherButton: {
-    padding: 10,
+    padding: sizes.padding,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    borderColor: colors.border,
+    borderRadius: sizes.borderRadius,
   },
   voucherText: {
-    fontSize: 16,
+    fontSize: sizes.fontSize,
+    color: colors.textPrimary,
   },
   total: {
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: sizes.margin * 2,
+    color: colors.textPrimary,
   },
   checkoutButton: {
     backgroundColor: '#F8B400',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
-  },
+    marginTop: 20, // Add this property to push the button higher
+    marginBottom: 80, // Optional, adjust for spacing
+},
+
   checkoutButtonText: {
     fontSize: 18,
-    color: '#fff',
+    color: colors.background,
   },
   modalOverlay: {
     flex: 1,
@@ -536,28 +566,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 5,
+    backgroundColor: colors.background,
+    padding: sizes.padding * 2,
+    borderRadius: sizes.borderRadius,
     width: '80%',
   },
   modalItem: {
-    padding: 10,
+    padding: sizes.padding,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: colors.border,
   },
   modalItemText: {
-    fontSize: 16,
+    fontSize: sizes.fontSize,
+    color: colors.textPrimary,
   },
   modalCloseButton: {
-    padding: 10,
-    backgroundColor: '#F8B400',
-    borderRadius: 5,
-    marginTop: 10,
+    padding: sizes.padding,
+    backgroundColor: colors.primary,
+    borderRadius: sizes.borderRadius,
+    marginTop: sizes.margin,
     alignItems: 'center',
   },
   modalCloseText: {
-    color: '#fff',
+    color: colors.background,
   },
 });
 

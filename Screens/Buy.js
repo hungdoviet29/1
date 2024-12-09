@@ -42,7 +42,7 @@ const ProductScreen = () => {
         navigation.navigate('Login');
         return;
       }
-      await axios.post('http://192.168.0.245:3000/cart/add', {
+      await axios.post('http://192.168.1.19:3000/cart/add', {
         userId,
         productId: product._id,
         quantity,
@@ -69,7 +69,7 @@ const ProductScreen = () => {
 
       if (isFavorite) {
         // Xóa sản phẩm khỏi yêu thích
-        await axios.post('http://192.168.0.245:3000/removeFavoriteProduct', {
+        await axios.post('http://192.168.1.19:3000/removeFavoriteProduct', {
           userId,
           productId: product._id,
         });
@@ -77,7 +77,7 @@ const ProductScreen = () => {
         Alert.alert('Thành công', 'Sản phẩm đã bị gỡ khỏi danh sách yêu thích');
       } else {
         // Thêm sản phẩm vào yêu thích
-        await axios.post('http://192.168.0.245:3000/addFavoriteProduct', {
+        await axios.post('http://192.168.1.19:3000/addFavoriteProduct', {
           userId,
           productId: product._id,
         });
@@ -105,7 +105,7 @@ const ProductScreen = () => {
           return;
 }
         const response = await axios.get(
-          `http://192.168.0.245:3000/favorites/${userId}`,
+          `http://192.168.1.19:3000/favorites/${userId}`,
         );
         const favoriteList = response.data.favorites || [];
         const isFavorite = favoriteList.some(item => item._id === product._id);
@@ -180,11 +180,13 @@ const ProductScreen = () => {
             <Text style={styles.sectionTitle}>MÔ TẢ</Text>
             <Text style={styles.descriptionText}>{product.moTa}</Text>
           </View>
-          <TouchableOpacity
-            style={styles.addToCartButton}
-            onPress={handleAddToCart}>
-            <Text style={styles.addToCartText}>THÊM VÀO GIỎ HÀNG</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+  <TouchableOpacity
+    style={styles.addToCartButton}
+    onPress={handleAddToCart}>
+    <Text style={styles.addToCartText}>THÊM VÀO GIỎ HÀNG</Text>
+  </TouchableOpacity>
+</View>
         </View>
       </ScrollView>
     </View>
@@ -198,7 +200,25 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
+    
   },
+  buttonContainer: {
+    marginTop: 16,  // Space above the button
+    marginBottom: 24, // Space below the button
+    width: '100%', // Ensure the container is full width
+    alignItems: 'center', // Center the button horizontally
+  },
+  
+  addToCartButton: {
+    backgroundColor: '#4A90E2',
+    borderRadius: 25,
+    paddingVertical: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 350, // Fixed width in pixels
+    alignSelf: 'center', // Centers the button horizontally
+  },
+  
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -207,6 +227,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
   },
+  
+  
+  
   icon: {
     width: 24,
     height: 24,

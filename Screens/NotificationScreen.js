@@ -174,18 +174,22 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         paddingHorizontal: 20,
         borderRadius: 8,
-        flex: 1,
+        flex: 2,
         marginRight: 10,
         alignItems: 'center',
+        marginTop: 20, // Add this property to push the button higher
+    marginBottom: 50,
     },
     clearButton: {
         backgroundColor: '#f44336',
         paddingVertical: 12,
         paddingHorizontal: 20,
         borderRadius: 8,
-        flex: 1,
+        flex: 2,
         marginLeft: 10,
         alignItems: 'center',
+        marginTop: 20, // Add this property to push the button higher
+    marginBottom: 50,
     },
     buttonText: {
         color: '#fff',
