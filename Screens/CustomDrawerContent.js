@@ -3,7 +3,6 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator, Ale
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import LinearGradient from 'react-native-linear-gradient';
 
 const CustomDrawerContent = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -14,14 +13,14 @@ const CustomDrawerContent = () => {
       try {
         const userId = await AsyncStorage.getItem('userId');
         if (!userId) {
-          Alert.alert('Error', 'User information not found.');
+          Alert.alert('Lỗi', 'Không tìm thấy thông tin đăng nhập.');
           return;
         }
-        const response = await axios.get(`http://192.168.0.245:3000/users/${userId}`);
+        const response = await axios.get(`http://192.168.101.9:3000/users/${userId}`);
         setUserInfo(response.data);
       } catch (error) {
-        console.error('Error fetching user info:', error);
-        Alert.alert('Error', 'Unable to load user information.');
+        console.error('Lỗi khi lấy thông tin người dùng:', error);
+        Alert.alert('Lỗi', 'Không thể tải thông tin người dùng.');
       }
     };
 
@@ -31,30 +30,32 @@ const CustomDrawerContent = () => {
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('userId');
+      // Redirect to login screen after logout
       navigation.navigate('Login');
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error('Lỗi khi đăng xuất:', error);
     }
   };
 
   if (!userInfo) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1E90FF" />
-        <Text style={styles.loadingText}>Loading user information...</Text>
+        <ActivityIndicator size="large" color="#007BFF" />
+        <Text style={styles.loadingText}>Đang tải thông tin...</Text>
       </View>
     );
   }
 
   return (
-    <LinearGradient colors={['#1E90FF', '#87CEFA']} style={styles.drawerContainer}>
+    
+    <View style={styles.drawerContainer}>
       {/* Profile Section */}
       <View style={styles.profileSection}>
         <Image
           source={{ uri: userInfo.avatar || 'https://via.placeholder.com/100' }}
           style={styles.profileImage}
         />
-        <Text style={styles.profileName}>{userInfo.username}</Text>
+        <Text style={styles.profileName}>{userInfo.tenDangNhap}</Text>
         <Text style={styles.profileEmail}>{userInfo.email}</Text>
       </View>
 
@@ -67,7 +68,7 @@ const CustomDrawerContent = () => {
 
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Favorite')}>
           <Image source={require('../acssets/Favorite.png')} style={styles.menuIcon} />
-          <Text style={styles.menuText}>Favorites</Text>
+          <Text style={styles.menuText}>Favorite</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('OderScreen')}>
@@ -93,36 +94,35 @@ const CustomDrawerContent = () => {
 
       {/* Logout Button */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Image source={require('../acssets/Group6893.png')} style={styles.logoutIcon} />
+        <Image source={require('../acssets/Group6893.png')} />
         <Text style={styles.logoutText}>LOG OUT</Text>
       </TouchableOpacity>
-    </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   drawerContainer: {
     flex: 1,
+    backgroundColor: '#6C63FF', // Adjust to match background in the image
   },
   profileSection: {
     padding: 20,
     alignItems: 'center',
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 45,
-    marginBottom: 0,
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 10,
   },
   profileName: {
-    color: '#FFFFFF',
-    fontSize: 22,
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
   },
   profileEmail: {
-    color: '#D3D3D3',
+    color: '#fff',
     fontSize: 14,
     marginTop: 5,
   },
@@ -134,52 +134,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     paddingHorizontal: 20,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    marginHorizontal: 15,
     marginBottom: 10,
   },
   menuIcon: {
-    width: 28,
-    height: 28,
+    width: 24,
+    height: 24,
     marginRight: 15,
-    tintColor: '#FFFFFF',
   },
   menuText: {
     fontSize: 16,
-    color: '#FFFFFF',
-    fontWeight: '600',
+    color: '#fff',
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 'auto',
-    marginBottom:25,
-    marginHorizontal: 15,
     paddingVertical: 15,
     paddingHorizontal: 20,
+    
+    marginBottom: 20,
     borderRadius: 8,
-    backgroundColor: '#FF6347',
-  },
-  logoutIcon: {
-    width: 24,
-    height: 24,
-    marginRight: 15,
   },
   logoutText: {
     fontSize: 16,
     color: '#FFFFFF',
-    fontWeight: 'bold',
+    marginLeft: 15,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F0F0F5',
   },
   loadingText: {
     fontSize: 16,
-    color: '#1E90FF',
+    color: '#007BFF',
     marginTop: 10,
   },
 });
