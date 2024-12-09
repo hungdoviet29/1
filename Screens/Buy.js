@@ -120,12 +120,11 @@ const ProductScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image
-            source={require('../acssets/BackButton.png')}
-            style={styles.icon}
-          />
-        </TouchableOpacity>
+      <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}>
+            <Text style={styles.backIcon}>←</Text>
+          </TouchableOpacity>
         <TouchableOpacity onPress={toggleFavorite}>
           <Image
             source={require('../acssets/Vector.png')}
@@ -228,8 +227,12 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   
-  
-  
+  backButton: {
+    marginRight: 10,
+  },
+  backIcon: {
+    fontSize: 30,
+  },
   icon: {
     width: 24,
     height: 24,

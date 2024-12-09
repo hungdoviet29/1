@@ -28,12 +28,11 @@ const ShopContactInfo = () => {
   return (
     <View style={styles.container}>
       {/* Back Button with Image only */}
-      <TouchableOpacity onPress={goBack} style={styles.backButton}>
-        <Image 
-          source={require('../acssets/Back_Button.png')}  // Path to your back button image
-          style={styles.backButtonImage} 
-        />
-      </TouchableOpacity>
+      <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}>
+            <Text style={styles.backIcon}>←</Text>
+          </TouchableOpacity>
 
       <Text style={styles.shopName}>{contactInfo.shopName}</Text>
 
@@ -95,16 +94,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingVertical: 10,
     paddingHorizontal: 15,
-    backgroundColor: '#1E90FF', // Retain the background color
+    
     borderRadius: 5,
     width: 40, // Size of the button
     height: 40, // Size of the button
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backButtonImage: {
-    width: 24,   // Size of the image
-    height: 24,  // Size of the image
+  backButton: {
+    marginRight: 10,
+  },
+  backIcon: {
+    fontSize: 24,
+  
   },
   shopName: {
     fontSize: 26,
