@@ -72,9 +72,9 @@ const MainHome = () => {
     setLoading(true);
     try {
       const [popularResponse, saleResponse, trendingResponse] = await Promise.all([
-        axios.get('http://192.168.0.245:3000/LapTop/getPopularLapTop'),
-        axios.get('http://192.168.0.245:3000/LapTop/getSaleLapTop'),
-        axios.get('http://192.168.0.245:3000/LapTop/getTrendingLapTop'),
+        axios.get('http://192.168.101.9:3000/LapTop/getPopularLapTop'),
+        axios.get('http://192.168.101.9:3000/LapTop/getSaleLapTop'),
+        axios.get('http://192.168.101.9:3000/LapTop/getTrendingLapTop'),
       ]);
 
       setPopularLaptops(popularResponse.data.data);
@@ -320,15 +320,7 @@ const MainHome = () => {
     </View>
   </View>
 </Modal>
-<TouchableOpacity
-  style={styles.zaloButton}
-  onPress={openZalo}
->
-  <Image
-    source={require('../acssets/zalo1.png')}
-    style={styles.zaloIcon}
-  />
-</TouchableOpacity>
+
           {/* Product Categories */}
           <View style={styles.fixedCategories}>
             <TouchableOpacity onPress={() => navigation.navigate('Home', { category: 'Popular' })}>
@@ -360,36 +352,19 @@ const MainHome = () => {
 
           <View style={styles.bottomSpacing} />
 
-          {/* bottomNavigation */}
-          <View style={styles.bottomNavigation}>
-            
-            <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-              <Image
-                source={require('../acssets/home.png')}
-                style={styles.iconNav}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('CartScreen')}>
-              <Image
-                source={require('../acssets/BasketIcon.png')}
-                style={styles.iconNav}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('FavoritesScreen')}>
-              <Image
-                source={require('../acssets/Vector.png')}
-                style={styles.iconNav}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
-              <Image
-                source={require('../acssets/profile.png')}
-                style={styles.iconNav}
-              />
-            </TouchableOpacity>
-          </View>
+        
         </ScrollView>
+        
       )}
+       <TouchableOpacity
+    style={styles.fixedZaloButton}
+    onPress={openZalo}
+  >
+    <Image
+      source={require('../acssets/Zalo.png')}
+      style={styles.zaloIcon}
+    />
+  </TouchableOpacity>
     </View>
   );
 };
@@ -597,6 +572,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'white',
   },
+  fixedZaloButton: {
+    position: 'absolute', // Đặt vị trí cố định
+    bottom: 70,           // Khoảng cách phía trên BottomNavigation
+    right: 20,            // Cách mép phải
+    zIndex: 10,           // Hiển thị trên các thành phần khác
+  },
+  zaloIcon: {
+    width: 50,            // Kích thước icon Zalo
+    height: 50,
+  },
+  
 });
 
 export default MainHome;
