@@ -167,7 +167,7 @@ const MainHome = () => {
           <BannerSlider />
 
           {/* Filter Button */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.filterButton}
             onPress={() => setFilterVisible(true)}
           >
@@ -175,151 +175,9 @@ const MainHome = () => {
               source={require('../acssets/filter1.png')}
               style={styles.filterIcon}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
-          <Modal
-            visible={filterVisible}
-            animationType="slide"
-            transparent={true}
-            onRequestClose={() => setFilterVisible(false)}
->
-  <View style={styles.modalOverlay}>
-    <View style={styles.modalContainer}>
-      {/* Tiêu đề */}
-      <View style={styles.header}>
-        <Image
-          source={require('../acssets/filter1.png')}
-          style={styles.icon}
-        />
-        <Text style={styles.title}>Bộ lọc tìm kiếm</Text>
-        <TouchableOpacity onPress={() => setFilterVisible(false)}>
-          <Image
-            source={require('../acssets/but.png')}
-            style={styles.closeIcon}
-          />
-        </TouchableOpacity>
-      </View>
 
-      {/* Nội dung */}
-      <ScrollView>
-        {/* Hãng sản xuất */}
-        <Text style={styles.sectionTitle}>Hãng sản xuất</Text>
-        <View style={styles.optionsContainer}>
-          {['Apple', 'Lenovo', 'Asus', 'MSI', 'Acer', 'HP', 'Dell', 'Gigabyte', 'Huawei', 'Masstel', 'VAIO'].map((brand) => (
-            <TouchableOpacity
-              key={brand}
-              style={[styles.optionButton, selectedOptions.brand === brand && styles.selectedOption]}
-              onPress={() => handleToggleOption('brand', brand)}
-            >
-              <Text style={styles.optionText}>{brand}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Mức giá */}
-        <Text style={styles.sectionTitle}>Mức giá</Text>
-        <View style={styles.checkboxContainer}>
-          {['Tất cả', 'Dưới 10 triệu', 'Từ 10 - 15 triệu', 'Từ 15 - 20 triệu', 'Từ 20 - 25 triệu', 'Từ 25 - 30 triệu', 'Trên 30 triệu'].map((price) => (
-            <TouchableOpacity
-              key={price}
-              style={styles.checkboxOption}
-              onPress={() => handleToggleOption('price', price)}
-            >
-              <View style={[styles.checkbox, selectedOptions.price === price && styles.checkedCheckbox]} />
-              <Text style={styles.checkboxText}>{price}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Kích thước màn hình */}
-        <Text style={styles.sectionTitle}>Kích thước màn hình</Text>
-        <View style={styles.optionsContainer}>
-          {['Dưới 13 inch', '13 - 15 inch', 'Trên 15 inch'].map((size) => (
-            <TouchableOpacity
-              key={size}
-              style={[styles.optionButton, selectedOptions.screenSize === size && styles.selectedOption]}
-              onPress={() => handleToggleOption('screenSize', size)}
-            >
-              <Text style={styles.optionText}>{size}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Công nghệ */}
-        <Text style={styles.sectionTitle}>Công nghệ</Text>
-        <View style={styles.optionsContainer}>
-          {['LCD', 'LED', 'OLED', 'IPS', 'Retina'].map((tech) => (
-            <TouchableOpacity
-              key={tech}
-              style={[styles.optionButton, selectedOptions.technology === tech && styles.selectedOption]}
-              onPress={() => handleToggleOption('technology', tech)}
-            >
-              <Text style={styles.optionText}>{tech}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* CPU */}
-        <Text style={styles.sectionTitle}>CPU</Text>
-        <View style={styles.optionsContainer}>
-          {['Intel', 'AMD', 'ARM'].map((cpu) => (
-            <TouchableOpacity
-              key={cpu}
-              style={[styles.optionButton, selectedOptions.cpu === cpu && styles.selectedOption]}
-              onPress={() => handleToggleOption('cpu', cpu)}
-            >
-              <Text style={styles.optionText}>{cpu}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Card đồ hoạ */}
-        <Text style={styles.sectionTitle}>Card đồ hoạ</Text>
-        <View style={styles.optionsContainer}>
-          {['NVIDIA', 'AMD', 'Intel', 'Không có'].map((gpu) => (
-            <TouchableOpacity
-              key={gpu}
-              style={[styles.optionButton, selectedOptions.gpu === gpu && styles.selectedOption]}
-              onPress={() => handleToggleOption('gpu', gpu)}
-            >
-              <Text style={styles.optionText}>{gpu}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* RAM */}
-        <Text style={styles.sectionTitle}>RAM</Text>
-        <View style={styles.optionsContainer}>
-          {['4GB', '8GB', '16GB', '32GB'].map((ram) => (
-            <TouchableOpacity
-              key={ram}
-              style={[styles.optionButton, selectedOptions.ram === ram && styles.selectedOption]}
-              onPress={() => handleToggleOption('ram', ram)}
-            >
-              <Text style={styles.optionText}>{ram}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Nút hành động */}
-      </ScrollView>
-      <View style={styles.actionButtons}>
-          <TouchableOpacity
-            style={styles.resetButton}
-            onPress={() => setSelectedOptions({})}
-          >
-            <Text style={styles.resetText}>Thiết lập lại</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.applyButton}
-            onPress={() => setFilterVisible(false)}
-          >
-            <Text style={styles.applyText}>Áp dụng</Text>
-          </TouchableOpacity>
-        </View>
-    </View>
-  </View>
-</Modal>
 
           {/* Product Categories */}
           <View style={styles.fixedCategories}>
