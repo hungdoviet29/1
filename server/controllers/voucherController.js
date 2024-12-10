@@ -182,16 +182,20 @@ const useVoucher = async (req, res) => {
       return res.status(404).json({message: 'Voucher không tồn tại'});
     }
 
-    if (voucher.quantity <= 0) {
+    // Kiểm tra nếu voucher đã hết hạn
+    const currentDate = new Date();
+    if (currentDate > voucher.expirationDate) {
       return res.status(400).json({message: 'Voucher này đã hết hạn sử dụng'});
     }
 
-    // Giảm số lượng voucher đi 1 và kiểm tra số lượng có hợp lệ không
-    voucher.quantity -= 1;
-    if (voucher.quantity < 0) {
-      return res.status(400).json({message: 'Số lượng voucher không hợp lệ'});
+    if (voucher.quantity <= 0) {
+      return res
+        .status(400)
+        .json({message: 'Voucher này đã hết số lượng sử dụng'});
     }
 
+    // Giảm số lượng voucher đi 1
+    voucher.quantity -= 1;
     const updatedVoucher = await voucher.save();
 
     return res.status(200).json({
