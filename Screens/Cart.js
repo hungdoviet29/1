@@ -74,7 +74,7 @@ const toggleSelectAll = () => {
 
   const fetchCartItems = async id => {
     try {
-      const response = await fetch(`http://192.168.0.245:3000/cart/${id}`);
+      const response = await fetch(`http://192.168.3.106:3000/cart/${id}`);
       const data = await response.json();
       console.log('Cart API Response:', data);
       if (response.ok) {
@@ -118,7 +118,7 @@ const toggleSelectAll = () => {
     calculateTotal(updatedCartItems);
 
     try {
-      const response = await fetch('http://192.168.0.245:3000/cart/update', {
+      const response = await fetch('http://192.168.3.106:3000/cart/update', {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({userId, productId, quantity: newQuantity}),
@@ -136,7 +136,7 @@ const toggleSelectAll = () => {
 
   const handleRemoveItem = async productId => {
     try {
-      const response = await fetch('http://192.168.0.245:3000/cart/remove', {
+      const response = await fetch('http://192.168.3.106:3000/cart/remove', {
         method: 'DELETE',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({userId, productId}),
@@ -155,109 +155,114 @@ const toggleSelectAll = () => {
       );
     }
   };
+  const handleCheckout = () => {
+    // Kiểm tra xem có sản phẩm nào được chọn không
+    if (selectedItems.length === 0) {
+      Alert.alert(
+        'Thông báo',
+        'Vui lòng chọn ít nhất một sản phẩm để thanh toán.',
+      );
+      return;
+    }
+
+    // Lọc các sản phẩm đã được chọn từ giỏ hàng
+    const selectedCartItems = cartItems.filter(item =>
+      selectedItems.includes(item.productId?._id),
+    );
+
+    // Tính tổng số tiền của các sản phẩm đã chọn
+    const selectedTotalAmount = selectedCartItems.reduce((sum, item) => {
+      return sum + item.productId.gia * item.quantity;
+    }, 0);
+
+    // Điều hướng đến CheckoutScreen với các sản phẩm đã chọn và tổng số tiền
+    navigation.navigate('Checkout', {
+      selectedItems: selectedCartItems,
+      totalAmount: selectedTotalAmount,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>My Cart</Text>
       </View>
       <ScrollView contentContainerStyle={styles.cartContainer}>
-    {cartItems.length > 0 ? (
-        cartItems.map((item) => (
+        {cartItems.length > 0 ? (
+          cartItems.map(item => (
             <View key={item.productId?._id || item._id} style={styles.cartItem}>
-                {/* Checkbox */}
+              {/* Checkbox */}
+              <TouchableOpacity
+                style={styles.checkbox}
+                onPress={() => toggleSelectItem(item.productId?._id)}>
+                {selectedItems.includes(item.productId?._id) && (
+                  <View style={styles.checkboxSelected} />
+                )}
+              </TouchableOpacity>
+
+              {/* Product Details */}
+              <Image
+                source={{uri: item.productId?.hinhAnh}}
+                style={styles.itemImage}
+              />
+              <View style={styles.itemDetails}>
+                <Text style={styles.itemName}>
+                  {item.productId?.ten || 'Unknown Product'}
+                </Text>
+                <Text style={styles.itemPrice}>
+                  {item.productId?.gia
+                    ? `${item.productId.gia.toLocaleString()} VND`
+                    : 'Price unavailable'}
+                </Text>
+              </View>
+              <View style={styles.itemActions}>
                 <TouchableOpacity
-                    style={styles.checkbox}
-                    onPress={() => toggleSelectItem(item.productId?._id)}
-                >
-                    {selectedItems.includes(item.productId?._id) && (
-                        <View style={styles.checkboxSelected} />
-                    )}
+                  onPress={() =>
+                    handleUpdateQuantity(item.productId?._id, item.quantity - 1)
+                  }
+                  style={styles.quantityButton}>
+                  <Text style={styles.quantityText}>-</Text>
                 </TouchableOpacity>
-
-                {/* Product Details */}
-                <Image
-                    source={{ uri: item.productId?.hinhAnh }}
-                    style={styles.itemImage}
-                />
-                <View style={styles.itemDetails}>
-                    <Text style={styles.itemName}>
-                        {item.productId?.ten || 'Unknown Product'}
-                    </Text>
-                    <Text style={styles.itemPrice}>
-                        {item.productId?.gia
-                            ? `${item.productId.gia.toLocaleString()} VND`
-                            : 'Price unavailable'}
-                    </Text>
-                </View>
-                <View style={styles.itemActions}>
-                    <TouchableOpacity
-                        onPress={() =>
-                            handleUpdateQuantity(
-                                item.productId?._id,
-                                item.quantity - 1
-                            )
-                        }
-                        style={styles.quantityButton}
-                    >
-                        <Text style={styles.quantityText}>-</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.quantityText}>{item.quantity}</Text>
-                    <TouchableOpacity
-                        onPress={() =>
-                            handleUpdateQuantity(
-                                item.productId?._id,
-                                item.quantity + 1
-                            )
-                        }
-                        style={styles.quantityButton}
-                    >
-                        <Text style={styles.quantityText}>+</Text>
-                    </TouchableOpacity>
-                </View>
+                <Text style={styles.quantityText}>{item.quantity}</Text>
                 <TouchableOpacity
-
-                    onPress={() => handleRemoveItem(item.productId?._id)}
-                >
-                    <Text style={styles.removeItemText}>✕</Text>
+                  onPress={() =>
+                    handleUpdateQuantity(item.productId?._id, item.quantity + 1)
+                  }
+                  style={styles.quantityButton}>
+                  <Text style={styles.quantityText}>+</Text>
                 </TouchableOpacity>
-
+              </View>
+              <TouchableOpacity
+                onPress={() => handleRemoveItem(item.productId?._id)}>
+                <Text style={styles.removeItemText}>✕</Text>
+              </TouchableOpacity>
             </View>
-        ))
-    ) : (
-        <Text style={styles.emptyCartText}>Your cart is empty.</Text>
-    )}
+          ))
+        ) : (
+          <Text style={styles.emptyCartText}>Your cart is empty.</Text>
+        )}
+      </ScrollView>
 
-</ScrollView>
-
-<View style={styles.checkoutBa}>
-<TouchableOpacity style={styles.selectAllButton} onPress={toggleSelectAll}>
-    <Text style={styles.selectAllText}>
-        {selectedItems.length === cartItems.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
-    </Text>
-</TouchableOpacity>
-</View>
+      <View style={styles.checkoutBa}>
+        <TouchableOpacity
+          style={styles.selectAllButton}
+          onPress={toggleSelectAll}>
+          <Text style={styles.selectAllText}>
+            {selectedItems.length === cartItems.length
+              ? 'Bỏ chọn tất cả'
+              : 'Chọn tất cả'}
+          </Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.checkoutBar}>
-
-
-<TouchableOpacity
-    style={styles.checkoutButton}
-    onPress={() =>
-        navigation.navigate('Checkout', {
-            selectedItems: cartItems.filter((item) =>
-                selectedItems.includes(item.productId?._id)
-            ),
-            totalAmount: calculateSelectedTotal(),
-        })
-    }
->
-
-    <Text style={styles.checkoutText}>Checkout</Text>
-    <Text style={styles.totalAmount}>
-        {`${calculateSelectedTotal().toLocaleString()} VND`}
-    </Text>
-</TouchableOpacity>
-
-
+        <TouchableOpacity
+          style={styles.checkoutButton}
+          onPress={handleCheckout}>
+          <Text style={styles.checkoutText}>Checkout</Text>
+          <Text style={styles.totalAmount}>
+            {`${calculateSelectedTotal().toLocaleString()} VND`}
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

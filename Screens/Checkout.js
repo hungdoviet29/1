@@ -41,6 +41,9 @@ const CheckoutScreen = ({navigation, route}) => {
         Alert.alert('Lỗi', 'Không tìm thấy User ID. Vui lòng đăng nhập lại.');
       }
     };
+    // In ra để kiểm tra thông tin truyền vào
+    console.log('Selected Items:', selectedItems);
+    console.log('Total Amount:', totalAmount);
     fetchUserId();
   }, []);
 
@@ -68,8 +71,10 @@ const CheckoutScreen = ({navigation, route}) => {
       const response = await fetch(`http://192.168.3.106:3000/cart/${id}`);
       const data = await response.json();
       if (response.ok) {
-        setCartItems(data.items || []);
-        calculateTotal(data.items || []);
+        // Filter out items with invalid productId
+        const validItems = data.items.filter(item => item.productId !== null);
+        setCartItems(validItems);
+        calculateTotal(validItems); // Recalculate total with valid items
       } else {
         Alert.alert('Lỗi', data.message || 'Không thể tải giỏ hàng.');
       }
@@ -79,6 +84,7 @@ const CheckoutScreen = ({navigation, route}) => {
       setLoading(false);
     }
   };
+
 
   const calculateTotal = (items, voucher = selectedVoucher) => {
     let newTotal = items.reduce((sum, item) => {
@@ -277,7 +283,7 @@ const CheckoutScreen = ({navigation, route}) => {
       </View>
 
       <ScrollView style={{maxHeight: 200}}>
-        {cartItems.map((item, index) => (
+        {selectedItems.map((item, index) => (
           <View key={index} style={styles.cartItem}>
             <Image
               source={{uri: item.productId?.hinhAnh}}
@@ -374,7 +380,7 @@ const CheckoutScreen = ({navigation, route}) => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.total}>Tổng: {total.toLocaleString()} VND</Text>
+      <Text style={styles.total}>Tổng: {totalAmount.toLocaleString()} VND</Text>
 
       <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
         <Text style={styles.checkoutButtonText}>Thanh toán</Text>
@@ -382,41 +388,40 @@ const CheckoutScreen = ({navigation, route}) => {
 
       {/* Voucher Modal */}
       <Modal
-  visible={isVoucherModalVisible}
-  transparent={true}
-  animationType="fade"
-  onRequestClose={() => setVoucherModalVisible(false)}>
-  <View style={styles.modalOverlay}>
-    <View style={styles.modalContent}>
-      {/* Lọc danh sách voucher có số lượng > 0 */}
-      {vouchers.filter(v => v.quantity > 0).length === 0 ? (
-        // Nếu không có voucher khả dụng
-        <Text style={styles.noVoucherText}>Không có voucher nào</Text>
-      ) : (
-        // Hiển thị danh sách voucher có số lượng > 0
-        <FlatList
-          data={vouchers.filter(v => v.quantity > 0)}
-          renderItem={({item}) => (
+        visible={isVoucherModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setVoucherModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {/* Lọc danh sách voucher có số lượng > 0 */}
+            {vouchers.filter(v => v.quantity > 0).length === 0 ? (
+              // Nếu không có voucher khả dụng
+              <Text style={styles.noVoucherText}>Không có voucher nào</Text>
+            ) : (
+              // Hiển thị danh sách voucher có số lượng > 0
+              <FlatList
+                data={vouchers.filter(v => v.quantity > 0)}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    onPress={() => handleVoucherSelect(item)}
+                    style={styles.modalItem}>
+                    <Text style={styles.modalItemText}>
+                      {item.title} - Số lượng còn: {item.quantity}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={item => item._id}
+              />
+            )}
             <TouchableOpacity
-              onPress={() => handleVoucherSelect(item)}
-              style={styles.modalItem}>
-              <Text style={styles.modalItemText}>
-                {item.title} - Số lượng còn: {item.quantity}
-              </Text>
+              onPress={() => setVoucherModalVisible(false)}
+              style={styles.modalCloseButton}>
+              <Text style={styles.modalCloseText}>Đóng</Text>
             </TouchableOpacity>
-          )}
-          keyExtractor={item => item._id}
-        />
-      )}
-      <TouchableOpacity
-        onPress={() => setVoucherModalVisible(false)}
-        style={styles.modalCloseButton}>
-        <Text style={styles.modalCloseText}>Đóng</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-</Modal>
-
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
