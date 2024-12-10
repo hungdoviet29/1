@@ -209,6 +209,50 @@
             text-align: center;
             /* Canh giữa nội dung */
         }
+
+        /* Kiểu dáng chung cho các nút hành động */
+        .table-container button {
+            padding: 8px 12px;
+            margin: 4px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        /* Kiểu riêng cho các trạng thái nút */
+        .table-container button:hover {
+            transform: scale(1.05);
+        }
+
+        .table-container button:active {
+            transform: scale(0.95);
+        }
+
+        .table-container button.confirm {
+            background-color: #28a745;
+            /* Màu xanh lá */
+            color: white;
+        }
+
+        .table-container button.cancel {
+            background-color: #dc3545;
+            /* Màu đỏ */
+            color: white;
+        }
+
+        .table-container button.ship {
+            background-color: #007bff;
+            /* Màu xanh dương */
+            color: white;
+        }
+
+        .table-container button.success {
+            background-color: #6f42c1;
+            /* Màu tím */
+            color: white;
+        }
     </style>
 </head>
 
@@ -366,17 +410,27 @@
                             if (status === 'chờ xác nhận') {
                                 const confirmButton = document.createElement('button');
                                 confirmButton.textContent = 'Xác nhận';
+                                confirmButton.className = 'confirm';
                                 confirmButton.addEventListener('click', () => updateOrderStatus(order._id, 'Chờ vận chuyển', row));
                                 actionCell.appendChild(confirmButton);
-                            } else if (status === 'chờ vận chuyển') {
+
+                                const cancelButton = document.createElement('button');
+                                cancelButton.textContent = 'Hủy đơn';
+                                cancelButton.className = 'cancel';
+                                cancelButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã hủy', row));
+                                actionCell.appendChild(cancelButton);
+                            }
+                            else if (status === 'chờ vận chuyển') {
                                 const shipButton = document.createElement('button');
                                 shipButton.textContent = 'Gửi hàng';
+                                shipButton.className = 'ship';
                                 shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đang vận chuyển', row));
                                 actionCell.appendChild(shipButton);
                             } else if (status === 'đang vận chuyển') {
                                 // Tạo hai nút "Thành công" và "Hủy đơn"
                                 const successButton = document.createElement('button');
                                 successButton.textContent = 'Thành công';
+                                successButton.className = 'success';
                                 successButton.addEventListener('click', () => updateOrderStatus(order._id, 'Thành công', row));
                                 actionCell.appendChild(successButton);
 
