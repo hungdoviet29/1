@@ -44,6 +44,7 @@ const CheckoutScreen = ({navigation, route}) => {
     // In ra để kiểm tra thông tin truyền vào
     console.log('Selected Items:', selectedItems);
     console.log('Total Amount:', totalAmount);
+    console.log('Total :', total);
     fetchUserId();
   }, []);
 
@@ -66,44 +67,58 @@ const CheckoutScreen = ({navigation, route}) => {
   }, [userId]);
 
   const fetchCartItems = async id => {
-    setLoading(true);
-    try {
-      const response = await fetch(`http://192.168.3.106:3000/cart/${id}`);
-      const data = await response.json();
-      if (response.ok) {
-        // Filter out items with invalid productId
-        const validItems = data.items.filter(item => item.productId !== null);
-        setCartItems(validItems);
-        calculateTotal(validItems); // Recalculate total with valid items
-      } else {
-        Alert.alert('Lỗi', data.message || 'Không thể tải giỏ hàng.');
+    const fetchCartItems = async id => {
+      setLoading(true);
+      try {
+        const response = await fetch(`http://192.168.3.106:3000/cart/${id}`);
+        const data = await response.json();
+        if (response.ok) {
+          // Filter out items with invalid productId
+          const validcartItems = data.cartItems.filter(
+            cartItems => cartItems.productId !== null,
+          );
+          setCartItems(validcartItems);
+          calculateTotal(validcartItems); // Recalculate total with valid items
+        } else {
+          console.log('Response Error:', data);  // Log error data from server
+          Alert.alert('Lỗi', data.message || 'Không thể tải giỏ hàng.');
+        }
+      } catch (error) {
+        console.error('Fetch Error:', error);  // Log any fetch-related error
+        Alert.alert('Lỗi', 'Không thể kết nối đến máy chủ.');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      Alert.alert('Lỗi', 'Không thể kết nối đến máy chủ.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+  }
 
 
   const calculateTotal = (items, voucher = selectedVoucher) => {
+    // Kiểm tra danh sách sản phẩm đã chọn và tính tổng đúng cách
     let newTotal = items.reduce((sum, item) => {
-      if (item.productId?.gia && item.quantity) {
-        return sum + item.productId.gia * item.quantity;
+      if (item.productId && item.productId.gia && item.quantity) {
+        return sum + item.productId.gia * item.quantity; // Tổng giá trị của sản phẩm đã chọn
       }
-      return sum;
+      return sum; // Nếu không có giá trị hợp lệ, không tính
     }, 0);
 
+    console.log('Tổng sau khi tính toán: ', newTotal); // Debug log
+
+    // Áp dụng voucher (nếu có)
     if (voucher && voucher.title) {
       const discountPercentage = parseFloat(voucher.title.trim());
       if (!isNaN(discountPercentage) && discountPercentage > 0) {
         const discountAmount = (newTotal * discountPercentage) / 100;
-        newTotal -= discountAmount;
+        newTotal -= discountAmount; // Giảm số tiền theo voucher
       }
     }
 
+    // Cập nhật tổng tiền
     setTotal(newTotal);
+    console.log('Tổng tiền sau khi áp dụng voucher: ', newTotal); // Debug log
   };
+
+
 
   const handleCheckout = async () => {
     if (!shippingInfo.name.trim()) {
@@ -380,7 +395,7 @@ const CheckoutScreen = ({navigation, route}) => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.total}>Tổng: {totalAmount.toLocaleString()} VND</Text>
+      <Text style={styles.total}>Tổng: {total.toLocaleString()} VND</Text>
 
       <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
         <Text style={styles.checkoutButtonText}>Thanh toán</Text>
