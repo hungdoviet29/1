@@ -1,7 +1,6 @@
 const DonHang = require('../models/donhangs_model');
 const Notification = require('../models/notification_model'); // Đảm bảo bạn có mô hình Notification
 
-// Tạo đơn hàng mới
 const createDonHang = async (req, res) => {
     try {
         const { userId, cartItems, totalAmount, paymentMethod, shippingInfo } = req.body;
@@ -10,6 +9,7 @@ const createDonHang = async (req, res) => {
             return res.status(400).json({ message: 'Thiếu thông tin cần thiết để tạo đơn hàng' });
         }
 
+        // Tạo đơn hàng mới
         const newDonHang = new DonHang({
             userId,
             cartItems,
@@ -20,12 +20,23 @@ const createDonHang = async (req, res) => {
         });
 
         await newDonHang.save();
+
+        // Tạo thông báo cho người dùng
+        const notification = new Notification({
+            userId,
+            message: `Đơn hàng của bạn đã được tạo thành công với mã đơn hàng ${newDonHang._id}.`,
+            createdAt: new Date(),
+        });
+
+        await notification.save();
+
         res.status(201).json({ success: true, message: 'Đơn hàng đã được tạo thành công!' });
     } catch (error) {
         console.error('Lỗi khi tạo đơn hàng:', error);
         res.status(500).json({ message: 'Đã xảy ra lỗi khi tạo đơn hàng. Vui lòng thử lại sau.' });
     }
 };
+
 
 // Lấy tất cả đơn hàng của một người dùng
 const getDonHangsByUser = async (req, res) => {
