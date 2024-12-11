@@ -392,7 +392,7 @@
                 const endDate = document.getElementById('end-date').value;
                 const searchQuery = document.getElementById('search-box').value.toLowerCase();
 
-                fetch('http://192.168.3.105:3000/donhang')
+                fetch('http://localhost:3000/donhang')
                     .then(response => response.json())
                     .then(data => {
                         const orderList = document.getElementById('order-list');
@@ -501,7 +501,7 @@
             fetchData();
 
             function updateOrderStatus(orderId, newStatus, row) {
-                fetch(`http://192.168.3.105:3000/donhang/${orderId}`, {
+                fetch(`http://localhost:3000/donhang/${orderId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: newStatus })
@@ -575,7 +575,7 @@
             const orderId = row.cells[0].textContent;
 
             // Fetch chi tiết đơn hàng từ API
-            fetch(`http://192.168.3.105:3000/donhang/${orderId}`)
+            fetch(`http://localhost:3000/donhang/${orderId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {

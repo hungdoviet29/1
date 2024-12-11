@@ -174,7 +174,7 @@
     </div>
 
     <script>
-        const apiUrl = 'http://192.168.101.9:3000/vouchers/all'; // Địa chỉ API để lấy tất cả các voucher
+        const apiUrl = 'http://localhost:3000/vouchers/all'; // Địa chỉ API để lấy tất cả các voucher
 
         document.addEventListener('DOMContentLoaded', fetchVouchers);
 
@@ -215,7 +215,7 @@
         // Hàm xóa voucher
         async function deleteVoucher(voucherId, userId) {
             try {
-                const response = await fetch(`http://192.168.101.9:3000/vouchers/${voucherId}`, {
+                const response = await fetch(`http://localhost:3000/vouchers/${voucherId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -258,7 +258,7 @@
     };
 
     try {
-        const response = await fetch('http://192.168.101.9:3000/vouchers', {
+        const response = await fetch('http://localhost:3000/vouchers', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newVoucher),

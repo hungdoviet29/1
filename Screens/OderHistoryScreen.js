@@ -40,7 +40,7 @@ const OrderHistoryScreen = ({ navigation }) => {
   const fetchOrders = async () => {
     if (!userId) return;
 
-    const url = `http://192.168.0.245:3000/donhang/user/${userId}`;
+    const url = `http://localhost:3000/donhang/user/${userId}`;
     console.log(`Fetching orders from: ${url}`);
 
     try {

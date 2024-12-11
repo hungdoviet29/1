@@ -30,19 +30,19 @@ const HomeScreen = () => {
 
     switch (category) {
       case 'Popular':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getPopularLapTop';
+        apiUrl = 'http://localhost:3000/LapTop/getPopularLapTop';
         break;
       case 'Trending':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getTrendingLapTop';
+        apiUrl = 'http://localhost:3000/LapTop/getTrendingLapTop';
         break;
       case 'News':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getNewsLapTop';
+        apiUrl = 'http://localhost:3000/LapTop/getNewsLapTop';
         break;
       case 'Sale':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getSaleLapTop';
+        apiUrl = 'http://localhost:3000/LapTop/getSaleLapTop';
         break;
       case 'All':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
+        apiUrl = 'http://localhost:3000/LapTop/getListLapTop';
         break;
       default:
     }

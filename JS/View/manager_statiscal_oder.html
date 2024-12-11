@@ -293,7 +293,7 @@
                 return;
             }
 
-            fetch("http://192.168.101.9:3000/donhang")
+            fetch("http://localhost:3000/donhang")
                 .then(response => response.json())
                 .then(orders => {
                     const filteredOrders = orders.filter(order => {

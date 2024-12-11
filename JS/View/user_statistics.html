@@ -233,7 +233,7 @@
             const month = document.getElementById("month").value;
             const userStatisticsBody = document.getElementById("user-statistics-body");
 
-            fetch("http://192.168.101.9:3000/donhang")
+            fetch("http://localhost:3000/donhang")
                 .then(response => response.json())
                 .then(orders => {
                     // Tính toán thống kê người dùng

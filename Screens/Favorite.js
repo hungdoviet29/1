@@ -17,7 +17,7 @@ const FavoriteScreen = () => {
                     navigation.navigate('Login');
                     return;
                 }
-                const response = await axios.get(`http://192.168.0.245:3000/favorites/${userId}`);
+                const response = await axios.get(`http://localhost:3000/favorites/${userId}`);
                 setFavoriteItems(response.data.favorites || []);
             } catch (error) {
                 console.error('Lỗi khi tải danh sách yêu thích:', error.response || error.message);
@@ -37,7 +37,7 @@ const FavoriteScreen = () => {
                 return;
             }
             // Gửi yêu cầu xóa sản phẩm khỏi yêu thích
-            const response = await axios.delete(`http://192.168.0.245:3000/favorites/${userId}/${productId}`);
+            const response = await axios.delete(`http://localhost:3000/favorites/${userId}/${productId}`);
 
             if (response.status === 200) {
                 // Cập nhật lại danh sách yêu thích trên giao diện

@@ -16,7 +16,7 @@ const CustomDrawerContent = () => {
           Alert.alert('Lỗi', 'Không tìm thấy thông tin đăng nhập.');
           return;
         }
-        const response = await axios.get(`http://192.168.101.9:3000/users/${userId}`);
+        const response = await axios.get(`http://localhost:3000/users/${userId}`);
         setUserInfo(response.data);
       } catch (error) {
         console.error('Lỗi khi lấy thông tin người dùng:', error);
