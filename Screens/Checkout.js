@@ -51,7 +51,7 @@ const CheckoutScreen = ({navigation, route}) => {
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
-        const url = `http://localhost:3000/vouchers?userId=${userId}`;
+        const url = `http://192.168.3.105:3000/vouchers?userId=${userId}`;
         const response = await fetch(url);
         const data = await response.json();
         if (response.ok) {
@@ -70,7 +70,7 @@ const CheckoutScreen = ({navigation, route}) => {
     const fetchCartItems = async id => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:3000/cart/${id}`);
+        const response = await fetch(`http://192.168.3.105:3000/cart/${id}`);
         const data = await response.json();
         if (response.ok) {
           // Filter out items with invalid productId
@@ -115,7 +115,7 @@ const CheckoutScreen = ({navigation, route}) => {
     console.log('Dữ liệu gửi đến server:', payload);
 
     try {
-        const response = await fetch('http://localhost:3000/donhang/zalopay', {
+        const response = await fetch('http://192.168.3.105:3000/donhang/zalopay', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -219,7 +219,7 @@ const handleSelectPaymentMethod = method => {
 
             try {
               const response = await fetch(
-                'http://localhost:3000/donhang',
+                'http://192.168.3.105:3000/donhang',
                 {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
@@ -262,7 +262,7 @@ const handleSelectPaymentMethod = method => {
         quantity: selectedVoucher.quantity - 1,
       };
       const response = await fetch(
-        `http://localhost:3000/vouchers/${voucherId}`,
+        `http://192.168.3.105:3000/vouchers/${voucherId}`,
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
@@ -279,11 +279,11 @@ const handleSelectPaymentMethod = method => {
 
   const resetCart = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/cart/${userId}`);
+      const response = await fetch(`http://192.168.3.105:3000/cart/${userId}`);
       const data = await response.json();
       if (data && data.items && data.items.length > 0) {
         const deleteResponse = await fetch(
-          `http://localhost:3000/cart/${userId}`,
+          `http://192.168.3.105:3000/cart/${userId}`,
           {
             method: 'DELETE',
           },

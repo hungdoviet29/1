@@ -20,8 +20,13 @@ router.get('/user/:userId/status', donhangController.getDonHangsByUserAndStatus)
 
 // Route để lấy đơn hàng theo ID
 router.get('/:id', donhangController.getDonHangById);
-//ZaloPay
+//Zalo
 router.post('/zalopay', donhangController.payWithZaloPay);
+
+
+const { getNotifications } = require('../controllers/notification_controller');
+
+router.get('/notifications/:userId', getNotifications);
 
 
 

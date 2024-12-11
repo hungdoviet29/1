@@ -4,7 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NotificationScreen = ({ route, navigation }) => {
     const [notifications, setNotifications] = useState([]);
-    const { message } = route.params || {};
     const [userId, setUserId] = useState(null);
 
     // Fetch userId from AsyncStorage when the screen loads
@@ -25,50 +24,26 @@ const NotificationScreen = ({ route, navigation }) => {
         fetchUserId();
     }, []);
 
-    // Load notifications from AsyncStorage when the screen loads
+    // Load notifications from server when the screen loads
     useEffect(() => {
-        const loadNotifications = async () => {
+        const fetchNotifications = async () => {
             if (!userId) return;
 
             try {
-                const storedNotifications = await AsyncStorage.getItem(`notifications_${userId}`);
-                if (storedNotifications) {
-                    setNotifications(JSON.parse(storedNotifications));
+                const response = await fetch(`http://192.168.3.105:3000/donhang/notifications/${userId}`);
+                const data = await response.json();
+                if (data.success) {
+                    setNotifications(data.data); // Set notifications from server response
+                } else {
+                    console.error('Failed to fetch notifications:', data.message);
                 }
             } catch (error) {
-                console.error('Error loading notifications:', error);
+                console.error('Error fetching notifications:', error);
             }
         };
 
-        loadNotifications();
+        fetchNotifications();
     }, [userId]);
-
-    // Add new notification when a message is received
-    useEffect(() => {
-        if (message && userId) {
-            const addNotification = async () => {
-                try {
-                    const storedNotifications = await AsyncStorage.getItem(`notifications_${userId}`);
-                    const currentNotifications = storedNotifications ? JSON.parse(storedNotifications) : [];
-
-                    const newNotifications = [
-                        ...currentNotifications,
-                        { id: Date.now(), text: message },
-                    ];
-
-                    setNotifications(newNotifications);
-                    await AsyncStorage.setItem(
-                        `notifications_${userId}`,
-                        JSON.stringify(newNotifications)
-                    );
-                } catch (error) {
-                    console.error('Error saving notification:', error);
-                }
-            };
-
-            addNotification();
-        }
-    }, [message, userId]);
 
     // Clear all notifications
     const clearNotifications = async () => {
@@ -83,8 +58,10 @@ const NotificationScreen = ({ route, navigation }) => {
                     text: 'Confirm',
                     onPress: async () => {
                         try {
-                            await AsyncStorage.removeItem(`notifications_${userId}`);
-                            setNotifications([]);
+                            await fetch(`http://<YOUR_SERVER_URL>/donhang/notifications/${userId}`, {
+                                method: 'DELETE',
+                            });
+                            setNotifications([]); // Clear notifications from UI
                         } catch (error) {
                             console.error('Error clearing notifications:', error);
                         }
@@ -101,10 +78,10 @@ const NotificationScreen = ({ route, navigation }) => {
             {notifications.length > 0 ? (
                 <FlatList
                     data={notifications}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item._id.toString()}
                     renderItem={({ item }) => (
                         <View style={styles.notificationItem}>
-                            <Text style={styles.notificationText}>{item.text}</Text>
+                            <Text style={styles.notificationText}>{item.message}</Text>
                         </View>
                     )}
                 />

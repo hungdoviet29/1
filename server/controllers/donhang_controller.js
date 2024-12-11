@@ -1,4 +1,5 @@
 const DonHang = require('../models/donhangs_model');
+const Notification = require('../models/notification_model'); // Đảm bảo bạn có mô hình Notification
 
 // Tạo đơn hàng mới
 const createDonHang = async (req, res) => {
@@ -69,8 +70,8 @@ const getAllDonHangs = async (req, res) => {
 // Sửa đơn hàng
 const updateDonHang = async (req, res) => {
     try {
-        const { id } = req.params; // Lấy orderId từ URL
-        const updatedData = req.body; // Dữ liệu cần cập nhật
+        const { id } = req.params;
+        const updatedData = req.body;
 
         // Cập nhật đơn hàng
         const updatedDonHang = await DonHang.findByIdAndUpdate(id, updatedData, { new: true });
@@ -79,7 +80,16 @@ const updateDonHang = async (req, res) => {
             return res.status(404).json({ message: 'Không tìm thấy đơn hàng với ID này.' });
         }
 
-        // Trả về phản hồi sau khi cập nhật
+        // Nếu trạng thái thay đổi, tạo thông báo mới
+        if (updatedData.status) {
+            const notification = new Notification({
+                userId: updatedDonHang.userId,
+                message: `Trạng thái đơn hàng ${id} đã thay đổi thành "${updatedData.status}".`,
+                createdAt: new Date(),
+            });
+            await notification.save();
+        }
+
         res.status(200).json({ success: true, message: 'Đơn hàng đã được cập nhật.', data: updatedDonHang });
     } catch (error) {
         console.error('Lỗi khi cập nhật đơn hàng:', error);
@@ -196,6 +206,20 @@ const payWithZaloPay = async (req, res) => {
         res.status(500).json({ message: 'Lỗi server.', detail: error.message });
     }
 };
+
+
+const getNotifications = async (req, res) => {
+    try {
+        const { userId } = req.params; // Lấy userId từ URL
+        const notifications = await Notification.find({ userId }).sort({ createdAt: -1 }); // Lấy thông báo mới nhất
+        res.status(200).json({ success: true, data: notifications });
+    } catch (error) {
+        console.error('Lỗi khi lấy thông báo:', error);
+        res.status(500).json({ success: false, message: 'Không thể lấy thông báo.' });
+    }
+};
+
+module.exports = { getNotifications };
 
 
 // Xuất khẩu tất cả hàm

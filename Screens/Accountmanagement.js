@@ -25,7 +25,7 @@ const AccountManagement = () => {
           return;
         }
         const response = await axios.get(
-          `http://localhost:3000/users/${userId}`,
+          `http://192.168.3.105:3000/users/${userId}`,
         );
         setUserInfo(response.data);
       } catch (error) {
