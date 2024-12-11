@@ -99,31 +99,42 @@ const CheckoutScreen = ({navigation, route}) => {
         return;
     }
 
+    const orderId = `${userId}_${Date.now()}`; // Tạo mã đơn hàng duy nhất
+    console.log('Order ID:', orderId);
+
+    const payload = {
+        orderId,
+        totalAmount: total, // Giá trị giỏ hàng
+        shippingInfo,       // Thông tin giao hàng
+        items: cartItems.map(item => ({
+            productId: item.productId._id,
+            quantity: item.quantity,
+        })),
+    };
+
+    console.log('Dữ liệu gửi đến server:', payload);
+
     try {
-        // Gọi API ZaloPay
         const response = await fetch('http://192.168.3.105:3000/donhang/zalopay', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                orderId: `${userId}_${Date.now()}`, // ID đơn hàng độc nhất
-                totalAmount: total, // Tổng tiền thanh toán
-                shippingInfo,
-            }),
+            body: JSON.stringify(payload),
         });
 
         const data = await response.json();
 
         if (data.success && data.payment_url) {
-            // Điều hướng đến màn hình WebView với URL thanh toán ZaloPay
+            // Điều hướng đến WebView để thanh toán
             navigation.navigate('WebViewScreen', { url: data.payment_url });
         } else {
             Alert.alert('Lỗi', data.message || 'Không thể khởi tạo thanh toán.');
         }
     } catch (error) {
-        console.error('Lỗi khi tạo thanh toán qua ZaloPay:', error);
+        console.error('Lỗi khi gửi yêu cầu thanh toán qua ZaloPay:', error);
         Alert.alert('Lỗi', 'Không thể kết nối đến máy chủ.');
     }
 };
+
 const handleSelectPaymentMethod = method => {
   setSelectedPaymentMethod(method);
   setPaymentDropdownVisible(false); // Đóng dropdown sau khi chọn

@@ -150,52 +150,52 @@ const crypto = require('crypto');
 // Thanh toán qua ZaloPay
 const payWithZaloPay = async (req, res) => {
     try {
-        const { orderId, totalAmount } = req.body;
+        const { orderId, totalAmount, shippingInfo, items } = req.body;
 
-        if (!orderId || !totalAmount) {
+        if (!orderId || !totalAmount || !shippingInfo || !items) {
             return res.status(400).json({ message: 'Thiếu thông tin cần thiết.' });
         }
 
-        // Cấu hình ZaloPay
         const config = {
             app_id: "2553",
-            key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
-            key2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
-            endpoint: "https://sb-openapi.zalopay.vn/v2/create"
+    key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
+    key2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
+    endpoint: "https://sb-openapi.zalopay.vn/v2/create"
         };
 
-        const timestamp = Date.now();
+        const moment = require('moment');
+        const appTransId = `${moment().format('YYMMDD')}_${Math.floor(Math.random() * 1000000)}`; // Định dạng mã giao dịch
+
         const order = {
             app_id: config.app_id,
-            app_trans_id: `${timestamp}`, // Mã giao dịch
-            app_user: 'user123', // Thông tin người dùng
-            app_time: timestamp,
+            app_trans_id: appTransId,
+            app_user: shippingInfo.name,
+            app_time: Date.now(),
             amount: totalAmount,
-            item: JSON.stringify([]), // Mảng sản phẩm (nếu cần)
-            embed_data: JSON.stringify({ orderId }), // Dữ liệu kèm theo
+            item: JSON.stringify(items),
+            embed_data: JSON.stringify({ orderId, shippingInfo }),
             description: `Thanh toán đơn hàng ${orderId}`,
         };
 
-        // Tạo signature
+        // Tạo chữ ký (signature)
+        const crypto = require('crypto');
         const data = `${config.app_id}|${order.app_trans_id}|${order.app_user}|${order.amount}|${order.app_time}|${order.embed_data}|${order.item}`;
-        const signature = crypto.createHmac('sha256', config.key1).update(data).digest('hex');
-        order.mac = signature;
+        order.mac = crypto.createHmac('sha256', config.key1).update(data).digest('hex');
 
         // Gửi yêu cầu đến ZaloPay
+        const axios = require('axios');
         const response = await axios.post(config.endpoint, order);
 
         if (response.data.return_code === 1) {
             res.status(200).json({ success: true, payment_url: response.data.order_url });
         } else {
-            res.status(400).json({ message: 'Lỗi khi tạo thanh toán ZaloPay.', detail: response.data });
+            res.status(400).json({ message: response.data.return_message, detail: response.data });
         }
     } catch (error) {
-        console.error('Lỗi thanh toán qua ZaloPay:', error);
-        res.status(500).json({ message: 'Đã xảy ra lỗi. Vui lòng thử lại.' });
+        console.error('Lỗi khi gửi yêu cầu thanh toán ZaloPay:', error);
+        res.status(500).json({ message: 'Lỗi server.', detail: error.message });
     }
 };
-
-module.exports = { payWithZaloPay };
 
 
 // Xuất khẩu tất cả hàm
