@@ -189,4 +189,22 @@ return res.status(404).json({ message: 'Không có sản phẩm nào thuộc hã
       res.status(500).json({ status: "lỗi", result: error.message });
   }
 };
-//sydgsyd
+
+// lấy theo id
+exports.getlaptopById = async (req, res) => {
+  try {
+      const { id } = req.params; // Lấy ID từ URL
+      const laptop = await laptopModel.findById(id); // Tìm sản phẩm theo ID
+
+      // Kiểm tra nếu không tìm thấy sản phẩm
+      if (!laptop) {
+          return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
+      }
+
+      // Trả về sản phẩm
+      res.status(200).json({ success: true, data: laptop });
+  } catch (error) {
+      console.error('Lỗi khi lấy sản phẩm theo ID:', error);
+      res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};

@@ -116,6 +116,34 @@ const getDonHangsByUserAndStatus = async (req, res) => {
         res.status(500).json({ message: 'Đã xảy ra lỗi. Vui lòng thử lại sau.' });
     }
 };
+// Lấy đơn hàng theo ID
+const getDonHangById = async (req, res) => {
+    try {
+        const { id } = req.params; // Lấy ID đơn hàng từ URL
+
+        // Kiểm tra xem ID có hợp lệ hay không
+        if (!id || id.trim() === "") {
+            return res.status(400).json({ message: 'ID đơn hàng không hợp lệ.' });
+        }
+
+        // Tìm đơn hàng theo ID và populate để lấy thông tin sản phẩm
+        const donHang = await DonHang.findById(id).populate({
+            path: 'cartItems.productId',
+            select: 'ten gia hinhAnh',
+        });
+
+        // Nếu không tìm thấy đơn hàng, trả về lỗi 404
+        if (!donHang) {
+            return res.status(404).json({ message: 'Không tìm thấy đơn hàng với ID này.' });
+        }
+
+        // Trả về thông tin đơn hàng
+        res.status(200).json({ success: true, data: donHang });
+    } catch (error) {
+        console.error('Lỗi khi lấy đơn hàng theo ID:', error);
+        res.status(500).json({ message: 'Đã xảy ra lỗi khi lấy đơn hàng. Vui lòng thử lại sau.' });
+    }
+};
 
 
 // Xuất khẩu tất cả hàm
@@ -125,4 +153,5 @@ module.exports = {
     getAllDonHangs,
     updateDonHang,
     getDonHangsByUserAndStatus,
+    getDonHangById,
 };

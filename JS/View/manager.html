@@ -253,10 +253,41 @@
             /* Màu tím */
             color: white;
         }
+        #order-detail-dialog h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+#detail-items li {
+    margin: 5px 0;
+    color: #555;
+}
+
+#dialog-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
     </style>
 </head>
 
 <body>
+    <div id="order-detail-dialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); padding: 20px; border-radius: 10px; z-index: 1000; width: 80%; max-width: 600px;">
+        <h3>Chi tiết đơn hàng</h3>
+        <p><strong>ID đơn hàng:</strong> <span id="detail-id"></span></p>
+        <p><strong>Tên người nhận:</strong> <span id="detail-name"></span></p>
+        <p><strong>Số điện thoại:</strong> <span id="detail-phone"></span></p>
+        <p><strong>Địa chỉ:</strong> <span id="detail-address"></span></p>
+        <p><strong>Tổng tiền:</strong> <span id="detail-total"></span></p>
+        <p><strong>Phương thức thanh toán:</strong> <span id="detail-payment"></span></p>
+        <p><strong>Trạng thái:</strong> <span id="detail-status"></span></p>
+        <p><strong>Ngày tạo:</strong> <span id="detail-created"></span></p>
+        <p><strong>Ngày cập nhật:</strong> <span id="detail-updated"></span></p>
+        <p><strong>Danh sách sản phẩm:</strong></p>
+        <ul id="detail-items"></ul>
+        <button id="close-dialog" style="padding: 10px 15px; background-color: #6c63ff; color: white; border: none; border-radius: 5px;">Đóng</button>
+    </div>
+    <div id="dialog-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999;"></div>
+            
     <header>Bảng Điều Khiển Quản Lý</header>
 
     <nav>
@@ -319,6 +350,7 @@
                             <th>SĐT</th>
                             <th>Ngày tạo</th>
                             <th>Tình trạng</th>
+                            <th>Chi tiết đơn hàng</th>
                             <th>Hành động</th>
                         </tr>
                     </thead>
@@ -360,7 +392,7 @@
                 const endDate = document.getElementById('end-date').value;
                 const searchQuery = document.getElementById('search-box').value.toLowerCase();
 
-                fetch('http://192.168.101.9:3000/donhang')
+                fetch('http://192.168.3.105:3000/donhang')
                     .then(response => response.json())
                     .then(data => {
                         const orderList = document.getElementById('order-list');
@@ -403,6 +435,7 @@
                     <td>${order.shippingInfo.phone}</td>
                     <td>${new Date(order.createdAt).toLocaleDateString('vi-VN')} ${new Date(order.createdAt).toLocaleTimeString('vi-VN')}</td>
                     <td>${order.status || 'Không xác định'}</td>
+                    <td> <Button>Chi tiết đơn hàng</button></td>
                 `;
 
                             const actionCell = document.createElement('td');
@@ -468,7 +501,7 @@
             fetchData();
 
             function updateOrderStatus(orderId, newStatus, row) {
-                fetch(`http://192.168.101.9:3000/donhang/${orderId}`, {
+                fetch(`http://192.168.3.105:3000/donhang/${orderId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: newStatus })
@@ -491,7 +524,70 @@
                     })
                     .catch(error => console.error('Error updating order:', error));
             }
+            document.addEventListener('DOMContentLoaded', () => {
+    const dialog = document.getElementById('order-detail-dialog');
+    const overlay = document.getElementById('dialog-overlay');
+    const closeButton = document.getElementById('close-dialog');
 
+    // Hàm hiển thị dialog với dữ liệu đơn hàng
+    function showOrderDetails(order) {
+        document.getElementById('detail-id').textContent = order._id;
+        document.getElementById('detail-name').textContent = order.shippingInfo.name;
+        document.getElementById('detail-phone').textContent = order.shippingInfo.phone;
+        document.getElementById('detail-address').textContent = order.shippingInfo.address;
+        document.getElementById('detail-total').textContent = `${order.totalAmount.toLocaleString()} VND`;
+        document.getElementById('detail-payment').textContent = order.paymentMethod;
+        document.getElementById('detail-status').textContent = order.status;
+        document.getElementById('detail-created').textContent = new Date(order.createdAt).toLocaleString('vi-VN');
+        document.getElementById('detail-updated').textContent = new Date(order.updatedAt).toLocaleString('vi-VN');
+
+        const itemsList = document.getElementById('detail-items');
+        itemsList.innerHTML = ''; // Xóa danh sách cũ
+        order.cartItems.forEach(item => {
+            const listItem = document.createElement('li');
+            if (item.productId) {
+                listItem.innerHTML = `
+                    <strong>${item.productId.ten}</strong>
+                    <br> Giá: ${item.productId.gia.toLocaleString()} VND
+                    <br> Số lượng: ${item.quantity}
+                    <br> <img src="${item.productId.hinhAnh}" alt="${item.productId.ten}" style="width: 100px; height: auto;">
+                `;
+            } else {
+                listItem.textContent = 'Sản phẩm không tồn tại';
+            }
+            itemsList.appendChild(listItem);
+        });
+
+        dialog.style.display = 'block';
+        overlay.style.display = 'block';
+    }
+
+    // Đóng dialog khi nhấn nút Đóng
+    closeButton.addEventListener('click', () => {
+        dialog.style.display = 'none';
+        overlay.style.display = 'none';
+    });
+
+    // Xử lý sự kiện mở chi tiết đơn hàng
+    document.getElementById('order-list').addEventListener('click', (event) => {
+        if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Chi tiết đơn hàng') {
+            const row = event.target.closest('tr');
+            const orderId = row.cells[0].textContent;
+
+            // Fetch chi tiết đơn hàng từ API
+            fetch(`http://192.168.3.105:3000/donhang/${orderId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showOrderDetails(data.data);
+                    } else {
+                        alert('Không thể tải chi tiết đơn hàng.');
+                    }
+                })
+                .catch(error => console.error('Lỗi khi lấy chi tiết đơn hàng:', error));
+        }
+    });
+});
 
         </script>
 </body>

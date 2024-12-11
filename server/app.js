@@ -76,24 +76,24 @@ app.get('/health-check', (req, res) => {
   res.status(200).json({status: 'OK', message: 'Server is running.'});
 });
 
-// Route xử lý thông tin thanh toán (checkout)
-app.get('/donhang/:userId', (req, res) => {
-  const userId = req.params.userId;
-  res.json({
-    message: `Đơn hàng của người dùng ${userId}`,
-    // Trả lại dữ liệu thực tế nếu có
-  });
-});
+// // Route xử lý thông tin thanh toán (checkout)
+// app.get('/donhang/:userId', (req, res) => {
+//   const userId = req.params.userId;
+//   res.json({
+//     message: `Đơn hàng của người dùng ${userId}`,
+//     // Trả lại dữ liệu thực tế nếu có
+//   });
+// });
 
-// Xác định route cho endpoint /donhang
-app.get('/donhang/:userId', (req, res) => {
-  const userId = req.params.userId;
-  // Lấy đơn hàng từ cơ sở dữ liệu hoặc xử lý yêu cầu
-  res.json({
-    message: `Đơn hàng của người dùng ${userId}`,
-    // Trả lại dữ liệu thực tế ở đây
-  });
-});
+// // Xác định route cho endpoint /donhang
+// app.get('/donhang/:userId', (req, res) => {
+//   const userId = req.params.userId;
+//   // Lấy đơn hàng từ cơ sở dữ liệu hoặc xử lý yêu cầu
+//   res.json({
+//     message: `Đơn hàng của người dùng ${userId}`,
+//     // Trả lại dữ liệu thực tế ở đây
+//   });
+// });
 
 // Sử dụng các route
 app.use('/', indexRouter);
