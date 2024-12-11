@@ -87,7 +87,7 @@ exports.getPopularLapTop = async (req, res) => {
         hang,
         CPU,
         RAM,
-CardManHinh,
+        CardManHinh,
         KichThuocManHinh
       });
   

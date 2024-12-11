@@ -254,7 +254,7 @@
 </div>
 
     <!-- Dialog sửa sản phẩm -->
-<div id="edit-dialog">
+<div id="edit-dialog" style="display: none;">
     <h3>Sửa Sản Phẩm</h3>
     <form>
         <input id="edit-product-id" type="hidden">
@@ -273,6 +273,7 @@
         <button type="button" onclick="closeDialog('edit-dialog')">Đóng</button>
     </form>
 </div>
+
 
 
     <script src="/scripts/manager.js"></script>
@@ -411,7 +412,7 @@ async function showEditDialog(id) {
     }
 
     // Cập nhật các trường trong form sửa sản phẩm
-    document.getElementById("edit-product-id").value = product.id;
+    document.getElementById("edit-product-id").value = product._id;
     document.getElementById("edit-product-name").value = product.ten;
     document.getElementById("edit-product-description").value = product.moTa;
     document.getElementById("edit-product-price").value = product.gia;
@@ -419,12 +420,11 @@ async function showEditDialog(id) {
     document.getElementById("edit-product-category").value = product.danhMuc;
     document.getElementById("edit-product-quantity").value = product.soLuong;
     document.getElementById("edit-product-brand").value = product.hang;
-
-    // Cập nhật các trường thông tin chi tiết
     document.getElementById("edit-cpu").value = product.CPU;
     document.getElementById("edit-cardmanhinh").value = product.CardManHinh;
     document.getElementById("edit-kichthuocmanhinh").value = product.KichThuocManHinh;
     document.getElementById("edit-ram").value = product.RAM;
+
 
     // Hiển thị dialog sửa sản phẩm
     showDialog("edit-dialog");
@@ -461,13 +461,22 @@ function editLaptop() {
     })
         .then(response => response.json())
         .then(data => {
-            alert("Sửa sản phẩm thành công!");
-            closeDialog("edit-dialog");
-            fetchProducts();
-        })
-        .catch(error => console.error("Error editing product:", error));
-}
+            // Kiểm tra nếu sửa thành công
+            if (data.status === 200) {
+                alert("Sửa sản phẩm thành công!");
+                closeDialog("edit-dialog");
 
+                // Gọi lại API để lấy danh sách sản phẩm mới
+                fetchProducts();
+            } else {
+                alert("Sửa sản phẩm không thành công. Vui lòng thử lại.");
+            }
+        })
+        .catch(error => {
+            console.error("Lỗi khi sửa sản phẩm:", error);
+            alert("Đã có lỗi xảy ra, vui lòng thử lại.");
+        });
+}
 // Delete a product
 function deleteLaptop(id) {
     if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
