@@ -233,38 +233,47 @@
         </div>
     </div>
 
-    <!-- Dialog thêm sản phẩm -->
-    <div id="add-dialog">
-        <h3>Thêm Sản Phẩm</h3>
-        <form>
-            <input id="ten" type="text" placeholder="Tên sản phẩm" required>
-            <input id="moTa" type="text" placeholder="Mô tả" required>
-            <input id="gia" type="number" placeholder="Giá" required>
-            <input id="hinhAnh" type="text" placeholder="Link hình ảnh" required>
-            <input id="danhMuc" type="text" placeholder="Danh mục" required>
-            <input id="soLuong" type="number" placeholder="Số lượng" required>
-            <input id="hang" type="text" placeholder="Hãng" required>
-            <button type="button" onclick="addLaptop()">Thêm</button>
-            <button type="button" onclick="closeDialog('add-dialog')">Đóng</button>
-        </form>
-    </div>
+   <!-- Dialog thêm sản phẩm -->
+<div id="add-dialog">
+    <h3>Thêm Sản Phẩm</h3>
+    <form>
+        <input id="ten" type="text" placeholder="Tên sản phẩm" required>
+        <input id="moTa" type="text" placeholder="Mô tả" required>
+        <input id="gia" type="number" placeholder="Giá" required>
+        <input id="hinhAnh" type="text" placeholder="Link hình ảnh" required>
+        <input id="danhMuc" type="text" placeholder="Danh mục" required>
+        <input id="soLuong" type="number" placeholder="Số lượng" required>
+        <input id="hang" type="text" placeholder="Hãng" required>
+        <input id="cpu" type="text" placeholder="CPU" required>
+        <input id="cardmanhinh" type="text" placeholder="Card Màn Hình" required>
+        <input id="kichthuocmanhinh" type="text" placeholder="Kích Thước Màn Hình" required>
+        <input id="ram" type="text" placeholder="RAM" required>
+        <button type="button" onclick="addLaptop()">Thêm</button>
+        <button type="button" onclick="closeDialog('add-dialog')">Đóng</button>
+    </form>
+</div>
 
     <!-- Dialog sửa sản phẩm -->
-    <div id="edit-dialog">
-        <h3>Sửa Sản Phẩm</h3>
-        <form>
-            <input id="edit-product-id" type="hidden">
-            <input id="edit-product-name" type="text" placeholder="Tên sản phẩm" required>
-            <input id="edit-product-description" type="text" placeholder="Mô tả" required>
-            <input id="edit-product-price" type="number" placeholder="Giá" required>
-            <input id="edit-product-image" type="text" placeholder="Hình ảnh" required>
-            <input id="edit-product-category" type="text" placeholder="Danh mục" required>
-            <input id="edit-product-quantity" type="number" placeholder="Số lượng" required>
-            <input id="edit-product-brand" type="text" placeholder="Hãng" required>
-            <button type="button" onclick="editLaptop()">Lưu</button>
-            <button type="button" onclick="closeDialog('edit-dialog')">Đóng</button>
-        </form>
-    </div>
+<div id="edit-dialog">
+    <h3>Sửa Sản Phẩm</h3>
+    <form>
+        <input id="edit-product-id" type="hidden">
+        <input id="edit-product-name" type="text" placeholder="Tên sản phẩm" required>
+        <input id="edit-product-description" type="text" placeholder="Mô tả" required>
+        <input id="edit-product-price" type="number" placeholder="Giá" required>
+        <input id="edit-product-image" type="text" placeholder="Hình ảnh" required>
+        <input id="edit-product-category" type="text" placeholder="Danh mục" required>
+        <input id="edit-product-quantity" type="number" placeholder="Số lượng" required>
+        <input id="edit-product-brand" type="text" placeholder="Hãng" required>
+        <input id="edit-cpu" type="text" placeholder="CPU" required>
+        <input id="edit-cardmanhinh" type="text" placeholder="Card Màn Hình" required>
+        <input id="edit-kichthuocmanhinh" type="text" placeholder="Kích Thước Màn Hình" required>
+        <input id="edit-ram" type="text" placeholder="RAM" required>
+        <button type="button" onclick="editLaptop()">Lưu</button>
+        <button type="button" onclick="closeDialog('edit-dialog')">Đóng</button>
+    </form>
+</div>
+
 
     <script src="/scripts/manager.js"></script>
 </body>
@@ -346,6 +355,7 @@ function filterProducts() {
 // Fetch products function remains the same
 
 // Add a new product
+// Thêm sản phẩm mới
 function addLaptop() {
     const product = {
         ten: document.getElementById("ten").value,
@@ -355,6 +365,10 @@ function addLaptop() {
         danhMuc: document.getElementById("danhMuc").value,
         soLuong: parseInt(document.getElementById("soLuong").value),
         hang: document.getElementById("hang").value,
+        CPU: document.getElementById("cpu").value,
+        CardManHinh: document.getElementById("cardmanhinh").value,
+        KichThuocManHinh: document.getElementById("kichthuocmanhinh").value,
+        RAM: document.getElementById("ram").value,
     };
 
     fetch(`${API_BASE_URL}/addLapTop`, {
@@ -372,19 +386,58 @@ function addLaptop() {
 }
 
 // Show edit dialog
-function showEditDialog(id, name, description, price, image, category, quantity, brand) {
-    document.getElementById("edit-product-id").value = id;
-    document.getElementById("edit-product-name").value = name;
-    document.getElementById("edit-product-description").value = description;
-    document.getElementById("edit-product-price").value = price;
-    document.getElementById("edit-product-image").value = image;
-    document.getElementById("edit-product-category").value = category;
-    document.getElementById("edit-product-quantity").value = quantity;
-    document.getElementById("edit-product-brand").value = brand;
+// Hàm để lấy sản phẩm theo ID từ API
+async function fetchProductById(id) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/getLapTopById/${id}`);
+        if (!response.ok) {
+            throw new Error('Không thể lấy dữ liệu sản phẩm');
+        }
+        const product = await response.json();
+        return product.data;  // Giả sử dữ liệu sản phẩm được trả về trong trường 'data'
+    } catch (error) {
+        console.error('Lỗi khi lấy dữ liệu sản phẩm:', error);
+        alert("Có lỗi xảy ra khi tải dữ liệu sản phẩm.");
+        return null;
+    }
+}
+
+// Hàm để hiển thị dialog sửa thông tin sản phẩm
+async function showEditDialog(id) {
+    const product = await fetchProductById(id);
+
+    if (!product) {
+        return;  // Nếu không lấy được dữ liệu, dừng lại
+    }
+
+    // Cập nhật các trường trong form sửa sản phẩm
+    document.getElementById("edit-product-id").value = product.id;
+    document.getElementById("edit-product-name").value = product.ten;
+    document.getElementById("edit-product-description").value = product.moTa;
+    document.getElementById("edit-product-price").value = product.gia;
+    document.getElementById("edit-product-image").value = product.hinhAnh;
+    document.getElementById("edit-product-category").value = product.danhMuc;
+    document.getElementById("edit-product-quantity").value = product.soLuong;
+    document.getElementById("edit-product-brand").value = product.hang;
+
+    // Cập nhật các trường thông tin chi tiết
+    document.getElementById("edit-cpu").value = product.CPU;
+    document.getElementById("edit-cardmanhinh").value = product.CardManHinh;
+    document.getElementById("edit-kichthuocmanhinh").value = product.KichThuocManHinh;
+    document.getElementById("edit-ram").value = product.RAM;
+
+    // Hiển thị dialog sửa sản phẩm
     showDialog("edit-dialog");
 }
 
+// Hàm hiển thị dialog (giả định)
+function showDialog(dialogId) {
+    const dialog = document.getElementById(dialogId);
+    dialog.style.display = 'block';  // Hoặc cách khác để hiển thị dialog tùy theo cách bạn triển khai
+}
+
 // Edit a product
+// Sửa sản phẩm
 function editLaptop() {
     const id = document.getElementById("edit-product-id").value;
     const product = {
@@ -395,6 +448,10 @@ function editLaptop() {
         danhMuc: document.getElementById("edit-product-category").value,
         soLuong: parseInt(document.getElementById("edit-product-quantity").value),
         hang: document.getElementById("edit-product-brand").value,
+        CPU: document.getElementById("edit-cpu").value,
+        CardManHinh: document.getElementById("edit-cardmanhinh").value,
+        KichThuocManHinh: document.getElementById("edit-kichthuocmanhinh").value,
+        RAM: document.getElementById("edit-ram").value,
     };
 
     fetch(`${API_BASE_URL}/updateLapTop/${id}`, {
