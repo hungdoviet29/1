@@ -84,7 +84,7 @@ const updateDonHang = async (req, res) => {
         if (updatedData.status) {
             const notification = new Notification({
                 userId: updatedDonHang.userId,
-                message: `Trạng thái đơn hàng ${id} đã thay đổi thành "${updatedData.status}".`,
+                message: `Trạng thái đơn hàng ${id} Đơn hàng của bạn đã "${updatedData.status}".`,
                 createdAt: new Date(),
             });
             await notification.save();

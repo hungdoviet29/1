@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const NotificationScreen = ({ route, navigation }) => {
+const NotificationScreen = ({ navigation }) => {
     const [notifications, setNotifications] = useState([]);
     const [userId, setUserId] = useState(null);
 
@@ -24,24 +24,34 @@ const NotificationScreen = ({ route, navigation }) => {
         fetchUserId();
     }, []);
 
-    // Load notifications from server when the screen loads
-    useEffect(() => {
-        const fetchNotifications = async () => {
-            if (!userId) return;
+    // Function to fetch notifications from server
+    const fetchNotifications = async () => {
+        if (!userId) return;
 
-            try {
-                const response = await fetch(`http://192.168.3.105:3000/donhang/notifications/${userId}`);
-                const data = await response.json();
-                if (data.success) {
-                    setNotifications(data.data); // Set notifications from server response
-                } else {
-                    console.error('Failed to fetch notifications:', data.message);
-                }
-            } catch (error) {
-                console.error('Error fetching notifications:', error);
+        try {
+            const response = await fetch(`http://192.168.3.105:3000/donhang/notifications/${userId}`);
+            const data = await response.json();
+            if (data.success) {
+                setNotifications(data.data); // Set notifications from server response
+            } else {
+                console.error('Failed to fetch notifications:', data.message);
             }
-        };
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
+    };
 
+    // Automatically reload notifications every 30 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchNotifications();
+        }, 30000); // Reload every 30 seconds
+
+        return () => clearInterval(interval); // Cleanup interval on unmount
+    }, [userId]);
+
+    // Initial fetch when userId is available
+    useEffect(() => {
         fetchNotifications();
     }, [userId]);
 
@@ -58,7 +68,7 @@ const NotificationScreen = ({ route, navigation }) => {
                     text: 'Confirm',
                     onPress: async () => {
                         try {
-                            await fetch(`http://<YOUR_SERVER_URL>/donhang/notifications/${userId}`, {
+                            await fetch(`http://192.168.3.105:3000/donhang/notifications/${userId}`, {
                                 method: 'DELETE',
                             });
                             setNotifications([]); // Clear notifications from UI
