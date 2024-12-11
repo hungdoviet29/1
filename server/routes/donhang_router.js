@@ -20,6 +20,9 @@ router.get('/user/:userId/status', donhangController.getDonHangsByUserAndStatus)
 
 // Route để lấy đơn hàng theo ID
 router.get('/:id', donhangController.getDonHangById);
+//ZaloPay
+router.post('/zalopay', donhangController.payWithZaloPay);
+
 
 
 module.exports = router;

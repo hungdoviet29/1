@@ -51,7 +51,7 @@ const CheckoutScreen = ({navigation, route}) => {
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
-        const url = `http://192.168.3.106:3000/vouchers?userId=${userId}`;
+        const url = `http://192.168.3.105:3000/vouchers?userId=${userId}`;
         const response = await fetch(url);
         const data = await response.json();
         if (response.ok) {
@@ -70,7 +70,7 @@ const CheckoutScreen = ({navigation, route}) => {
     const fetchCartItems = async id => {
       setLoading(true);
       try {
-        const response = await fetch(`http://192.168.3.106:3000/cart/${id}`);
+        const response = await fetch(`http://192.168.3.105:3000/cart/${id}`);
         const data = await response.json();
         if (response.ok) {
           // Filter out items with invalid productId
@@ -91,6 +91,43 @@ const CheckoutScreen = ({navigation, route}) => {
       }
     };
   }
+
+
+  const handleZaloPayCheckout = async () => {
+    if (!shippingInfo.name.trim() || !shippingInfo.phone.trim() || !shippingInfo.address.trim()) {
+        Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin vận chuyển.');
+        return;
+    }
+
+    try {
+        // Gọi API ZaloPay
+        const response = await fetch('http://192.168.3.105:3000/donhang/zalopay', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                orderId: `${userId}_${Date.now()}`, // ID đơn hàng độc nhất
+                totalAmount: total, // Tổng tiền thanh toán
+                shippingInfo,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.payment_url) {
+            // Điều hướng đến màn hình WebView với URL thanh toán ZaloPay
+            navigation.navigate('WebViewScreen', { url: data.payment_url });
+        } else {
+            Alert.alert('Lỗi', data.message || 'Không thể khởi tạo thanh toán.');
+        }
+    } catch (error) {
+        console.error('Lỗi khi tạo thanh toán qua ZaloPay:', error);
+        Alert.alert('Lỗi', 'Không thể kết nối đến máy chủ.');
+    }
+};
+const handleSelectPaymentMethod = method => {
+  setSelectedPaymentMethod(method);
+  setPaymentDropdownVisible(false); // Đóng dropdown sau khi chọn
+};
 
 
   const calculateTotal = (items, voucher = selectedVoucher) => {
@@ -121,6 +158,15 @@ const CheckoutScreen = ({navigation, route}) => {
 
 
   const handleCheckout = async () => {
+    if (!selectedPaymentMethod) {
+      Alert.alert('Lỗi', 'Vui lòng chọn phương thức thanh toán.');
+      return;
+  }
+
+  if (selectedPaymentMethod === 'Thanh toán qua ZaloPay') {
+      handleZaloPayCheckout();
+      return;
+  }
     if (!shippingInfo.name.trim()) {
       Alert.alert('Lỗi', 'Vui lòng nhập tên người nhận.');
       return;
@@ -162,7 +208,7 @@ const CheckoutScreen = ({navigation, route}) => {
 
             try {
               const response = await fetch(
-                'http://192.168.3.106:3000/donhang',
+                'http://192.168.3.105:3000/donhang',
                 {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
@@ -205,7 +251,7 @@ const CheckoutScreen = ({navigation, route}) => {
         quantity: selectedVoucher.quantity - 1,
       };
       const response = await fetch(
-        `http://192.168.3.106:3000/vouchers/${voucherId}`,
+        `http://192.168.3.105:3000/vouchers/${voucherId}`,
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
@@ -222,11 +268,11 @@ const CheckoutScreen = ({navigation, route}) => {
 
   const resetCart = async () => {
     try {
-      const response = await fetch(`http://192.168.3.106:3000/cart/${userId}`);
+      const response = await fetch(`http://192.168.3.105:3000/cart/${userId}`);
       const data = await response.json();
       if (data && data.items && data.items.length > 0) {
         const deleteResponse = await fetch(
-          `http://192.168.3.106:3000/cart/${userId}`,
+          `http://192.168.3.105:3000/cart/${userId}`,
           {
             method: 'DELETE',
           },
@@ -240,12 +286,6 @@ const CheckoutScreen = ({navigation, route}) => {
       console.error('Failed to reset cart:', error);
     }
   };
-
-  const handleSelectPaymentMethod = method => {
-    setSelectedPaymentMethod(method);
-    setPaymentDropdownVisible(false); // Close the dropdown after selection
-  };
-
   const handleVoucherSelect = voucher => {
     const currentDate = new Date();
     const expirationDate = new Date(voucher.expirationDate);
@@ -378,6 +418,10 @@ const CheckoutScreen = ({navigation, route}) => {
               }>
               <Text style={styles.dropdownItem}>Thanh toán qua ngân hàng</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => handleSelectPaymentMethod('Thanh toán qua ZaloPay')}>
+              <Text style={styles.dropdownItem}>Thanh toán qua ZaloPay</Text>
+            </TouchableOpacity>
           </View>
         )}
       </View>
@@ -398,8 +442,13 @@ const CheckoutScreen = ({navigation, route}) => {
       <Text style={styles.total}>Tổng: {total.toLocaleString()} VND</Text>
 
       <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
-        <Text style={styles.checkoutButtonText}>Thanh toán</Text>
-      </TouchableOpacity>
+    <Text style={styles.checkoutButtonText}>
+        {selectedPaymentMethod === 'Thanh toán qua ZaloPay'
+            ? 'Thanh toán qua ZaloPay'
+            : 'Thanh toán'}
+    </Text>
+</TouchableOpacity>
+
 
       {/* Voucher Modal */}
       <Modal
