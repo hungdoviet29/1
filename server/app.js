@@ -127,4 +127,6 @@ app.use((err, req, res, next) => {
 });
 
 // Xuất module app
+
+app.use('/api', laptopRouter);
 module.exports = app;

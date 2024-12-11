@@ -1,5 +1,4 @@
-const db = require("./db");
-const mongoose = db.mongoose;
+const mongoose = require('mongoose');
 
 const laptopSchema = new mongoose.Schema(
   {
