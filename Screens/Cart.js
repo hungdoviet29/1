@@ -155,32 +155,61 @@ const toggleSelectAll = () => {
       );
     }
   };
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     // Kiểm tra xem có sản phẩm nào được chọn không
     if (selectedItems.length === 0) {
-      Alert.alert(
-        'Thông báo',
-        'Vui lòng chọn ít nhất một sản phẩm để thanh toán.',
-      );
-      return;
+        Alert.alert('Thông báo', 'Vui lòng chọn ít nhất một sản phẩm để thanh toán.');
+        return;
     }
 
     // Lọc các sản phẩm đã được chọn từ giỏ hàng
     const selectedCartItems = cartItems.filter(item =>
-      selectedItems.includes(item.productId?._id),
+        selectedItems.includes(item.productId?._id),
     );
+
+    // Kiểm tra số lượng từng sản phẩm trong kho
+    for (const item of selectedCartItems) {
+        try {
+            const response = await fetch(`http://192.168.3.105:3000/laptop/getLapTopById/${item.productId?._id}`);
+            const data = await response.json();
+            if (data.success) {
+                const product = data.data;
+
+                if (product.soLuong === 0) {
+                    Alert.alert('Thông báo', `Sản phẩm "${product.ten}" đã hết hàng.`);
+                    return;
+                }
+
+                if (product.soLuong < item.quantity) {
+                    Alert.alert(
+                        'Thông báo',
+                        `Sản phẩm "${product.ten}" chỉ còn ${product.soLuong} trong kho. Vui lòng điều chỉnh số lượng.`,
+                    );
+                    return;
+                }
+            } else {
+                Alert.alert('Lỗi', `Không thể kiểm tra sản phẩm "${item.productId?.ten || 'Không rõ'}".`);
+                return;
+            }
+        } catch (error) {
+            console.error(`Lỗi khi kiểm tra sản phẩm ${item.productId?._id}:`, error);
+            Alert.alert('Lỗi', 'Không thể kết nối tới máy chủ. Vui lòng thử lại sau.');
+            return;
+        }
+    }
 
     // Tính tổng số tiền của các sản phẩm đã chọn
     const selectedTotalAmount = selectedCartItems.reduce((sum, item) => {
-      return sum + item.productId.gia * item.quantity;
+        return sum + item.productId.gia * item.quantity;
     }, 0);
 
     // Điều hướng đến CheckoutScreen với các sản phẩm đã chọn và tổng số tiền
     navigation.navigate('Checkout', {
-      selectedItems: selectedCartItems,
-      totalAmount: selectedTotalAmount,
+        selectedItems: selectedCartItems,
+        totalAmount: selectedTotalAmount,
     });
-  };
+};
+
 
   return (
     <View style={styles.container}>

@@ -1,5 +1,6 @@
 const DonHang = require('../models/donhangs_model');
 const Notification = require('../models/notification_model'); // Đảm bảo bạn có mô hình Notification
+const { laptopModel } = require('../models/laptop_model'); // Import model laptop
 
 const createDonHang = async (req, res) => {
     try {
@@ -84,18 +85,40 @@ const updateDonHang = async (req, res) => {
         const { id } = req.params;
         const updatedData = req.body;
 
-        // Cập nhật đơn hàng
         const updatedDonHang = await DonHang.findByIdAndUpdate(id, updatedData, { new: true });
 
         if (!updatedDonHang) {
             return res.status(404).json({ message: 'Không tìm thấy đơn hàng với ID này.' });
         }
 
-        // Nếu trạng thái thay đổi, tạo thông báo mới
-        if (updatedData.status) {
+        // Kiểm tra trạng thái đơn hàng
+        if (updatedData.status === 'Đang vận chuyển') {
+            for (const item of updatedDonHang.cartItems) {
+                const product = await laptopModel.findById(item.productId);
+                if (!product) {
+                    return res.status(404).json({ message: `Sản phẩm không tồn tại với ID ${item.productId}` });
+                }
+                if (product.soLuong < item.quantity) {
+                    return res.status(400).json({ message: `Sản phẩm ${product.ten} không đủ số lượng trong kho` });
+                }
+                product.soLuong -= item.quantity;
+                await product.save();
+            }
+
+            // Tạo thông báo cho người dùng
             const notification = new Notification({
                 userId: updatedDonHang.userId,
-                message: `Trạng thái đơn hàng ${id} Đơn hàng của bạn đã "${updatedData.status}".`,
+                message: `Đơn hàng ${id} của bạn đang được vận chuyển.`,
+                createdAt: new Date(),
+            });
+            await notification.save();
+        }
+
+        // Tạo thông báo nếu trạng thái thay đổi
+        if (updatedData.status && updatedData.status !== 'Đang vận chuyển') {
+            const notification = new Notification({
+                userId: updatedDonHang.userId,
+                message: `Trạng thái đơn hàng ${id} đã thay đổi thành "${updatedData.status}".`,
                 createdAt: new Date(),
             });
             await notification.save();
@@ -107,7 +130,6 @@ const updateDonHang = async (req, res) => {
         res.status(500).json({ message: 'Đã xảy ra lỗi khi cập nhật đơn hàng. Vui lòng thử lại sau.' });
     }
 };
-
 
 
 // Lấy đơn hàng theo trạng thái và userId

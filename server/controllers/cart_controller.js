@@ -35,28 +35,35 @@ exports.addToCart = async (req, res) => {
   const { userId, productId, quantity } = req.body;
 
   try {
-    const product = await laptopModel.findById(productId);
-    if (!product) {
-      return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
-    }
+      const product = await laptopModel.findById(productId);
+      if (!product) {
+          return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
+      }
 
-    let cart = await CartModel.findOne({ userId });
-    if (!cart) {
-      cart = new CartModel({ userId, items: [] });
-    }
+      if (product.soLuong < quantity) {
+          return res.status(400).json({ message: `Sản phẩm ${product.ten} không đủ số lượng trong kho` });
+      }
 
-    const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
-    if (itemIndex > -1) {
-      cart.items[itemIndex].quantity += quantity;
-    } else {
-      cart.items.push({ productId, quantity });
-    }
+      let cart = await CartModel.findOne({ userId });
+      if (!cart) {
+          cart = new CartModel({ userId, items: [] });
+      }
 
-    await cart.save();
-    res.status(200).json(cart);
+      const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+      if (itemIndex > -1) {
+          if (cart.items[itemIndex].quantity + quantity > product.soLuong) {
+              return res.status(400).json({ message: `Số lượng sản phẩm ${product.ten} vượt quá số lượng trong kho` });
+          }
+          cart.items[itemIndex].quantity += quantity;
+      } else {
+          cart.items.push({ productId, quantity });
+      }
+
+      await cart.save();
+      res.status(200).json(cart);
   } catch (error) {
-    console.error('Lỗi khi thêm vào giỏ hàng:', error);
-    res.status(500).json({ message: 'Lỗi server', error });
+      console.error('Lỗi khi thêm vào giỏ hàng:', error);
+      res.status(500).json({ message: 'Lỗi server', error });
   }
 };
 
@@ -84,35 +91,43 @@ exports.updateCartItem = async (req, res) => {
   const { userId, productId, quantity } = req.body;
 
   if (!userId || !productId || quantity < 1) {
-    return res.status(400).json({ message: 'Invalid request. Provide userId, productId, and valid quantity.' });
+      return res.status(400).json({ message: 'Invalid request. Provide userId, productId, and valid quantity.' });
   }
 
   try {
-    // Find the user's cart and populate product details
-    const cart = await CartModel.findOne({ userId });
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
-    }
+      const product = await laptopModel.findById(productId);
+      if (!product) {
+          return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
+      }
 
-    const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
-    if (itemIndex > -1) {
-      cart.items[itemIndex].quantity = quantity;
-      await cart.save();
+      if (product.soLuong < quantity) {
+          return res.status(400).json({ message: `Sản phẩm ${product.ten} không đủ số lượng trong kho` });
+      }
 
-      // Re-fetch and populate cart to ensure product details are included
-      const updatedCart = await CartModel.findOne({ userId }).populate(
-        'items.productId',
-        'ten moTa gia hinhAnh danhMuc'
-      );
-      return res.status(200).json({ message: 'Quantity updated successfully', cart: updatedCart });
-    }
+      const cart = await CartModel.findOne({ userId });
+      if (!cart) {
+          return res.status(404).json({ message: 'Cart not found' });
+      }
 
-    return res.status(404).json({ message: 'Product not found in cart' });
+      const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+      if (itemIndex > -1) {
+          cart.items[itemIndex].quantity = quantity;
+          await cart.save();
+
+          const updatedCart = await CartModel.findOne({ userId }).populate(
+              'items.productId',
+              'ten moTa gia hinhAnh danhMuc'
+          );
+          return res.status(200).json({ message: 'Quantity updated successfully', cart: updatedCart });
+      }
+
+      return res.status(404).json({ message: 'Product not found in cart' });
   } catch (error) {
-    console.error('Error updating cart item:', error);
-    res.status(500).json({ message: 'Internal server error', error });
+      console.error('Error updating cart item:', error);
+      res.status(500).json({ message: 'Internal server error', error });
   }
 };
+
 
 
 exports.clearCart = async (req, res) => {
