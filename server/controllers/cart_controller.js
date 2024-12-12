@@ -40,9 +40,9 @@ exports.addToCart = async (req, res) => {
           return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
       }
 
-      if (product.soLuong < quantity) {
-          return res.status(400).json({ message: `Sản phẩm ${product.ten} không đủ số lượng trong kho` });
-      }
+      // if (product.soLuong < quantity) {
+      //     return res.status(400).json({ message: `Sản phẩm ${product.ten} không đủ số lượng trong kho` });
+      // }
 
       let cart = await CartModel.findOne({ userId });
       if (!cart) {
@@ -100,9 +100,9 @@ exports.updateCartItem = async (req, res) => {
           return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
       }
 
-      if (product.soLuong < quantity) {
-          return res.status(400).json({ message: `Sản phẩm ${product.ten} không đủ số lượng trong kho` });
-      }
+      // if (product.soLuong < quantity) {
+      //     return res.status(400).json({ message: `Sản phẩm ${product.ten} không đủ số lượng trong kho` });
+      // }
 
       const cart = await CartModel.findOne({ userId });
       if (!cart) {

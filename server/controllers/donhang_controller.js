@@ -118,7 +118,7 @@ const updateDonHang = async (req, res) => {
         if (updatedData.status && updatedData.status !== 'Đang vận chuyển') {
             const notification = new Notification({
                 userId: updatedDonHang.userId,
-                message: `Đơn hàng${id} của ban đang"${updatedData.status}".`,
+                message: `Đơn hàng${id} của ban đang ${updatedData.status}.`,
                 createdAt: new Date(),
             });
             await notification.save();
