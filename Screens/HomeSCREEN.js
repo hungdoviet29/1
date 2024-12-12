@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';import {
+import React, { useState, useEffect, useRef } from 'react'; import {
   View,
   Text,
   Image,
@@ -8,10 +8,10 @@ import React, { useState, useEffect, useRef } from 'react';import {
   StyleSheet,
   Modal,
 } from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
-import {useDispatch, useSelector} from 'react-redux';
-import {addToFavorites, removeFromFavorites} from '../redux/favoriteSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToFavorites, removeFromFavorites } from '../redux/favoriteSlice';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -23,26 +23,53 @@ const HomeScreen = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [filterVisible, setFilterVisible] = useState(false); // Trạng thái hiển thị bộ lọc
   const [selectedOptions, setSelectedOptions] = useState({}); // Trạng thái lưu tùy chọn bộ lọc
-  
+  const normalize = (value) => value?.toString().toLowerCase().trim();
+
+  const applyFilters = () => {
+    const filteredLaptops = laptops.filter((laptop) => {
+      return (
+        (!selectedOptions.cpu || normalize(laptop.CPU) === normalize(selectedOptions.cpu)) &&
+        (!selectedOptions.ram || normalize(laptop.RAM) === normalize(selectedOptions.ram)) &&
+        (!selectedOptions.card || normalize(laptop.CardManHinh) === normalize(selectedOptions.card)) &&
+        (!selectedOptions.screenSize || normalize(laptop.KichThuocManHinh) === normalize(selectedOptions.screenSize)) &&
+        (!selectedOptions.price || checkPriceRange(laptop.gia, selectedOptions.price))
+      );
+    });
+    console.log('Kết quả lọc:', filteredLaptops);
+    setLaptops(filteredLaptops);
+    setFilterVisible(false);
+  };
+  const checkPriceRange = (price, range) => {
+    console.log('Giá:', price, 'Khoảng giá:', range);
+    switch (range) {
+      case 'Dưới 10 triệu': return price < 10000000;
+      case 'Từ 10 - 15 triệu': return price >= 10000000 && price <= 15000000;
+      case 'Từ 15 - 20 triệu': return price > 15000000 && price <= 20000000;
+      case 'Trên 30 triệu': return price > 30000000;
+      default: return true;
+    }
+  };
+
+
   const fetchData = category => {
     setLoading(true);
     let apiUrl = '';
 
     switch (category) {
       case 'Popular':
-        apiUrl = 'http://192.168.3.105:3000/LapTop/getPopularLapTop';
+        apiUrl = 'http://192.168.101.9:3000/LapTop/getPopularLapTop';
         break;
       case 'Trending':
-        apiUrl = 'http://192.168.3.105:3000/LapTop/getTrendingLapTop';
+        apiUrl = 'http://192.168.101.9:3000/LapTop/getTrendingLapTop';
         break;
       case 'News':
-        apiUrl = 'http://192.168.3.105:3000/LapTop/getNewsLapTop';
+        apiUrl = 'http://192.168.101.9:3000/LapTop/getNewsLapTop';
         break;
       case 'Sale':
-        apiUrl = 'http://192.168.3.105:3000/LapTop/getSaleLapTop';
+        apiUrl = 'http://192.168.101.9:3000/LapTop/getSaleLapTop';
         break;
       case 'All':
-        apiUrl = 'http://192.168.3.105:3000/LapTop/getListLapTop';
+        apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
         break;
       default:
     }
@@ -79,7 +106,7 @@ const HomeScreen = () => {
       [key]: value,
     }));
   };
-  
+
   const handleAddToFavorites = laptop => {
     const isFavorite = favorites.some(item => item._id === laptop._id);
     if (isFavorite) {
@@ -141,13 +168,13 @@ const HomeScreen = () => {
         ))}
       </View>
       <TouchableOpacity
-  style={styles.filterButton}
-  onPress={() => setFilterVisible(true)}>
-  <Image
-    source={require('../acssets/filter1.png')}
-    style={styles.filterIcon}
-  />
-</TouchableOpacity>
+        style={styles.filterButton}
+        onPress={() => setFilterVisible(true)}>
+        <Image
+          source={require('../acssets/filter1.png')}
+          style={styles.filterIcon}
+        />
+      </TouchableOpacity>
 
       {/* Product List */}
       {loading ? (
@@ -156,131 +183,151 @@ const HomeScreen = () => {
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.productScrollView}>
-          <View style={styles.productList}>
-            {laptops.map(laptop => (
-              <View style={styles.product} key={laptop._id}>
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('ProductScreen', {product: laptop})
-                  }>
-                  <Image
-                    source={{uri: laptop.hinhAnh}}
-                    style={styles.productImage}
-                  />
-                  <Text style={styles.productName}>{laptop.ten}</Text>
-                  <Text style={styles.productPrice}>
-                    {laptop.gia.toLocaleString()} VND
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
+          {laptops.length > 0 ? (
+            <View style={styles.productList}>
+              {laptops.map(laptop => (
+                <View style={styles.product} key={laptop._id}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate('ProductScreen', { product: laptop })
+                    }>
+                    <Image
+                      source={{ uri: laptop.hinhAnh }}
+                      style={styles.productImage}
+                    />
+                    <Text style={styles.productName}>{laptop.ten}</Text>
+                    <Text style={styles.productPrice}>
+                      {laptop.gia.toLocaleString()} VND
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text>Không có sản phẩm nào phù hợp với bộ lọc</Text>
+          )}
         </ScrollView>
+
       )}
       <Modal
-  visible={filterVisible}
-  animationType="slide"
-  transparent={true}
-  onRequestClose={() => setFilterVisible(false)}>
-  <View style={styles.modalOverlay}>
-    <View style={styles.modalContainer}>
-      {/* Tiêu đề */}
-      <View style={styles.header}>
-        <Image
-          source={require('../acssets/filter1.png')}
-          style={styles.icon}
-        />
-        <Text style={styles.title}>Bộ lọc tìm kiếm</Text>
-        <TouchableOpacity onPress={() => setFilterVisible(false)}>
-          <Image
-            source={require('../acssets/but.png')}
-            style={styles.closeIcon}
-          />
-        </TouchableOpacity>
-      </View>
+        visible={filterVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setFilterVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            {/* Tiêu đề */}
+            <View style={styles.header}>
+              <Image
+                source={require('../acssets/filter1.png')}
+                style={styles.icon}
+              />
+              <Text style={styles.title}>Bộ lọc tìm kiếm</Text>
+              <TouchableOpacity onPress={() => setFilterVisible(false)}>
+                <Image
+                  source={require('../acssets/but.png')}
+                  style={styles.closeIcon}
+                />
+              </TouchableOpacity>
+            </View>
 
-      {/* Nội dung */}
-      <ScrollView>
-        {/* Hãng sản xuất */}
-        <Text style={styles.sectionTitle}>Hãng sản xuất</Text>
-        <View style={styles.optionsContainer}>
-          {['Apple', 'Lenovo', 'Asus', 'MSI', 'Acer', 'HP', 'Dell', 'Gigabyte', 'Huawei', 'Masstel', 'VAIO'].map((brand) => (
-            <TouchableOpacity
-              key={brand}
-              style={[styles.optionButton, selectedOptions.brand === brand && styles.selectedOption]}
-              onPress={() => handleToggleOption('brand', brand)}>
-              <Text style={styles.optionText}>{brand}</Text>
-            </TouchableOpacity>
-          ))}
+            {/* Nội dung */}
+            <ScrollView>
+              {/* CPU */}
+              <Text style={styles.sectionTitle}>CPU</Text>
+              <View style={styles.optionsContainer}>
+                {['Core i3', 'Intel i7', 'AMD Ryzen 5'].map((cpu) => (
+                  <TouchableOpacity
+                    key={cpu}
+                    style={[styles.optionButton, selectedOptions.cpu === cpu && styles.selectedOption]}
+                    onPress={() => handleToggleOption('cpu', cpu)}>
+                    <Text style={styles.optionText}>{cpu}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* RAM */}
+              <Text style={styles.sectionTitle}>RAM</Text>
+              <View style={styles.optionsContainer}>
+                {['8 GB (1 thanh 8 GB)', '16GB'].map((ram) => (
+                  <TouchableOpacity
+                    key={ram}
+                    style={[styles.optionButton, selectedOptions.ram === ram && styles.selectedOption]}
+                    onPress={() => handleToggleOption('ram', ram)}>
+                    <Text style={styles.optionText}>{ram}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Card màn hình */}
+              <Text style={styles.sectionTitle}>Card màn hình</Text>
+              <View style={styles.optionsContainer}>
+                {['Intel UHD Graphics', 'NVIDIA GTX 1660 Ti'].map((card) => (
+                  <TouchableOpacity
+                    key={card}
+                    style={[styles.optionButton, selectedOptions.card === card && styles.selectedOption]}
+                    onPress={() => handleToggleOption('card', card)}>
+                    <Text style={styles.optionText}>{card}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Kích thước màn hình */}
+              <Text style={styles.sectionTitle}>Kích thước màn hình</Text>
+              <View style={styles.optionsContainer}>
+                {['14 inch', '15.6 inch'].map((screenSize) => (
+                  <TouchableOpacity
+                    key={screenSize}
+                    style={[styles.optionButton, selectedOptions.screenSize === screenSize && styles.selectedOption]}
+                    onPress={() => handleToggleOption('screenSize', screenSize)}>
+                    <Text style={styles.optionText}>{screenSize}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+
+
+            {/* Nút hành động */}
+            <View style={styles.actionButtons}>
+              <TouchableOpacity
+                style={styles.resetButton}
+                onPress={() => setSelectedOptions({})}>
+                <Text style={styles.resetText}>Thiết lập lại</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.applyButton}
+                onPress={applyFilters}>
+                <Text style={styles.applyText}>Áp dụng</Text>
+              </TouchableOpacity>
+
+
+            </View>
+          </View>
         </View>
-
-        {/* Mức giá */}
-        <Text style={styles.sectionTitle}>Mức giá</Text>
-        <View style={styles.checkboxContainer}>
-          {['Tất cả', 'Dưới 10 triệu', 'Từ 10 - 15 triệu', 'Từ 15 - 20 triệu', 'Từ 20 - 25 triệu', 'Từ 25 - 30 triệu', 'Trên 30 triệu'].map((price) => (
-            <TouchableOpacity
-              key={price}
-              style={styles.checkboxOption}
-              onPress={() => handleToggleOption('price', price)}>
-              <View style={[styles.checkbox, selectedOptions.price === price && styles.checkedCheckbox]} />
-              <Text style={styles.checkboxText}>{price}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Kích thước màn hình */}
-        <Text style={styles.sectionTitle}>Kích thước màn hình</Text>
-        <View style={styles.optionsContainer}>
-          {['Dưới 13 inch', '13 - 15 inch', 'Trên 15 inch'].map((size) => (
-            <TouchableOpacity
-              key={size}
-              style={[styles.optionButton, selectedOptions.screenSize === size && styles.selectedOption]}
-              onPress={() => handleToggleOption('screenSize', size)}>
-              <Text style={styles.optionText}>{size}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
-
-      {/* Nút hành động */}
-      <View style={styles.actionButtons}>
-        <TouchableOpacity
-          style={styles.resetButton}
-          onPress={() => setSelectedOptions({})}>
-          <Text style={styles.resetText}>Thiết lập lại</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.applyButton}
-          onPress={() => setFilterVisible(false)}>
-          <Text style={styles.applyText}>Áp dụng</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-</Modal>
+      </Modal>
 
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#fff'},
-  loadingContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  container: { flex: 1, backgroundColor: '#fff' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 16,
     alignItems: 'center',
   },
-  profileImage: {width: 40, height: 40, borderRadius: 20},
-  headerIcons: {flexDirection: 'row'},
-  icon: {width: 24, height: 24, marginLeft: 16},
+  profileImage: { width: 40, height: 40, borderRadius: 20 },
+  headerIcons: { flexDirection: 'row' },
+  icon: { width: 24, height: 24, marginLeft: 16 },
   categories: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 16,
   },
-  category: {fontSize: 16, fontWeight: 'bold', color: '#999'},
+  category: { fontSize: 16, fontWeight: 'bold', color: '#999' },
   categoryActive: {
     color: '#6C63FF',
     borderBottomWidth: 2,
@@ -304,16 +351,16 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
-  productImage: {width: 100, height: 100, resizeMode: 'contain'},
+  productImage: { width: 100, height: 100, resizeMode: 'contain' },
   productName: {
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 10,
     textAlign: 'center',
   },
-  productPrice: {fontSize: 14, color: '#888', marginTop: 5},
-  heartIconContainer: {position: 'absolute', top: 10, right: 10},
-  heartIcon: {width: 20, height: 20},
+  productPrice: { fontSize: 14, color: '#888', marginTop: 5 },
+  heartIconContainer: { position: 'absolute', top: 10, right: 10 },
+  heartIcon: { width: 20, height: 20 },
   modalOverlay: {
     position: 'absolute', // Đảm bảo Modal nằm trên các thành phần khác
     top: 0,
@@ -433,7 +480,7 @@ const styles = StyleSheet.create({
     color: '#fff', // Chữ màu trắng
     fontWeight: 'bold',
   },
-  
+
 });
 
 export default HomeScreen;
