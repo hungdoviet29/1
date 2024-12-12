@@ -57,19 +57,19 @@ const HomeScreen = () => {
 
     switch (category) {
       case 'Popular':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getPopularLapTop';
+        apiUrl = 'http://192.168.3.105:3000/LapTop/getPopularLapTop';
         break;
       case 'Trending':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getTrendingLapTop';
+        apiUrl = 'http://192.168.3.105:3000/LapTop/getTrendingLapTop';
         break;
       case 'News':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getNewsLapTop';
+        apiUrl = 'http://192.168.3.105:3000/LapTop/getNewsLapTop';
         break;
       case 'Sale':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getSaleLapTop';
+        apiUrl = 'http://192.168.3.105:3000/LapTop/getSaleLapTop';
         break;
       case 'All':
-        apiUrl = 'http://192.168.101.9:3000/LapTop/getListLapTop';
+        apiUrl = 'http://192.168.3.105:3000/LapTop/getListLapTop';
         break;
       default:
     }
@@ -191,16 +191,34 @@ const HomeScreen = () => {
                     onPress={() =>
                       navigation.navigate('ProductScreen', { product: laptop })
                     }>
-                    <Image
-                      source={{ uri: laptop.hinhAnh }}
-                      style={styles.productImage}
-                    />
-                    <Text style={styles.productName}>{laptop.ten}</Text>
+                    <View style={styles.productContainer}>
+                      {/* Ảnh sản phẩm */}
+                      <Image source={{ uri: laptop.hinhAnh }} style={styles.productImage} />
+
+                      {/* Thông tin bên phải ảnh */}
+                      <View style={styles.productDetails}>
+                        <Text style={styles.productDetailText}>{laptop.CPU || 'N/A'}</Text>
+                        <Text style={styles.productDetailText}>{laptop.RAM || 'N/A'}</Text>
+                        <Text style={styles.productDetailText}>
+                          {laptop.KichThuocManHinh || 'N/A'}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* Tên sản phẩm */}
+                    <Text style={styles.productName} numberOfLines={1}>
+                      {laptop.ten}
+                    </Text>
+
+                    {/* Giá sản phẩm */}
                     <Text style={styles.productPrice}>
                       {laptop.gia.toLocaleString()} VND
                     </Text>
                   </TouchableOpacity>
                 </View>
+
+
+
               ))}
             </View>
           ) : (
@@ -339,17 +357,18 @@ const styles = StyleSheet.create({
   },
   productList: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexWrap: 'wrap', // Cho phép xuống dòng
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: 8, // Giảm padding hai bên
   },
   product: {
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: 15,
-    width: '47%',
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: '#FFFFFF', // Màu nền trắng
+    borderRadius: 10, // Bo góc
+    padding: 10, // Khoảng cách bên trong
+    marginBottom: 16, // Khoảng cách giữa các sản phẩm
+    borderColor: '#E0E0E0', // Màu viền
+    borderWidth: 1, // Độ dày viền
+    alignItems: 'center', // Căn giữa nội dung
   },
   productImage: { width: 100, height: 100, resizeMode: 'contain' },
   productName: {
@@ -479,6 +498,48 @@ const styles = StyleSheet.create({
   applyText: {
     color: '#fff', // Chữ màu trắng
     fontWeight: 'bold',
+  },
+  productContainer: {
+    flexDirection: 'row', // Đặt ảnh và thông tin theo chiều ngang
+    alignItems: 'center', // Căn giữa theo trục dọc
+  },
+  productDetails: {
+    marginLeft: 15, // Tạo khoảng cách giữa ảnh và thông tin
+    flex: 1, // Cho phép chiếm phần còn lại của chiều ngang
+    justifyContent: 'space-between', // Căn đều các dòng
+    flexDirection: 'column', // Căn theo cột
+    alignItems: 'flex-start', // Căn trái
+  },
+  productDetailText: {
+    fontSize: 14, // Cỡ chữ phù hợp
+    color: '#333', // Màu chữ
+    marginBottom: 2, // Khoảng cách nhỏ giữa các dòng
+  },
+  productImage: {
+    width: 120, // Chiều rộng ảnh
+    height: 120, // Chiều cao ảnh
+    resizeMode: 'contain', // Đảm bảo ảnh không bị méo
+    borderRadius: 10, // Bo góc
+  },
+  productName: {
+    fontSize: 16, // Cỡ chữ lớn hơn cho tên sản phẩm
+    fontWeight: 'bold', // Làm đậm chữ
+    color: '#333', // Màu chữ đậm hơn
+  },
+  productPrice: {
+    fontSize: 16, // Cỡ chữ cho giá sản phẩm
+    fontWeight: 'bold', // Chữ đậm
+    color: '#FF0000', // Màu đỏ cho giá
+    marginTop: 5, // Khoảng cách phía trên
+  },
+  product: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    padding: 8, // Giảm padding bên trong
+    marginBottom: 8, // Giảm khoảng cách giữa các sản phẩm
+    width: '48%', // Giảm kích thước sản phẩm để vừa với màn hình
+    borderColor: '#E0E0E0',
+    borderWidth: 1,
   },
 
 });
