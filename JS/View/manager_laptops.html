@@ -179,335 +179,7 @@
     border-radius: 5px;
     cursor: pointer;
 }
-
-
-    </style>
-</head>
-
-<body>
-    <header>Bảng Điều Khiển Quản Lý</header>
-
-    <nav>
-        <ul>
-            <li><a href="manager.html">Đơn Hàng</a></li>
-            <li><a href="manager_laptops.html">Sản phẩm</a></li>
-            <li><a href="manager_user.html">Người Dùng</a></li>
-            <li><a href="manager_discount.html">Khuyến mại</a></li>
-            <li><a href="manager_statistical.html">Thống kê</a></li>
-            <li><a href="login.html">Đăng Xuất</a></li>
-        </ul>
-    </nav>
-
-    <div class="container">
-        <div class="summary-cards">
-            <div class="card">
-                <h3>Tổng Sản Phẩm</h3>
-                <p id="total-laptops">0</p>
-            </div>
-        </div>
-        <div class="table-container">
-            <h3>Quản lý sản phẩm</h3>
-            <div class="search-container">
-                <input type="text" id="search-box" placeholder="Tìm kiếm theo ID sản phẩm hoặc tên sản phẩm...">
-                <button id="search-button">Tìm kiếm</button>
-            </div>
-            
-            
-            <button onclick="showDialog('add-dialog')">Thêm</button>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID sản phẩm</th>
-                        <th>Tên Sản Phẩm</th>
-                        <th>Mô Tả</th>
-                        <th>Giá</th>
-                        <th>Hình ảnh</th>
-                        <th>Danh mục</th>
-                        <th>Số Lượng</th>
-                        <th>Hãng</th>
-                        <th>Hành Động</th>
-                    </tr>
-                </thead>
-                <tbody id="product-table-body"></tbody>
-            </table>
-        </div>
-    </div>
-
-   <!-- Dialog thêm sản phẩm -->
-<div id="add-dialog">
-    <h3>Thêm Sản Phẩm</h3>
-    <form>
-        <input id="ten" type="text" placeholder="Tên sản phẩm" required>
-        <input id="moTa" type="text" placeholder="Mô tả" required>
-        <input id="gia" type="number" placeholder="Giá" required>
-        <input id="hinhAnh" type="text" placeholder="Link hình ảnh" required>
-        <input id="danhMuc" type="text" placeholder="Danh mục" required>
-        <input id="soLuong" type="number" placeholder="Số lượng" required>
-        <input id="hang" type="text" placeholder="Hãng" required>
-        <input id="cpu" type="text" placeholder="CPU" required>
-        <input id="cardmanhinh" type="text" placeholder="Card Màn Hình" required>
-        <input id="kichthuocmanhinh" type="text" placeholder="Kích Thước Màn Hình" required>
-        <input id="ram" type="text" placeholder="RAM" required>
-        <button type="button" onclick="addLaptop()">Thêm</button>
-        <button type="button" onclick="closeDialog('add-dialog')">Đóng</button>
-    </form>
-</div>
-
-    <!-- Dialog sửa sản phẩm -->
-<div id="edit-dialog" style="display: none;">
-    <h3>Sửa Sản Phẩm</h3>
-    <form>
-        <input id="edit-product-id" type="hidden">
-        <input id="edit-product-name" type="text" placeholder="Tên sản phẩm" required>
-        <input id="edit-product-description" type="text" placeholder="Mô tả" required>
-        <input id="edit-product-price" type="number" placeholder="Giá" required>
-        <input id="edit-product-image" type="text" placeholder="Hình ảnh" required>
-        <input id="edit-product-category" type="text" placeholder="Danh mục" required>
-        <input id="edit-product-quantity" type="number" placeholder="Số lượng" required>
-        <input id="edit-product-brand" type="text" placeholder="Hãng" required>
-        <input id="edit-cpu" type="text" placeholder="CPU" required>
-        <input id="edit-cardmanhinh" type="text" placeholder="Card Màn Hình" required>
-        <input id="edit-kichthuocmanhinh" type="text" placeholder="Kích Thước Màn Hình" required>
-        <input id="edit-ram" type="text" placeholder="RAM" required>
-        <button type="button" onclick="editLaptop()">Lưu</button>
-        <button type="button" onclick="closeDialog('edit-dialog')">Đóng</button>
-    </form>
-</div>
-
-
-
-    <script src="/scripts/manager.js"></script>
-</body>
-
-</html>
-<script>
-    const API_BASE_URL = "http://localhost:3000/LapTop";
-// Hàm để tải nội dung từ file summary-cards.html
-async function loadSummaryCards() {
-    try {
-        const response = await fetch('summary-cards.html');
-        const content = await response.text();
-        document.getElementById('summary-cards-container').innerHTML = content;
-    } catch (error) {
-        console.error('Lỗi khi tải component:', error);
-    }
-}
-// Gọi hàm khi tải trang
-loadSummaryCards();
-
-// Fetch data and display in the table
-function fetchProducts() {
-    fetch(`${API_BASE_URL}/getListLapTop`)
-        .then(response => response.json())
-        .then(data => {
-            const tableBody = document.getElementById("product-table-body");
-            const totalLaptopsElement = document.getElementById("total-laptops");
-            tableBody.innerHTML = ""; // Xóa các hàng cũ
-            let totalProducts = 0; // Biến đếm tổng số sản phẩm (không phụ thuộc vào soLuong)
-            
-            // Duyệt qua danh sách sản phẩm
-            data.data.forEach(product => {
-                totalProducts++; // Tăng tổng số sản phẩm lên 1 cho mỗi sản phẩm
-
-                const row = `
-                    <tr>
-                        <td>${product._id}</td>
-                        <td>${product.ten}</td>
-                        <td>${product.moTa}</td>
-                        <td>${product.gia.toLocaleString()} VND</td>
-                        <td><img src="${product.hinhAnh}" alt="${product.ten}" style="width: 50px;"></td>
-                        <td>${product.danhMuc}</td>
-                        <td>${product.soLuong}</td>
-                        <td>${product.hang}</td>
-                        <td>
-                            <button class="edit-button" onclick="showEditDialog('${product._id}', '${product.ten}', '${product.moTa}', ${product.gia}, '${product.hinhAnh}', '${product.danhMuc}', ${product.soLuong}, '${product.hang}')">Sửa</button>
-                            <button class="delete-button" onclick="deleteLaptop('${product._id}')">Xóa</button>
-                        </td>
-                    </tr>
-                `;
-                tableBody.innerHTML += row;
-            });
-
-            // Cập nhật tổng số sản phẩm vào giao diện
-            totalLaptopsElement.textContent = totalProducts;
-        })
-        .catch(error => console.error("Error fetching products:", error));
-}
-document.getElementById('search-button').addEventListener('click', filterProducts);
-
-function filterProducts() {
-    const searchTerm = document.getElementById('search-box').value.toLowerCase();
-    const tableBody = document.getElementById('product-table-body');
-    const rows = tableBody.getElementsByTagName('tr');
-
-    for (const row of rows) {
-        const id = row.cells[0].textContent.toLowerCase();
-        const name = row.cells[1].textContent.toLowerCase();
-
-        if (id.includes(searchTerm) || name.includes(searchTerm)) {
-            row.style.display = ""; // Hiển thị
-        } else {
-            row.style.display = "none"; // Ẩn
-        }
-    }
-}
-
-
-// Fetch products function remains the same
-
-// Add a new product
-// Thêm sản phẩm mới
-function addLaptop() {
-    const product = {
-        ten: document.getElementById("ten").value,
-        moTa: document.getElementById("moTa").value,
-        gia: parseInt(document.getElementById("gia").value),
-        hinhAnh: document.getElementById("hinhAnh").value,
-        danhMuc: document.getElementById("danhMuc").value,
-        soLuong: parseInt(document.getElementById("soLuong").value),
-        hang: document.getElementById("hang").value,
-        CPU: document.getElementById("cpu").value,
-        CardManHinh: document.getElementById("cardmanhinh").value,
-        KichThuocManHinh: document.getElementById("kichthuocmanhinh").value,
-        RAM: document.getElementById("ram").value,
-    };
-
-    fetch(`${API_BASE_URL}/addLapTop`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(product),
-    })
-        .then(response => response.json())
-        .then(data => {
-            alert("Thêm sản phẩm thành công!");
-            closeDialog("add-dialog");
-            fetchProducts();
-        })
-        .catch(error => console.error("Error adding product:", error));
-}
-
-// Show edit dialog
-// Hàm để lấy sản phẩm theo ID từ API
-async function fetchProductById(id) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/getLapTopById/${id}`);
-        if (!response.ok) {
-            throw new Error('Không thể lấy dữ liệu sản phẩm');
-        }
-        const product = await response.json();
-        return product.data;  // Giả sử dữ liệu sản phẩm được trả về trong trường 'data'
-    } catch (error) {
-        console.error('Lỗi khi lấy dữ liệu sản phẩm:', error);
-        alert("Có lỗi xảy ra khi tải dữ liệu sản phẩm.");
-        return null;
-    }
-}
-
-// Hàm để hiển thị dialog sửa thông tin sản phẩm
-async function showEditDialog(id) {
-    const product = await fetchProductById(id);
-
-    if (!product) {
-        return;  // Nếu không lấy được dữ liệu, dừng lại
-    }
-
-    // Cập nhật các trường trong form sửa sản phẩm
-    document.getElementById("edit-product-id").value = product._id;
-    document.getElementById("edit-product-name").value = product.ten;
-    document.getElementById("edit-product-description").value = product.moTa;
-    document.getElementById("edit-product-price").value = product.gia;
-    document.getElementById("edit-product-image").value = product.hinhAnh;
-    document.getElementById("edit-product-category").value = product.danhMuc;
-    document.getElementById("edit-product-quantity").value = product.soLuong;
-    document.getElementById("edit-product-brand").value = product.hang;
-    document.getElementById("edit-cpu").value = product.CPU;
-    document.getElementById("edit-cardmanhinh").value = product.CardManHinh;
-    document.getElementById("edit-kichthuocmanhinh").value = product.KichThuocManHinh;
-    document.getElementById("edit-ram").value = product.RAM;
-
-
-    // Hiển thị dialog sửa sản phẩm
-    showDialog("edit-dialog");
-}
-
-// Hàm hiển thị dialog (giả định)
-function showDialog(dialogId) {
-    const dialog = document.getElementById(dialogId);
-    dialog.style.display = 'block';  // Hoặc cách khác để hiển thị dialog tùy theo cách bạn triển khai
-}
-
-// Edit a product
-// Sửa sản phẩm
-function editLaptop() {
-    const id = document.getElementById("edit-product-id").value;
-    const product = {
-        ten: document.getElementById("edit-product-name").value,
-        moTa: document.getElementById("edit-product-description").value,
-        gia: parseInt(document.getElementById("edit-product-price").value),
-        hinhAnh: document.getElementById("edit-product-image").value,
-        danhMuc: document.getElementById("edit-product-category").value,
-        soLuong: parseInt(document.getElementById("edit-product-quantity").value),
-        hang: document.getElementById("edit-product-brand").value,
-        CPU: document.getElementById("edit-cpu").value,
-        CardManHinh: document.getElementById("edit-cardmanhinh").value,
-        KichThuocManHinh: document.getElementById("edit-kichthuocmanhinh").value,
-        RAM: document.getElementById("edit-ram").value,
-    };
-
-    fetch(`${API_BASE_URL}/updateLapTop/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(product),
-    })
-        .then(response => response.json())
-        .then(data => {
-            // Kiểm tra nếu sửa thành công
-            if (data.status === 200) {
-                alert("Sửa sản phẩm thành công!");
-                closeDialog("edit-dialog");
-
-                // Gọi lại API để lấy danh sách sản phẩm mới
-                fetchProducts();
-            } else {
-                alert("Sửa sản phẩm không thành công. Vui lòng thử lại.");
-            }
-        })
-        .catch(error => {
-            console.error("Lỗi khi sửa sản phẩm:", error);
-            alert("Đã có lỗi xảy ra, vui lòng thử lại.");
-        });
-}
-// Delete a product
-function deleteLaptop(id) {
-    if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
-        fetch(`${API_BASE_URL}/deleteLapTop/${id}`, { method: "DELETE" })
-            .then(response => response.json())
-            .then(data => {
-                alert("Xóa sản phẩm thành công!");
-                fetchProducts();
-            })
-            .catch(error => console.error("Error deleting product:", error));
-    }
-}
-
-// Show dialog
-function showDialog(dialogId) {
-    document.getElementById(dialogId).style.display = "block";
-}
-
-// Close dialog
-function closeDialog(dialogId) {
-    document.getElementById(dialogId).style.display = "none";
-}
-
-// Initialize data on page load
-document.addEventListener("DOMContentLoaded", fetchProducts);
-
-</script>
-<style>
-    <style>
-        
-        #add-dialog, #edit-dialog {
+#add-dialog, #edit-dialog {
        position: fixed;
        top: 50%;
        left: 50%;
@@ -695,5 +367,417 @@ document.addEventListener("DOMContentLoaded", fetchProducts);
    .delete-button:hover {
        background-color: #e53935;
    }
-   </style>
-</style>
+   .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    border-radius: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+#productDetailModal img {
+    max-width: 100%; /* Ảnh sẽ tự động nhỏ lại theo chiều rộng container */
+    max-height: 200px; /* Giới hạn chiều cao tối đa */
+    display: block; /* Hiển thị dạng khối */
+    margin: 10px auto; /* Căn giữa hình ảnh */
+    border-radius: 8px; /* Bo góc */
+    object-fit: contain; /* Đảm bảo ảnh không bị méo */
+}
+
+    </style>
+</head>
+
+<body>
+    <div id="productDetailModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1000;">
+        <div style="position:relative; margin:5% auto; width:80%; background:white; border-radius:8px; padding:20px; max-height:80%; overflow-y:auto;">
+            <span id="closeModal" style="position:absolute; top:10px; right:20px; cursor:pointer; font-size:24px;">&times;</span>
+            <div id="productDetails">
+                <!-- Product details will be injected here -->
+            </div>
+        </div>
+    </div>
+    
+    
+    
+    <header>Bảng Điều Khiển Quản Lý</header>
+
+    <nav>
+        <ul>
+            <li><a href="manager.html">Đơn Hàng</a></li>
+            <li><a href="manager_laptops.html">Sản phẩm</a></li>
+            <li><a href="manager_user.html">Người Dùng</a></li>
+            <li><a href="manager_discount.html">Khuyến mại</a></li>
+            <li><a href="manager_statistical.html">Thống kê</a></li>
+            <li><a href="login.html">Đăng Xuất</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="summary-cards">
+            <div class="card">
+                <h3>Tổng Sản Phẩm</h3>
+                <p id="total-laptops">0</p>
+            </div>
+        </div>
+        <div class="table-container">
+            <h3>Quản lý sản phẩm</h3>
+            <div class="search-container">
+                <input type="text" id="search-box" placeholder="Tìm kiếm theo ID sản phẩm hoặc tên sản phẩm...">
+                <button id="search-button">Tìm kiếm</button>
+            </div>
+            
+            
+            <button onclick="showDialog('add-dialog')">Thêm</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID sản phẩm</th>
+                        <th>Tên Sản Phẩm</th>
+                        <th>Giá</th>
+                        <th>Hình ảnh</th>
+                        <th>Danh mục</th>
+                        <th>Số Lượng</th>
+                        <th>Hãng</th>
+                        <th>Chi tiết sản phẩm</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody id="product-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+   <!-- Dialog thêm sản phẩm -->
+<div id="add-dialog">
+    <h3>Thêm Sản Phẩm</h3>
+    <form>
+        <input id="ten" type="text" placeholder="Tên sản phẩm" required>
+        <input id="moTa" type="text" placeholder="Mô tả" required>
+        <input id="gia" type="number" placeholder="Giá" required>
+        <input id="hinhAnh" type="text" placeholder="Link hình ảnh" required>
+        <input id="danhMuc" type="text" placeholder="Danh mục" required>
+        <input id="soLuong" type="number" placeholder="Số lượng" required>
+        <input id="hang" type="text" placeholder="Hãng" required>
+        <input id="cpu" type="text" placeholder="CPU" required>
+        <input id="cardmanhinh" type="text" placeholder="Card Màn Hình" required>
+        <input id="kichthuocmanhinh" type="text" placeholder="Kích Thước Màn Hình" required>
+        <input id="ram" type="text" placeholder="RAM" required>
+        <button type="button" onclick="addLaptop()">Thêm</button>
+        <button type="button" onclick="closeDialog('add-dialog')">Đóng</button>
+    </form>
+</div>
+
+    <!-- Dialog sửa sản phẩm -->
+<div id="edit-dialog" style="display: none;">
+    <h3>Sửa Sản Phẩm</h3>
+    <form>
+        <input id="edit-product-id" type="hidden">
+        <input id="edit-product-name" type="text" placeholder="Tên sản phẩm" required>
+        <input id="edit-product-description" type="text" placeholder="Mô tả" required>
+        <input id="edit-product-price" type="number" placeholder="Giá" required>
+        <input id="edit-product-image" type="text" placeholder="Hình ảnh" required>
+        <input id="edit-product-category" type="text" placeholder="Danh mục" required>
+        <input id="edit-product-quantity" type="number" placeholder="Số lượng" required>
+        <input id="edit-product-brand" type="text" placeholder="Hãng" required>
+        <input id="edit-cpu" type="text" placeholder="CPU" required>
+        <input id="edit-cardmanhinh" type="text" placeholder="Card Màn Hình" required>
+        <input id="edit-kichthuocmanhinh" type="text" placeholder="Kích Thước Màn Hình" required>
+        <input id="edit-ram" type="text" placeholder="RAM" required>
+        <button type="button" onclick="editLaptop()">Lưu</button>
+        <button type="button" onclick="closeDialog('edit-dialog')">Đóng</button>
+    </form>
+</div>
+
+
+
+    <script src="/scripts/manager.js"></script>
+</body>
+
+</html>
+<script>
+    const API_BASE_URL = "http://localhost:3000/LapTop";
+// Hàm để tải nội dung từ file summary-cards.html
+async function loadSummaryCards() {
+    try {
+        const response = await fetch('summary-cards.html');
+        const content = await response.text();
+        document.getElementById('summary-cards-container').innerHTML = content;
+    } catch (error) {
+        console.error('Lỗi khi tải component:', error);
+    }
+}
+// Gọi hàm khi tải trang
+loadSummaryCards();
+
+// Fetch data and display in the table
+function fetchProducts() {
+    fetch(`${API_BASE_URL}/getListLapTop`)
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById("product-table-body");
+            const totalLaptopsElement = document.getElementById("total-laptops");
+            tableBody.innerHTML = ""; // Xóa các hàng cũ
+            let totalProducts = 0; // Biến đếm tổng số sản phẩm (không phụ thuộc vào soLuong)
+            
+            // Duyệt qua danh sách sản phẩm
+            data.data.forEach(product => {
+                totalProducts++; // Tăng tổng số sản phẩm lên 1 cho mỗi sản phẩm
+
+                const row = `
+                    <tr>
+                        <td>${product._id}</td>
+                        <td>${product.ten}</td>
+                        
+                        <td>${product.gia.toLocaleString()} VND</td>
+                        <td><img src="${product.hinhAnh}" alt="${product.ten}" style="width: 50px;"></td>
+                        <td>${product.danhMuc}</td>
+                        <td>${product.soLuong}</td>
+                        <td>${product.hang}</td>
+                        <td><button class="detail-button" onclick="showProductDetails('${product._id}')">Chi tiết sản phẩm</button></td>
+                        <td>
+                            <button class="edit-button" onclick="showEditDialog('${product._id}', '${product.ten}', '${product.moTa}', ${product.gia}, '${product.hinhAnh}', '${product.danhMuc}', ${product.soLuong}, '${product.hang}')">Sửa</button>
+                            <button class="delete-button" onclick="deleteLaptop('${product._id}')">Xóa</button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+
+            // Cập nhật tổng số sản phẩm vào giao diện
+            totalLaptopsElement.textContent = totalProducts;
+        })
+        .catch(error => console.error("Error fetching products:", error));
+}
+document.getElementById('search-button').addEventListener('click', filterProducts);
+
+function filterProducts() {
+    const searchTerm = document.getElementById('search-box').value.toLowerCase();
+    const tableBody = document.getElementById('product-table-body');
+    const rows = tableBody.getElementsByTagName('tr');
+
+    for (const row of rows) {
+        const id = row.cells[0].textContent.toLowerCase();
+        const name = row.cells[1].textContent.toLowerCase();
+
+        if (id.includes(searchTerm) || name.includes(searchTerm)) {
+            row.style.display = ""; // Hiển thị
+        } else {
+            row.style.display = "none"; // Ẩn
+        }
+    }
+}
+
+
+// Fetch products function remains the same
+
+// Add a new product
+// Thêm sản phẩm mới
+function addLaptop() {
+    const product = {
+        ten: document.getElementById("ten").value,
+        moTa: document.getElementById("moTa").value,
+        gia: parseInt(document.getElementById("gia").value),
+        hinhAnh: document.getElementById("hinhAnh").value,
+        danhMuc: document.getElementById("danhMuc").value,
+        soLuong: parseInt(document.getElementById("soLuong").value),
+        hang: document.getElementById("hang").value,
+        CPU: document.getElementById("cpu").value,
+        CardManHinh: document.getElementById("cardmanhinh").value,
+        KichThuocManHinh: document.getElementById("kichthuocmanhinh").value,
+        RAM: document.getElementById("ram").value,
+    };
+
+    fetch(`${API_BASE_URL}/addLapTop`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product),
+    })
+        .then(response => response.json())
+        .then(data => {
+            alert("Thêm sản phẩm thành công!");
+            closeDialog("add-dialog");
+            fetchProducts();
+        })
+        .catch(error => console.error("Error adding product:", error));
+}
+
+// Show edit dialog
+// Hàm để lấy sản phẩm theo ID từ API
+async function fetchProductById(id) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/getLapTopById/${id}`);
+        if (!response.ok) {
+            throw new Error('Không thể lấy dữ liệu sản phẩm');
+        }
+        const product = await response.json();
+        return product.data;  // Giả sử dữ liệu sản phẩm được trả về trong trường 'data'
+    } catch (error) {
+        console.error('Lỗi khi lấy dữ liệu sản phẩm:', error);
+        alert("Có lỗi xảy ra khi tải dữ liệu sản phẩm.");
+        return null;
+    }
+}
+
+// Hàm để hiển thị dialog sửa thông tin sản phẩm
+async function showEditDialog(id) {
+    const product = await fetchProductById(id);
+
+    if (!product) {
+        return;  // Nếu không lấy được dữ liệu, dừng lại
+    }
+
+    // Cập nhật các trường trong form sửa sản phẩm
+    document.getElementById("edit-product-id").value = product._id;
+    document.getElementById("edit-product-name").value = product.ten;
+    document.getElementById("edit-product-description").value = product.moTa;
+    document.getElementById("edit-product-price").value = product.gia;
+    document.getElementById("edit-product-image").value = product.hinhAnh;
+    document.getElementById("edit-product-category").value = product.danhMuc;
+    document.getElementById("edit-product-quantity").value = product.soLuong;
+    document.getElementById("edit-product-brand").value = product.hang;
+    document.getElementById("edit-cpu").value = product.CPU;
+    document.getElementById("edit-cardmanhinh").value = product.CardManHinh;
+    document.getElementById("edit-kichthuocmanhinh").value = product.KichThuocManHinh;
+    document.getElementById("edit-ram").value = product.RAM;
+
+
+    // Hiển thị dialog sửa sản phẩm
+    showDialog("edit-dialog");
+}
+
+// Hàm hiển thị dialog (giả định)
+function showDialog(dialogId) {
+    const dialog = document.getElementById(dialogId);
+    dialog.style.display = 'block';  // Hoặc cách khác để hiển thị dialog tùy theo cách bạn triển khai
+}
+
+// Edit a product
+// Sửa sản phẩm
+function editLaptop() {
+    const id = document.getElementById("edit-product-id").value;
+    const product = {
+        ten: document.getElementById("edit-product-name").value,
+        moTa: document.getElementById("edit-product-description").value,
+        gia: parseInt(document.getElementById("edit-product-price").value),
+        hinhAnh: document.getElementById("edit-product-image").value,
+        danhMuc: document.getElementById("edit-product-category").value,
+        soLuong: parseInt(document.getElementById("edit-product-quantity").value),
+        hang: document.getElementById("edit-product-brand").value,
+        CPU: document.getElementById("edit-cpu").value,
+        CardManHinh: document.getElementById("edit-cardmanhinh").value,
+        KichThuocManHinh: document.getElementById("edit-kichthuocmanhinh").value,
+        RAM: document.getElementById("edit-ram").value,
+    };
+
+    fetch(`${API_BASE_URL}/updateLapTop/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product),
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Kiểm tra nếu sửa thành công
+            if (data.status === 200) {
+                alert("Sửa sản phẩm thành công!");
+                closeDialog("edit-dialog");
+
+                // Gọi lại API để lấy danh sách sản phẩm mới
+                fetchProducts();
+            } else {
+                alert("Sửa sản phẩm không thành công. Vui lòng thử lại.");
+            }
+        })
+        .catch(error => {
+            console.error("Lỗi khi sửa sản phẩm:", error);
+            alert("Đã có lỗi xảy ra, vui lòng thử lại.");
+        });
+}
+// Delete a product
+function deleteLaptop(id) {
+    if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
+        fetch(`${API_BASE_URL}/deleteLapTop/${id}`, { method: "DELETE" })
+            .then(response => response.json())
+            .then(data => {
+                alert("Xóa sản phẩm thành công!");
+                fetchProducts();
+            })
+            .catch(error => console.error("Error deleting product:", error));
+    }
+}
+
+// Show dialog
+function showDialog(dialogId) {
+    document.getElementById(dialogId).style.display = "block";
+}
+
+// Close dialog
+function closeDialog(dialogId) {
+    document.getElementById(dialogId).style.display = "none";
+}
+
+// Initialize data on page load
+document.addEventListener("DOMContentLoaded", fetchProducts);
+
+
+// Hiển thị modal chi tiết sản phẩm
+function showProductDetails(productId) {
+    fetch(`http://localhost:3000/LapTop/${productId}`)
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                const product = data.data;
+                const productDetails = `
+                    <p><strong>Tên:</strong> ${product.ten}</p>
+                    <p><strong>Giá:</strong> ${product.gia.toLocaleString()} VND</p>
+                    <p><strong>Số lượng:</strong> ${product.soLuong > 0 ? product.soLuong : 'Hết hàng'}</p>
+                    <p><strong>Hãng:</strong> ${product.hang}</p>
+                    <p><strong>CPU:</strong> ${product.CPU}</p>
+                    <p><strong>Card Màn Hình:</strong> ${product.CardManHinh}</p>
+                    <p><strong>Kích Thước Màn Hình:</strong> ${product.KichThuocManHinh}</p>
+                    <p><strong>RAM:</strong> ${product.RAM}</p>
+                    <p><strong>Mô tả:</strong> ${product.moTa || 'Không có mô tả'}</p>
+                    <img src="${product.hinhAnh}" alt="${product.ten}" style="width:100%; height:auto; margin-top:10px;">
+                `;
+                document.getElementById('productDetails').innerHTML = productDetails;
+                document.getElementById('productDetailModal').style.display = 'block';
+            } else {
+                alert('Không thể lấy thông tin chi tiết sản phẩm.');
+            }
+        })
+        .catch((error) => {
+            console.error('Lỗi khi lấy chi tiết sản phẩm:', error);
+        });
+}
+
+document.getElementById('closeModal').onclick = () => {
+    document.getElementById('productDetailModal').style.display = 'none';
+};
+
+</script>
