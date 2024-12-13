@@ -337,86 +337,26 @@ exports.getFavoriteProducts = async (req, res) => {
 };
 
 exports.addFavoriteProduct = async (req, res) => {
-  const {userId, productId} = req.body;
+  const { userId, productId } = req.body;
 
   try {
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({message: 'Người dùng không tồn tại'});
-    }
+      const user = await UserModel.findById(userId);
+      if (!user) {
+          return res.status(404).json({ message: 'Người dùng không tồn tại' });
+      }
 
-    if (user.sanPhamYeuThich.includes(productId)) {
-      return res
-        .status(400)
-        .json({message: 'Sản phẩm đã có trong danh sách yêu thích'});
-    }
+      if (user.sanPhamYeuThich.includes(productId)) {
+          return res.status(400).json({ message: 'Sản phẩm đã có trong danh sách yêu thích' });
+      }
 
-    user.sanPhamYeuThich.push(productId); // Thêm sản phẩm vào danh sách yêu thích
-    await user.save();
-    res.status(200).json({message: 'Đã thêm sản phẩm vào danh sách yêu thích'});
+      user.sanPhamYeuThich.push(productId);
+      await user.save();
+      res.status(200).json({ message: 'Đã thêm sản phẩm vào danh sách yêu thích' });
   } catch (error) {
-    console.error('Lỗi khi thêm sản phẩm vào danh sách yêu thích:', error);
-    res.status(500).json({message: 'Lỗi server', error});
+      res.status(500).json({ message: 'Lỗi server', error: error.message });
   }
 };
 
-exports.removeFavoriteProduct = async (req, res) => {
-  const {userId, productId} = req.body;
-
-  try {
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({message: 'Người dùng không tồn tại'});
-    }
-
-    const productIndex = user.sanPhamYeuThich.indexOf(productId);
-    if (productIndex === -1) {
-      return res
-        .status(400)
-        .json({message: 'Sản phẩm không có trong danh sách yêu thích'});
-    }
-
-    user.sanPhamYeuThich.splice(productIndex, 1); // Xóa sản phẩm khỏi danh sách yêu thích
-    await user.save();
-    res.status(200).json({message: 'Đã xóa sản phẩm khỏi danh sách yêu thích'});
-  } catch (error) {
-    console.error('Lỗi khi xóa sản phẩm yêu thích:', error);
-    res.status(500).json({message: 'Lỗi server', error});
-  }
-};
-
-// Hàm xóa sản phẩm khỏi danh sách yêu thích
-exports.removeFavoriteProduct = async (req, res) => {
-  const {userId, productId} = req.body;
-
-  try {
-    // Tìm người dùng và kiểm tra sản phẩm có trong danh sách yêu thích của họ không
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({message: 'Người dùng không tồn tại.'});
-    }
-
-    const productIndex = user.favorites.findIndex(
-      item => item._id.toString() === productId,
-    );
-    if (productIndex === -1) {
-      return res
-        .status(404)
-        .json({message: 'Sản phẩm không có trong danh sách yêu thích.'});
-    }
-
-    // Xóa sản phẩm khỏi danh sách yêu thích
-    user.favorites.splice(productIndex, 1);
-    await user.save();
-
-    res
-      .status(200)
-      .json({message: 'Sản phẩm đã bị xóa khỏi danh sách yêu thích.'});
-  } catch (error) {
-    console.error('Lỗi khi xóa sản phẩm yêu thích:', error);
-    res.status(500).json({message: 'Lỗi server', error});
-  }
-};
 
 // Hàm xóa sản phẩm khỏi danh sách yêu thích
 exports.removeFavoriteProduct = async (req, res) => {

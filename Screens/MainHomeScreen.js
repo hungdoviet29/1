@@ -72,9 +72,9 @@ const MainHome = () => {
     setLoading(true);
     try {
       const [popularResponse, saleResponse, trendingResponse] = await Promise.all([
-        axios.get('http://192.168.1.3:3000/LapTop/getPopularLapTop'),
-        axios.get('http://192.168.1.3:3000/LapTop/getSaleLapTop'),
-        axios.get('http://192.168.1.3:3000/LapTop/getTrendingLapTop'),
+        axios.get('http://172.20.10.6:3000/LapTop/getPopularLapTop'),
+        axios.get('http://172.20.10.6:3000/LapTop/getSaleLapTop'),
+        axios.get('http://172.20.10.6:3000/LapTop/getTrendingLapTop'),
       ]);
 
       setPopularLaptops(popularResponse.data.data);
@@ -95,20 +95,20 @@ const MainHome = () => {
   };
 
   const renderProducts = (laptops) =>
-    laptops.slice(0, 5).map((laptop) => (
-      <View style={styles.product} key={laptop._id}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('ProductScreen', { product: laptop })}
-        >
-          <Image source={{ uri: laptop.hinhAnh }} style={styles.productImage} />
-          <Text style={styles.productName}>{laptop.ten}</Text>
-          <Text style={styles.productPrice}>
-            {laptop.gia.toLocaleString()} VND
-          </Text>
-          <Text style={styles.productRating}>⭐️ 4.5</Text>
-        </TouchableOpacity>
-      </View>
+    laptops.filter((laptop) => laptop.soLuong > 0).slice(0, 5).map((laptop) => (
+        <View style={styles.product} key={laptop._id}>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('ProductScreen', { product: laptop })}
+            >
+                <Image source={{ uri: laptop.hinhAnh }} style={styles.productImage} />
+                <Text style={styles.productName}>{laptop.ten}</Text>
+                <Text style={styles.productPrice}>
+                    {laptop.gia.toLocaleString()} VND
+                </Text>
+            </TouchableOpacity>
+        </View>
     ));
+
     const openZalo = () => {
       const phoneNumber = '0357103658';
       const zaloUrl = `zalo://chat?phone=${phoneNumber}`;

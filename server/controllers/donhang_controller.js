@@ -83,7 +83,12 @@ const getAllDonHangs = async (req, res) => {
 const updateDonHang = async (req, res) => {
     try {
         const { id } = req.params;
-        const updatedData = req.body;
+        const { status, reason } = req.body; // Lấy trạng thái và lý do từ body request
+
+        const updatedData = { status };
+        if (status === 'Đã được hủy' && reason) {
+            updatedData.cancelReason = reason; // Lưu lý do hủy nếu trạng thái là Hủy
+        }
 
         const updatedDonHang = await DonHang.findByIdAndUpdate(id, updatedData, { new: true });
 
@@ -91,8 +96,8 @@ const updateDonHang = async (req, res) => {
             return res.status(404).json({ message: 'Không tìm thấy đơn hàng với ID này.' });
         }
 
-        // Kiểm tra trạng thái đơn hàng
-        if (updatedData.status === 'Đang vận chuyển') {
+        // Xử lý các trạng thái đặc biệt
+        if (status === 'Đang vận chuyển') {
             for (const item of updatedDonHang.cartItems) {
                 const product = await laptopModel.findById(item.productId);
                 if (!product) {
@@ -114,15 +119,23 @@ const updateDonHang = async (req, res) => {
             await notification.save();
         }
 
-        // Tạo thông báo nếu trạng thái thay đổi
-        if (updatedData.status && updatedData.status !== 'Đang vận chuyển') {
-            const notification = new Notification({
-                userId: updatedDonHang.userId,
-                message: `Đơn hàng${id} của ban đang ${updatedData.status}.`,
-                createdAt: new Date(),
-            });
-            await notification.save();
-        }
+        // Xử lý thông báo khi trạng thái thay đổi
+if (status && status !== 'Đang vận chuyển') {
+    const notificationMessage =
+        status === 'Hủy' && reason
+            ? `Đơn hàng ${id} của bạn đã bị hủy.`
+            : `Trạng thái đơn hàng ${id} của bạn ${status}.`;
+
+    const notification = new Notification({
+        userId: updatedDonHang.userId,
+        orderId: id, // Truyền orderId vào thông báo
+        message: notificationMessage,
+        createdAt: new Date(),
+    });
+
+    await notification.save();
+}
+
 
         res.status(200).json({ success: true, message: 'Đơn hàng đã được cập nhật.', data: updatedDonHang });
     } catch (error) {

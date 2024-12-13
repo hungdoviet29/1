@@ -29,7 +29,7 @@ const NotificationScreen = ({ navigation }) => {
         if (!userId) return;
 
         try {
-            const response = await fetch(`http://192.168.3.105:3000/donhang/notifications/${userId}`);
+            const response = await fetch(`http://172.20.10.6:3000/donhang/notifications/${userId}`);
             const data = await response.json();
             if (data.success) {
                 setNotifications(data.data); // Set notifications from server response
@@ -68,7 +68,7 @@ const NotificationScreen = ({ navigation }) => {
                     text: 'Confirm',
                     onPress: async () => {
                         try {
-                            await fetch(`http://192.168.3.105:3000/donhang/notifications/${userId}`, {
+                            await fetch(`http://172.20.10.6:3000/donhang/notifications/${userId}`, {
                                 method: 'DELETE',
                             });
                             setNotifications([]); // Clear notifications from UI
@@ -87,14 +87,21 @@ const NotificationScreen = ({ navigation }) => {
             <Text style={styles.title}>Your Notifications</Text>
             {notifications.length > 0 ? (
                 <FlatList
-                    data={notifications}
-                    keyExtractor={(item) => item._id.toString()}
-                    renderItem={({ item }) => (
-                        <View style={styles.notificationItem}>
-                            <Text style={styles.notificationText}>{item.message}</Text>
-                        </View>
-                    )}
-                />
+                data={notifications}
+                keyExtractor={(item) => item._id.toString()}
+                renderItem={({ item }) => (
+                    <View style={styles.notificationItem}>
+                        <Text style={styles.notificationText}>{item.message}</Text>
+                        {/* Hiển thị lý do hủy nếu có */}
+                        {item.message.includes('Đã được hủy') && (
+    <Text style={styles.cancelReasonText}>
+        {item.reason ? `Lý do hủy: ${item.reason}` : 'Không có lý do hủy được cung cấp.'}
+    </Text>
+)}
+
+                    </View>
+                )}
+            />
             ) : (
                 <Text style={styles.noNotifications}>No notifications available</Text>
             )}

@@ -42,7 +42,7 @@ const ProductScreen = () => {
         navigation.navigate('Login');
         return;
       }
-      await axios.post('http://192.168.0.104:3000/cart/add', {
+      await axios.post('http://172.20.10.6:3000/cart/add', {
         userId,
         productId: product._id,
         quantity,
@@ -57,60 +57,52 @@ const ProductScreen = () => {
 
   const toggleFavorite = async () => {
     try {
-      const userId = await AsyncStorage.getItem('userId');
-      if (!userId) {
-        Alert.alert(
-          'Lỗi',
-          'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.',
-        );
-        navigation.navigate('Login');
-        return;
-      }
-  
-      // Kiểm tra trạng thái yêu thích và thực hiện hành động tương ứng
-      if (isFavorite) {
-        // Nếu sản phẩm đã có trong danh sách yêu thích, gỡ bỏ sản phẩm khỏi yêu thích
-        await axios.post('http://192.168.0.104:3000/removeFavoriteProduct', {
-          userId,
-          productId: product._id,
-        });
-        setIsFavorite(false); // Cập nhật lại trạng thái
-        Alert.alert('Thành công', 'Sản phẩm đã bị gỡ khỏi danh sách yêu thích');
-      } else {
-        // Nếu sản phẩm chưa có trong danh sách yêu thích, thêm vào danh sách yêu thích
-        await axios.post('http://192.168.0.104:3000/addFavoriteProduct', {
-          userId,
-          productId: product._id,
-        });
-        setIsFavorite(true); // Cập nhật lại trạng thái
-        Alert.alert('Thành công', 'Sản phẩm đã được thêm vào danh sách yêu thích');
-      }
-    } catch (error) {
-      console.error('Lỗi khi cập nhật danh sách yêu thích:', error.response?.data || error.message);
-      Alert.alert('Lỗi', 'Không thể cập nhật danh sách yêu thích');
-    }
-  };
-  
-  useEffect(() => {
-    const checkIfFavorite = async () => {
-      try {
         const userId = await AsyncStorage.getItem('userId');
         if (!userId) {
-          console.error('User ID không tồn tại');
-          return;
-}
-        const response = await axios.get(
-          `http://192.168.0.104:3000/favorites/${userId}`,
-        );
-        const favoriteList = response.data.favorites || [];
-        const isFavorite = favoriteList.some(item => item._id === product._id);
-        setIsFavorite(isFavorite);
+            Alert.alert('Lỗi', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+            navigation.navigate('Login');
+            return;
+        }
+
+        if (isFavorite) {
+            // Xóa sản phẩm khỏi yêu thích
+            await axios.delete(`http://172.20.10.6:3000/favorites/${userId}/${product._id}`);
+            setIsFavorite(false);
+            Alert.alert('Thành công', 'Sản phẩm đã bị gỡ khỏi danh sách yêu thích');
+        } else {
+            // Thêm sản phẩm vào yêu thích
+            await axios.post(`http://172.20.10.6:3000/favorites`, { userId, productId: product._id });
+            setIsFavorite(true);
+            Alert.alert('Thành công', 'Sản phẩm đã được thêm vào danh sách yêu thích');
+        }
+    } catch (error) {
+        console.error('Lỗi khi cập nhật danh sách yêu thích:', error.response?.data || error.message);
+        Alert.alert('Lỗi', 'Không thể cập nhật danh sách yêu thích');
+    }
+};
+
+
+  
+useEffect(() => {
+  const checkIfFavorite = async () => {
+      try {
+          const userId = await AsyncStorage.getItem('userId');
+          if (!userId) {
+              console.error('User ID không tồn tại');
+              return;
+          }
+
+          const response = await axios.get(`http://172.20.10.6:3000/favorites/${userId}`);
+          const favoriteList = response.data.favorites || [];
+          const isFav = favoriteList.some(item => item._id === product._id);
+          setIsFavorite(isFav);
       } catch (error) {
-        console.error('Lỗi khi kiểm tra danh sách yêu thích:', error);
+          console.error('Lỗi khi kiểm tra danh sách yêu thích:', error);
       }
-    };
-    checkIfFavorite();
-  }, [product._id]);
+  };
+  checkIfFavorite();
+}, [product._id]);
+
 
   return (
     <View style={styles.container}>
@@ -173,6 +165,10 @@ const ProductScreen = () => {
           <View style={styles.descriptionContainer}>
             <Text style={styles.sectionTitle}>MÔ TẢ</Text>
             <Text style={styles.descriptionText}>{product.moTa}</Text>
+          </View>
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.sectionTitle}>Số lượng máy còn lại</Text>
+            <Text style={styles.descriptionText}>{product.soLuong}</Text>
           </View>
           <View style={styles.buttonContainer}>
   <TouchableOpacity

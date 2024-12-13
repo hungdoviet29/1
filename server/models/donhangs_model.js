@@ -19,6 +19,7 @@ const donhangSchema = new mongoose.Schema({
         default: 'Chờ xác nhận',  // Trạng thái mặc định
         enum: ['Chờ xác nhận', 'Đã xác nhận', 'Đang vận chuyển', 'Đã giao', 'Hủy']  // Các trạng thái có thể có
     },
+    cancelReason: { type: String }, // Thêm lý do hủy
 }, { timestamps: true });
 
 // Export mô hình DonHang

@@ -271,6 +271,16 @@
 </head>
 
 <body>
+    <div id="cancel-dialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); padding: 20px; border-radius: 10px; z-index: 1000; width: 80%; max-width: 400px;">
+        <h3>Nhập lý do hủy đơn hàng</h3>
+        <textarea id="cancel-reason" style="width: 100%; height: 100px; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
+        <div style="text-align: right;">
+            <button id="cancel-submit" style="padding: 10px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px;">Xác nhận</button>
+            <button id="cancel-close" style="padding: 10px 15px; background-color: #6c63ff; color: white; border: none; border-radius: 5px; margin-left: 10px;">Đóng</button>
+        </div>
+    </div>
+    <div id="dialog-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999;"></div>
+    
     <div id="order-detail-dialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); padding: 20px; border-radius: 10px; z-index: 1000; width: 80%; max-width: 600px;">
         <h3>Chi tiết đơn hàng</h3>
         <p><strong>ID đơn hàng:</strong> <span id="detail-id"></span></p>
@@ -422,21 +432,23 @@
                         filteredData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
                         filteredData.forEach(order => {
-                            const row = document.createElement('tr');
+    const row = document.createElement('tr');
 
-                            // Populate cells
-                            row.innerHTML = `
-                    <td>${order._id}</td>
-                    <td>${order.userId}</td>
-                    <td>${order.cartItems.map(item => item.productId ? `${item.productId.ten} (x${item.quantity})` : 'Sản phẩm không tồn tại').join('<br>')}</td>
-                    <td>${order.totalAmount.toLocaleString()} VND</td>
-                    <td>${order.shippingInfo.address}</td>
-                    <td>${order.shippingInfo.name}</td>
-                    <td>${order.shippingInfo.phone}</td>
-                    <td>${new Date(order.createdAt).toLocaleDateString('vi-VN')} ${new Date(order.createdAt).toLocaleTimeString('vi-VN')}</td>
-                    <td>${order.status || 'Không xác định'}</td>
-                    <td> <Button>Chi tiết đơn hàng</button></td>
-                `;
+    row.innerHTML = `
+        <td>${order._id}</td>
+        <td>${order.userId}</td>
+        <td>${order.cartItems.map(item => item.productId ? `${item.productId.ten} (x${item.quantity})` : 'Sản phẩm không tồn tại').join('<br>')}</td>
+        <td>${order.totalAmount.toLocaleString()} VND</td>
+        <td>${order.shippingInfo.address}</td>
+        <td>${order.shippingInfo.name}</td>
+        <td>${order.shippingInfo.phone}</td>
+        <td>${new Date(order.createdAt).toLocaleDateString('vi-VN')} ${new Date(order.createdAt).toLocaleTimeString('vi-VN')}</td>
+        <td>
+            ${order.status}
+            ${order.status.toLowerCase() === 'đã được hủy' && order.cancelReason ? `<br><strong>Lý do:</strong> ${order.cancelReason}` : ''}
+        </td>
+        <td><button>Chi tiết đơn hàng</button></td>
+    `;
 
                             const actionCell = document.createElement('td');
                             const status = order.status.toLowerCase();
@@ -450,7 +462,7 @@
                                 const cancelButton = document.createElement('button');
                                 cancelButton.textContent = 'Hủy đơn';
                                 cancelButton.className = 'cancel';
-                                cancelButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã hủy', row));
+                                // cancelButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã hủy', row));
                                 actionCell.appendChild(cancelButton);
                             }
                             else if (status === 'chờ vận chuyển') {
@@ -460,7 +472,6 @@
                                 shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đang vận chuyển', row));
                                 actionCell.appendChild(shipButton);
                             } else if (status === 'đang vận chuyển') {
-                                // Tạo hai nút "Thành công" và "Hủy đơn"
                                 const successButton = document.createElement('button');
                                 successButton.textContent = 'Thành công';
                                 successButton.className = 'success';
@@ -468,15 +479,15 @@
                                 actionCell.appendChild(successButton);
 
                                 const cancelButton = document.createElement('button');
-                                cancelButton.textContent = 'Hủy đơn';
-                                cancelButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã hủy', row));
+                                cancelButton.textContent = 'Hủy đơn hàng';
+                                cancelButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã được hủy', row));
                                 actionCell.appendChild(cancelButton);
                             } else if (status === 'thành công') {
                                 const shipButton = document.createElement('button');
-                                shipButton.textContent = 'Hủy đơn';
-                                shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã hủy', row));
+                                shipButton.textContent = 'Hủy đơn hàng';
+                                shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã được hủy', row));
                                 actionCell.appendChild(shipButton);
-                            } else if (status === 'đã hủy') {
+                            } else if (status === 'Đã được hủy') {
                                 actionCell.innerHTML = ''; // Ẩn nút, không hiện gì
                             }
 
@@ -587,6 +598,54 @@
                 .catch(error => console.error('Lỗi khi lấy chi tiết đơn hàng:', error));
         }
     });
+});
+
+document.getElementById('order-list').addEventListener('click', (event) => {
+    if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Hủy đơn') {
+        const orderId = event.target.closest('tr').cells[0].textContent;
+
+        // Mở dialog
+        const dialog = document.getElementById('cancel-dialog');
+        const overlay = document.getElementById('dialog-overlay');
+        dialog.style.display = 'block';
+        overlay.style.display = 'block';
+
+        // Xử lý nút xác nhận hủy
+        document.getElementById('cancel-submit').onclick = () => {
+            const reason = document.getElementById('cancel-reason').value.trim();
+            if (!reason) {
+                alert('Vui lòng nhập lý do hủy đơn.');
+                return;
+            }
+
+            // Gửi yêu cầu hủy đơn hàng kèm lý do
+            fetch(`http://localhost:3000/donhang/${orderId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'Đã được hủy', reason })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Đơn hàng đã được hủy.');
+                        location.reload(); // Tải lại trang
+                    } else {
+                        alert('Không thể hủy đơn hàng.');
+                    }
+                })
+                .catch(error => console.error('Lỗi khi hủy đơn hàng:', error));
+
+            // Đóng dialog
+            dialog.style.display = 'none';
+            overlay.style.display = 'none';
+        };
+
+        // Xử lý nút đóng dialog
+        document.getElementById('cancel-close').onclick = () => {
+            dialog.style.display = 'none';
+            overlay.style.display = 'none';
+        };
+    }
 });
 
         </script>
