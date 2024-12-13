@@ -72,9 +72,9 @@ const MainHome = () => {
     setLoading(true);
     try {
       const [popularResponse, saleResponse, trendingResponse] = await Promise.all([
-        axios.get('http://192.168.3.105:3000/LapTop/getPopularLapTop'),
-        axios.get('http://192.168.3.105:3000/LapTop/getSaleLapTop'),
-        axios.get('http://192.168.3.105:3000/LapTop/getTrendingLapTop'),
+        axios.get('http://192.168.0.104:3000/LapTop/getPopularLapTop'),
+        axios.get('http://192.168.0.104:3000/LapTop/getSaleLapTop'),
+        axios.get('http://192.168.0.104:3000/LapTop/getTrendingLapTop'),
       ]);
 
       setPopularLaptops(popularResponse.data.data);
@@ -110,18 +110,19 @@ const MainHome = () => {
       </View>
     ));
     const openZalo = () => {
-      // Chuyển đến cuộc trò chuyện Zalo với số điện thoại hoặc tài khoản Zalo
-      const zaloUrl = 'https://zalo.me/0357103658'; // Đổi số điện thoại theo ý muốn
+      const zaloUrl = 'zalo://0357103658'; // Nếu bạn muốn mở trò chuyện với một người dùng cụ thể
       Linking.canOpenURL(zaloUrl)
         .then((supported) => {
           if (supported) {
             Linking.openURL(zaloUrl);
           } else {
             console.log('Không thể mở Zalo');
+            // Có thể hiển thị thông báo thay thế
           }
         })
         .catch((err) => console.error('Lỗi khi mở Zalo:', err));
-    };
+  };
+  
   return (
     <View style={styles.container}>
       {loading ? (
@@ -131,7 +132,7 @@ const MainHome = () => {
           {/* Header */}
           <View style={styles.header}>
   <Image
-    source={require('../acssets/profile1.png')}
+    source={require('../acssets/lapstore_logo.png')}
     style={styles.profileImage}
   />
   <View style={styles.headerIcons}>
