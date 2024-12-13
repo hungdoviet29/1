@@ -72,9 +72,9 @@ const MainHome = () => {
     setLoading(true);
     try {
       const [popularResponse, saleResponse, trendingResponse] = await Promise.all([
-        axios.get('http://192.168.0.104:3000/LapTop/getPopularLapTop'),
-        axios.get('http://192.168.0.104:3000/LapTop/getSaleLapTop'),
-        axios.get('http://192.168.0.104:3000/LapTop/getTrendingLapTop'),
+        axios.get('http://192.168.1.3:3000/LapTop/getPopularLapTop'),
+        axios.get('http://192.168.1.3:3000/LapTop/getSaleLapTop'),
+        axios.get('http://192.168.1.3:3000/LapTop/getTrendingLapTop'),
       ]);
 
       setPopularLaptops(popularResponse.data.data);
@@ -110,19 +110,22 @@ const MainHome = () => {
       </View>
     ));
     const openZalo = () => {
-      const zaloUrl = 'zalo://0357103658'; // Nếu bạn muốn mở trò chuyện với một người dùng cụ thể
+      const phoneNumber = '0357103658';
+      const zaloUrl = `zalo://chat?phone=${phoneNumber}`;
+      const fallbackUrl = `https://zalo.me/${phoneNumber}`; // Trang web Zalo.
+    
       Linking.canOpenURL(zaloUrl)
         .then((supported) => {
           if (supported) {
-            Linking.openURL(zaloUrl);
+            Linking.openURL(zaloUrl); // Mở ứng dụng Zalo.
           } else {
-            console.log('Không thể mở Zalo');
-            // Có thể hiển thị thông báo thay thế
+            console.log('Mở Zalo thành công');
+            Linking.openURL(fallbackUrl); 
           }
         })
         .catch((err) => console.error('Lỗi khi mở Zalo:', err));
-  };
-  
+    };
+
   return (
     <View style={styles.container}>
       {loading ? (
