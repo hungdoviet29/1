@@ -64,6 +64,7 @@ import FixPasswordScreen from './Screens/FixPasswordScreen';
 import OrderHistoryScreen from './Screens/OderHistoryScreen';
 import MainHomeScreen from './Screens/MainHomeScreen';
 import ShopContactInfo from './Screens/ShopContactInfo';
+import WebViewScreen from './Screens/WebViewScreen';
 
 
 
@@ -109,7 +110,8 @@ const AppNavigator = ({ navigationRef }) => {
     ,'PortfolioDetails',
     'ShopContactInfo',
     'EditProfileScreen',
-    'CustomDrawerContent'
+    'CustomDrawerContent',
+    'WebViewScreen',
     
   ];
 
@@ -185,6 +187,7 @@ const AppNavigator = ({ navigationRef }) => {
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
         <Stack.Screen name="DetailPortfolio" component={DetailPortfolio} />
         <Stack.Screen name="VoucherScreen" component={VoucherScreen} />
+        <Stack.Screen name="WebViewScreen" component={WebViewScreen} />
       </Stack.Navigator>
 
       {/* Hiển thị Bottom Navigation khi không thuộc các màn hình trong danh sách noBottomNavScreens */}

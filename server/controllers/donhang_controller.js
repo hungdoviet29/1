@@ -2,6 +2,10 @@ const DonHang = require('../models/donhangs_model');
 const Notification = require('../models/notification_model'); // Đảm bảo bạn có mô hình Notification
 const { laptopModel } = require('../models/laptop_model'); // Import model laptop
 
+const axios = require('axios');
+const crypto = require('crypto');
+const moment = require('moment');
+
 const createDonHang = async (req, res) => {
     try {
         const { userId, cartItems, totalAmount, paymentMethod, shippingInfo } = req.body;
@@ -200,52 +204,64 @@ const getDonHangById = async (req, res) => {
         res.status(500).json({ message: 'Đã xảy ra lỗi khi lấy đơn hàng. Vui lòng thử lại sau.' });
     }
 };
-const axios = require('axios');
-const crypto = require('crypto');
+
 
 // Thanh toán qua ZaloPay
 const payWithZaloPay = async (req, res) => {
     try {
-        const { orderId, totalAmount, shippingInfo, items } = req.body;
+        const { amount, items, embed_data } = req.body;
+console.log(req.body.amount);
+console.log(req.body.items);
+console.log(req.body.embed_data);
 
-        if (!orderId || !totalAmount || !shippingInfo || !items) {
+        // Kiểm tra dữ liệu
+        if (!amount || !items || !embed_data || !embed_data.orderId || !embed_data.shippingInfo) {
             return res.status(400).json({ message: 'Thiếu thông tin cần thiết.' });
         }
 
+        const { orderId, shippingInfo } = embed_data;
+
+        console.log("orderId:", orderId, "amount:", amount, "shippingInfo:", shippingInfo, "item:", items);
+
         const config = {
-            app_id: "2553",
-    key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
-    key2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
-    endpoint: "https://sb-openapi.zalopay.vn/v2/create"
+            app_id: 2553,
+            key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
+            key2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
+            endpoint: "https://sb-openapi.zalopay.vn/v2/create"
         };
 
-        const moment = require('moment');
         const appTransId = `${moment().format('YYMMDD')}_${Math.floor(Math.random() * 1000000)}`; // Định dạng mã giao dịch
 
         const order = {
             app_id: config.app_id,
-            app_trans_id: appTransId,
             app_user: shippingInfo.name,
+            app_trans_id: appTransId,
             app_time: Date.now(),
-            amount: totalAmount,
+            amount: amount,
             item: JSON.stringify(items),
-            embed_data: JSON.stringify({ orderId, shippingInfo }),
             description: `Thanh toán đơn hàng ${orderId}`,
+            embed_data: JSON.stringify(embed_data),
         };
 
         // Tạo chữ ký (signature)
-        const crypto = require('crypto');
         const data = `${config.app_id}|${order.app_trans_id}|${order.app_user}|${order.amount}|${order.app_time}|${order.embed_data}|${order.item}`;
         order.mac = crypto.createHmac('sha256', config.key1).update(data).digest('hex');
 
+        console.log('Dữ liệu gửi đến ZaloPay:', order);
+        console.log('Data:', data);
+        console.log('MAC:', order.mac);
+
+
         // Gửi yêu cầu đến ZaloPay
-        const axios = require('axios');
         const response = await axios.post(config.endpoint, order);
 
+        console.log(response.data);
+
         if (response.data.return_code === 1) {
-            res.status(200).json({ success: true, payment_url: response.data.order_url });
+            res.status(200).json({ success: true, payment_url: response.data.order_url,zp_trans_token:response.zp_trans_token });
         } else {
             res.status(400).json({ message: response.data.return_message, detail: response.data });
+            console.log(response.data);
         }
     } catch (error) {
         console.error('Lỗi khi gửi yêu cầu thanh toán ZaloPay:', error);
