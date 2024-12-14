@@ -37,7 +37,7 @@ router.get("/getListLapTop", LapTopCtl.getListlaptop);
 //theo hãng
 router.get('/brand/:brand', laptopController.getLaptopsByBrand);
 //lấy theo id
-router.get('/:id', laptopController.getlaptopById);
+// router.get('/:id', laptopController.getlaptopById);
 // Route lấy sản phẩm theo ID
 
 

@@ -146,7 +146,6 @@ exports.getPopularLapTop = async (req, res) => {
       res.status(500).json({ message: 'Lỗi server', result: error });
     }
   };
-  
 exports.deletelaptop = async (req, res) => {
   try {
       console.log('Deleting laptop with ID:', req.params.id);  // Thêm log để kiểm tra ID
@@ -161,18 +160,18 @@ exports.deletelaptop = async (req, res) => {
 };
 
 
-exports.getlaptopById = async (req, res) => {
-  try {
-      const { id } = req.params;
-      const laptop = await laptopModel.findById(id);
-      if (!laptop) {
-          return res.status(404).json({ message: 'Không tìm thấy sản phẩm.' });
-      }
-      res.status(200).json({ success: true, data: laptop });
-  } catch (error) {
-      res.status(500).json({ message: 'Lỗi khi lấy chi tiết sản phẩm.', error: error.message });
-  }
-};
+// exports.getlaptopById = async (req, res) => {
+//   try {
+//       const { id } = req.params;
+//       const laptop = await laptopModel.findById(id);
+//       if (!laptop) {
+//           return res.status(404).json({ message: 'Không tìm thấy sản phẩm.' });
+//       }
+//       res.status(200).json({ success: true, data: laptop });
+//   } catch (error) {
+//       res.status(500).json({ message: 'Lỗi khi lấy chi tiết sản phẩm.', error: error.message });
+//   }
+// };
 
 exports.getLaptopsByBrand = async (req, res) => {
   const brand = req.params.brand;
