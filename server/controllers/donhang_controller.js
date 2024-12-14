@@ -101,7 +101,7 @@ const updateDonHang = async (req, res) => {
         }
 
         // Xử lý các trạng thái đặc biệt
-        if (status === 'Đang vận chuyển') {
+        if (status === 'Chờ xác nhận') {
             for (const item of updatedDonHang.cartItems) {
                 const product = await laptopModel.findById(item.productId);
                 if (!product) {
