@@ -748,7 +748,7 @@ document.addEventListener("DOMContentLoaded", fetchProducts);
 
 // Hiển thị modal chi tiết sản phẩm
 function showProductDetails(productId) {
-    fetch(`http://localhost:3000/LapTop/${productId}`)
+    fetch(`http://localhost:3000/getLapTopById/${productId}`)
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
