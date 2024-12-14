@@ -479,14 +479,16 @@
                                 actionCell.appendChild(successButton);
 
                                 const cancelButton = document.createElement('button');
-                                cancelButton.textContent = 'Hủy đơn hàng';
-                                cancelButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã được hủy', row));
+                                cancelButton.textContent = 'Hủy đơn';
+                                cancelButton.className = 'cancel';
+                                // cancelButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã hủy', row));
                                 actionCell.appendChild(cancelButton);
                             } else if (status === 'thành công') {
-                                const shipButton = document.createElement('button');
-                                shipButton.textContent = 'Hủy đơn hàng';
-                                shipButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã được hủy', row));
-                                actionCell.appendChild(shipButton);
+                                const cancelButton = document.createElement('button');
+                                cancelButton.textContent = 'Hủy đơn';
+                                cancelButton.className = 'cancel';
+                                // cancelButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã hủy', row));
+                                actionCell.appendChild(cancelButton);
                             } else if (status === 'Đã được hủy') {
                                 actionCell.innerHTML = ''; // Ẩn nút, không hiện gì
                             }
