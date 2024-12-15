@@ -306,6 +306,9 @@
           const productName = item.productId?.ten || "Sản phẩm không xác định";
           const productPrice = item.productId?.gia || 0;
 
+          // Bỏ qua sản phẩm có ID là "unknown"
+          if (productId === "unknown") return;
+
           if (!statistics[productId]) {
             statistics[productId] = {
               id: productId,
