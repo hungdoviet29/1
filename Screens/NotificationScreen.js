@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    TouchableOpacity, 
+    FlatList, 
+    Alert, 
+    ActivityIndicator, 
+    RefreshControl 
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NotificationScreen = ({ navigation }) => {
     const [notifications, setNotifications] = useState([]);
     const [userId, setUserId] = useState(null);
+    const [isLoading, setIsLoading] = useState(true); // Loading state
+    const [isRefreshing, setIsRefreshing] = useState(false); // Pull-to-refresh state
 
     // Fetch userId from AsyncStorage when the screen loads
     useEffect(() => {
@@ -13,11 +24,14 @@ const NotificationScreen = ({ navigation }) => {
                 const id = await AsyncStorage.getItem('userId');
                 if (id) {
                     setUserId(id);
+                    fetchNotifications(id); // Fetch notifications when userId is set
                 } else {
                     Alert.alert('Error', 'User information not found. Please log in again.');
+                    setIsLoading(false);
                 }
             } catch (error) {
                 console.error('Error fetching userId:', error);
+                setIsLoading(false);
             }
         };
 
@@ -25,11 +39,10 @@ const NotificationScreen = ({ navigation }) => {
     }, []);
 
     // Function to fetch notifications from server
-    const fetchNotifications = async () => {
-        if (!userId) return;
-
+    const fetchNotifications = async (id) => {
         try {
-            const response = await fetch(`http://172.20.10.6:3000/donhang/notifications/${userId}`);
+            setIsLoading(true);
+            const response = await fetch(`http://172.20.10.6:3000/donhang/notifications/${id}`);
             const data = await response.json();
             if (data.success) {
                 setNotifications(data.data); // Set notifications from server response
@@ -38,22 +51,18 @@ const NotificationScreen = ({ navigation }) => {
             }
         } catch (error) {
             console.error('Error fetching notifications:', error);
+        } finally {
+            setIsLoading(false); // Stop loading
         }
     };
 
-    // Automatically reload notifications every 30 seconds
-    useEffect(() => {
-        const interval = setInterval(() => {
-            fetchNotifications();
-        }, 30000); // Reload every 30 seconds
-
-        return () => clearInterval(interval); // Cleanup interval on unmount
-    }, [userId]);
-
-    // Initial fetch when userId is available
-    useEffect(() => {
-        fetchNotifications();
-    }, [userId]);
+    // Pull-to-refresh functionality
+    const handleRefresh = async () => {
+        if (!userId) return;
+        setIsRefreshing(true);
+        await fetchNotifications(userId);
+        setIsRefreshing(false);
+    };
 
     // Clear all notifications
     const clearNotifications = async () => {
@@ -85,23 +94,29 @@ const NotificationScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Your Notifications</Text>
-            {notifications.length > 0 ? (
-                <FlatList
-                data={notifications}
-                keyExtractor={(item) => item._id.toString()}
-                renderItem={({ item }) => (
-                    <View style={styles.notificationItem}>
-                        <Text style={styles.notificationText}>{item.message}</Text>
-                        {/* Hiển thị lý do hủy nếu có */}
-                        {item.message.includes('Đã được hủy') && (
-    <Text style={styles.cancelReasonText}>
-        {item.reason ? `Lý do hủy: ${item.reason}` : 'Không có lý do hủy được cung cấp.'}
-    </Text>
-)}
+            {isLoading ? (
+                <ActivityIndicator size="large" color="#4CAF50" style={styles.loadingIndicator} />
+            ) : notifications.length > 0 ? (
+<FlatList
+    data={notifications}
+    keyExtractor={(item) => item._id.toString()}
+    renderItem={({ item }) => (
+        <View style={styles.notificationItem}>
+            <Text style={styles.notificationText}>{item.message}</Text>
+            {/* Hiển thị lý do hủy nếu có */}
+            {item.message.toLowerCase().includes('đã được hủy'.toLowerCase()) && (
+                <Text style={styles.cancelReasonText}>
+                    {item.reason
+                        ? `Lý do hủy: ${item.reason}`
+                        : 'Không có lý do hủy được cung cấp.'}
+                </Text>
+            )}
+        </View>
+    )}
+/>
 
-                    </View>
-                )}
-            />
+
+
             ) : (
                 <Text style={styles.noNotifications}>No notifications available</Text>
             )}
@@ -112,10 +127,7 @@ const NotificationScreen = ({ navigation }) => {
                 >
                     <Text style={styles.buttonText}>Back to Home</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.clearButton}
-                    onPress={clearNotifications}
-                >
+                <TouchableOpacity style={styles.clearButton} onPress={clearNotifications}>
                     <Text style={styles.buttonText}>Clear All</Text>
                 </TouchableOpacity>
             </View>
@@ -136,6 +148,9 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         color: '#333',
     },
+    loadingIndicator: {
+        marginTop: 20,
+    },
     notificationItem: {
         backgroundColor: '#ffffff',
         padding: 16,
@@ -151,6 +166,11 @@ const styles = StyleSheet.create({
     notificationText: {
         fontSize: 16,
         color: '#333',
+    },
+    cancelReasonText: {
+        fontSize: 14,
+        color: '#f44336',
+        marginTop: 8,
     },
     noNotifications: {
         fontSize: 16,
@@ -171,8 +191,6 @@ const styles = StyleSheet.create({
         flex: 2,
         marginRight: 10,
         alignItems: 'center',
-        marginTop: 20, // Add this property to push the button higher
-    marginBottom: 50,
     },
     clearButton: {
         backgroundColor: '#f44336',
@@ -182,8 +200,6 @@ const styles = StyleSheet.create({
         flex: 2,
         marginLeft: 10,
         alignItems: 'center',
-        marginTop: 20, // Add this property to push the button higher
-    marginBottom: 50,
     },
     buttonText: {
         color: '#fff',

@@ -9,7 +9,11 @@ const getNotifications = async (req, res) => {
 
         const enhancedNotifications = await Promise.all(
             notifications.map(async (notification) => {
-                if (notification.message.includes('Đã được hủy') && notification.orderId) {
+                // Kiểm tra không phân biệt chữ hoa và chữ thường
+                if (
+                    notification.message.toLowerCase().includes('đã được hủy'.toLowerCase()) &&
+                    notification.orderId
+                ) {
                     const donHang = await DonHang.findById(notification.orderId);
                     if (donHang && donHang.cancelReason) {
                         return {

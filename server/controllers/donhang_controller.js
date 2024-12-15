@@ -100,10 +100,13 @@ const getAllDonHangs = async (req, res) => {
 const updateDonHang = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status, reason } = req.body;
+        let { status, reason } = req.body;
+
+        // Chuyển trạng thái sang chữ thường để không phân biệt chữ hoa/thường
+        status = status.toLowerCase();
 
         const updatedData = { status };
-        if (status === 'Đã được hủy' && reason) {
+        if (status === 'đã được hủy' && reason) {
             updatedData.cancelReason = reason;
         }
 
@@ -113,22 +116,23 @@ const updateDonHang = async (req, res) => {
             return res.status(404).json({ message: 'Không tìm thấy đơn hàng với ID này.' });
         }
 
-        if (status === 'Đã được hủy') {
+        // Nếu trạng thái là "đã được hủy", cập nhật lại số lượng sản phẩm
+        if (status === 'đã được hủy') {
             for (const item of updatedDonHang.cartItems) {
                 const product = await laptopModel.findById(item.productId);
                 if (!product) {
                     console.error(`Không tìm thấy sản phẩm với ID ${item.productId}`);
                     continue;
                 }
-                product.soLuong += item.quantity; // Add the quantities back to stock
+                product.soLuong += item.quantity; // Hoàn trả lại số lượng vào kho
                 await product.save();
             }
         }
 
-        // Create notification for the user
-        const notificationMessage = status === 'Đã được hủy' && reason
-            ? `Đơn hàng ${id} của bạn đã bị hủy.`
-            : `Trạng thái đơn hàng ${id} của bạn đã thay đổi thành ${status}.`;
+        // Tạo thông báo cho người dùng
+        const notificationMessage = status === 'đã được hủy' && reason
+            ? `Đơn hàng ${id} của bạn Đã được hủy.`
+            : `Trạng thái đơn hàng ${id} của bạn đã thay đổi thành ${req.body.status}.`;
 
         const notification = new Notification({
             userId: updatedDonHang.userId,
@@ -145,7 +149,6 @@ const updateDonHang = async (req, res) => {
         res.status(500).json({ message: 'Đã xảy ra lỗi khi cập nhật đơn hàng. Vui lòng thử lại sau.' });
     }
 };
-
 
 
 // Lấy đơn hàng theo trạng thái và userId
