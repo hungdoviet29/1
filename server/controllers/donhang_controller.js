@@ -14,6 +14,19 @@ const createDonHang = async (req, res) => {
             return res.status(400).json({ message: 'Thiếu thông tin cần thiết để tạo đơn hàng' });
         }
 
+        // Check stock availability and subtract quantities
+        for (const item of cartItems) {
+            const product = await laptopModel.findById(item.productId);
+            if (!product) {
+                return res.status(404).json({ message: `Sản phẩm không tồn tại với ID ${item.productId}` });
+            }
+            if (product.soLuong < item.quantity) {
+                return res.status(400).json({ message: `Sản phẩm ${product.ten} không đủ số lượng trong kho` });
+            }
+            product.soLuong -= item.quantity;
+            await product.save();
+        }
+
         // Tạo đơn hàng mới
         const newDonHang = new DonHang({
             userId,
@@ -87,11 +100,11 @@ const getAllDonHangs = async (req, res) => {
 const updateDonHang = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status, reason } = req.body; // Lấy trạng thái và lý do từ body request
+        const { status, reason } = req.body;
 
         const updatedData = { status };
         if (status === 'Đã được hủy' && reason) {
-            updatedData.cancelReason = reason; // Lưu lý do hủy nếu trạng thái là Hủy
+            updatedData.cancelReason = reason;
         }
 
         const updatedDonHang = await DonHang.findByIdAndUpdate(id, updatedData, { new: true });
@@ -100,46 +113,31 @@ const updateDonHang = async (req, res) => {
             return res.status(404).json({ message: 'Không tìm thấy đơn hàng với ID này.' });
         }
 
-        // Xử lý các trạng thái đặc biệt
-        if (status === 'Đang vận chuyển') {
+        if (status === 'Đã được hủy') {
             for (const item of updatedDonHang.cartItems) {
                 const product = await laptopModel.findById(item.productId);
                 if (!product) {
-                    return res.status(404).json({ message: `Sản phẩm không tồn tại với ID ${item.productId}` });
+                    console.error(`Không tìm thấy sản phẩm với ID ${item.productId}`);
+                    continue;
                 }
-                if (product.soLuong < item.quantity) {
-                    return res.status(400).json({ message: `Sản phẩm ${product.ten} không đủ số lượng trong kho` });
-                }
-                product.soLuong -= item.quantity;
+                product.soLuong += item.quantity; // Add the quantities back to stock
                 await product.save();
             }
-
-            // Tạo thông báo cho người dùng
-            const notification = new Notification({
-                userId: updatedDonHang.userId,
-                message: `Đơn hàng ${id} của bạn đang được vận chuyển.`,
-                createdAt: new Date(),
-            });
-            await notification.save();
         }
 
-        // Xử lý thông báo khi trạng thái thay đổi
-if (status && status !== 'Đang vận chuyển') {
-    const notificationMessage =
-        status === 'Hủy' && reason
+        // Create notification for the user
+        const notificationMessage = status === 'Đã được hủy' && reason
             ? `Đơn hàng ${id} của bạn đã bị hủy.`
-            : `Trạng thái đơn hàng ${id} của bạn ${status}.`;
+            : `Trạng thái đơn hàng ${id} của bạn đã thay đổi thành ${status}.`;
 
-    const notification = new Notification({
-        userId: updatedDonHang.userId,
-        orderId: id, // Truyền orderId vào thông báo
-        message: notificationMessage,
-        createdAt: new Date(),
-    });
+        const notification = new Notification({
+            userId: updatedDonHang.userId,
+            orderId: id,
+            message: notificationMessage,
+            createdAt: new Date(),
+        });
 
-    await notification.save();
-}
-
+        await notification.save();
 
         res.status(200).json({ success: true, message: 'Đơn hàng đã được cập nhật.', data: updatedDonHang });
     } catch (error) {
@@ -147,6 +145,7 @@ if (status && status !== 'Đang vận chuyển') {
         res.status(500).json({ message: 'Đã xảy ra lỗi khi cập nhật đơn hàng. Vui lòng thử lại sau.' });
     }
 };
+
 
 
 // Lấy đơn hàng theo trạng thái và userId
