@@ -11,8 +11,11 @@ import {
   Image,
   TextInput,
   Modal,
+  NativeModules
 } from 'react-native';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
+const { ZaloPayBridge } = NativeModules;
 
 const CheckoutScreen = ({navigation, route}) => {
   const {selectedItems, totalAmount, voucher} = route.params;
@@ -51,7 +54,7 @@ const CheckoutScreen = ({navigation, route}) => {
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
-        const url = `http://192.168.3.105:3000/vouchers?userId=${userId}`;
+        const url = `http://10.24.24.5:3000/vouchers?userId=${userId}`;
         const response = await fetch(url);
         const data = await response.json();
         if (response.ok) {
@@ -70,7 +73,7 @@ const CheckoutScreen = ({navigation, route}) => {
     const fetchCartItems = async id => {
       setLoading(true);
       try {
-        const response = await fetch(`http://192.168.3.105:3000/cart/${id}`);
+        const response = await fetch(`http://10.24.24.5:3000/cart/${id}`);
         const data = await response.json();
         if (response.ok) {
           // Filter out items with invalid productId
@@ -103,29 +106,42 @@ const CheckoutScreen = ({navigation, route}) => {
     console.log('Order ID:', orderId);
 
     const payload = {
-        orderId,
-        totalAmount: total, // Giá trị giỏ hàng
-        shippingInfo,       // Thông tin giao hàng
+        amount: total, // Giá trị giỏ hàng
         items: cartItems.map(item => ({
             productId: item.productId._id,
             quantity: item.quantity,
         })),
+        embed_data:{
+          orderId:orderId,
+          shippingInfo:shippingInfo
+        }
     };
 
     console.log('Dữ liệu gửi đến server:', payload);
 
     try {
-        const response = await fetch('http://192.168.3.105:3000/donhang/zalopay', {
+        const response = await fetch('http://10.24.24.5:3000/donhang/zalopay', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
         });
 
         const data = await response.json();
-
+const zp_trans_token=data.zp_trans_token
         if (data.success && data.payment_url) {
-            // Điều hướng đến WebView để thanh toán
-            navigation.navigate('WebViewScreen', { url: data.payment_url });
+          const result = await ZaloPayBridge.payOrder(zp_trans_token);
+          if (result.startsWith('success')) {
+              // Thanh toán thành công -> Chuyển màn hình
+              const transactionId = result.split('|')[1];
+
+              console.log('Thanh toán thành công:', transactionId);
+              Alert.alert('Thanh toán thành công', 'Cảm ơn bạn đã đặt hàng')
+
+              
+          } else if (result.startsWith('canceled')) {
+              // Thanh toán bị hủy -> Xử lý
+              console.log('Thanh toán bị hủy');
+          }
         } else {
             Alert.alert('Lỗi', data.message || 'Không thể khởi tạo thanh toán.');
         }
@@ -219,7 +235,7 @@ const handleSelectPaymentMethod = method => {
 
             try {
               const response = await fetch(
-                'http://192.168.3.105:3000/donhang',
+                'http://10.24.24.5:3000/donhang',
                 {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
@@ -262,7 +278,7 @@ const handleSelectPaymentMethod = method => {
         quantity: selectedVoucher.quantity - 1,
       };
       const response = await fetch(
-        `http://192.168.3.105:3000/vouchers/${voucherId}`,
+        `http://10.24.24.5:3000/vouchers/${voucherId}`,
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
@@ -279,11 +295,11 @@ const handleSelectPaymentMethod = method => {
 
   const resetCart = async () => {
     try {
-      const response = await fetch(`http://192.168.3.105:3000/cart/${userId}`);
+      const response = await fetch(`http://10.24.24.5:3000/cart/${userId}`);
       const data = await response.json();
       if (data && data.items && data.items.length > 0) {
         const deleteResponse = await fetch(
-          `http://192.168.3.105:3000/cart/${userId}`,
+          `http://10.24.24.5:3000/cart/${userId}`,
           {
             method: 'DELETE',
           },
