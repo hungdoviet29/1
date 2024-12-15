@@ -273,69 +273,70 @@
     });
 
     document.getElementById("filter-button").addEventListener("click", () => {
-      const month = document.getElementById("month").value;
-      const year = document.getElementById("year").value;
-      const startDate = document.getElementById("start-date").value;
-      const endDate = document.getElementById("end-date").value;
+  const month = document.getElementById("month").value;
+  const year = document.getElementById("year").value;
+  const startDate = document.getElementById("start-date").value;
+  const endDate = document.getElementById("end-date").value;
 
-      const statisticsBody = document.getElementById("statistics-body");
-      statisticsBody.innerHTML = ""; // Xóa dữ liệu cũ
+  const statisticsBody = document.getElementById("statistics-body");
+  statisticsBody.innerHTML = ""; // Xóa dữ liệu cũ
 
-      // Gọi API đơn hàng
-      fetch("http://localhost:3000/donhang")
-        .then(response => response.json())
-        .then(orders => {
-          // Lọc đơn hàng theo trạng thái "Thành công" và các bộ lọc khác
-          const filteredOrders = orders.filter(order => {
-            const orderDate = new Date(order.createdAt);
+  // Gọi API đơn hàng
+  fetch("http://localhost:3000/donhang")
+    .then(response => response.json())
+    .then(orders => {
+      // Lọc đơn hàng theo trạng thái "Thành công" và các bộ lọc khác
+      const filteredOrders = orders.filter(order => {
+        const orderDate = new Date(order.createdAt);
 
-            const isStatusSuccess = order.status.toLowerCase() === "thành công";
-            const isMonthMatch = month ? orderDate.getMonth() + 1 === parseInt(month) : true;
-            const isYearMatch = year ? orderDate.getFullYear() === parseInt(year) : true;
-            const isStartMatch = startDate ? orderDate >= new Date(startDate) : true;
-            const isEndDateMatch = endDate ? orderDate <= new Date(new Date(endDate).setHours(23, 59, 59, 999)) : true;
+        const isStatusSuccess = order.status.toLowerCase() === "thành công";
+        const isMonthMatch = month ? orderDate.getMonth() + 1 === parseInt(month) : true;
+        const isYearMatch = year ? orderDate.getFullYear() === parseInt(year) : true;
+        const isStartMatch = startDate ? orderDate >= new Date(startDate) : true;
+        const isEndMatch = endDate ? orderDate <= new Date(new Date(endDate).setHours(23, 59, 59, 999)) : true;
 
-            return isStatusSuccess && isMonthMatch && isYearMatch && isStartMatch && isEndMatch;
-          });
+        return isStatusSuccess && isMonthMatch && isYearMatch && isStartMatch && isEndMatch;
+      });
 
-          // Tính toán thống kê sản phẩm
-          const statistics = {};
-          filteredOrders.forEach(order => {
-            order.cartItems.forEach(item => {
-              const productId = item.productId?._id || "unknown";
-              const productName = item.productId?.ten || "Sản phẩm không xác định";
-              const productPrice = item.productId?.gia || 0;
+      // Tính toán thống kê sản phẩm
+      const statistics = {};
+      filteredOrders.forEach(order => {
+        order.cartItems.forEach(item => {
+          const productId = item.productId?._id || "unknown";
+          const productName = item.productId?.ten || "Sản phẩm không xác định";
+          const productPrice = item.productId?.gia || 0;
 
-              if (!statistics[productId]) {
-                statistics[productId] = {
-                  id: productId,
-                  name: productName,
-                  sold: 0,
-                  revenue: 0,
-                };
-              }
-              statistics[productId].sold += item.quantity;
-              statistics[productId].revenue += item.quantity * productPrice;
-            });
-          });
+          if (!statistics[productId]) {
+            statistics[productId] = {
+              id: productId,
+              name: productName,
+              sold: 0,
+              revenue: 0,
+            };
+          }
+          statistics[productId].sold += item.quantity;
+          statistics[productId].revenue += item.quantity * productPrice;
+        });
+      });
 
-          // Hiển thị dữ liệu thống kê
-          const sortedStatistics = Object.values(statistics).sort((a, b) => b.sold - a.sold);
+      // Hiển thị dữ liệu thống kê
+      const sortedStatistics = Object.values(statistics).sort((a, b) => b.sold - a.sold);
 
-          sortedStatistics.forEach(stat => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                    <td>${stat.id}</td>
-                    <td>${stat.name}</td>
-                    <td>${stat.sold}</td>
-                    <td>${stat.revenue.toLocaleString()} VND</td>
-                    <td>${startDate || "Toàn thời gian"}</td>
-                `;
-            statisticsBody.appendChild(row);
-          });
-        })
-        .catch(error => console.error("Lỗi khi tải dữ liệu thống kê:", error));
-    });
+      sortedStatistics.forEach(stat => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${stat.id}</td>
+          <td>${stat.name}</td>
+          <td>${stat.sold}</td>
+          <td>${stat.revenue.toLocaleString()} VND</td>
+          <td>${startDate || "Toàn thời gian"}</td>
+        `;
+        statisticsBody.appendChild(row);
+      });
+    })
+    .catch(error => console.error("Lỗi khi tải dữ liệu thống kê:", error));
+});
+
 
   </script>
 
