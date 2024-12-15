@@ -120,17 +120,6 @@ const NotificationScreen = ({ navigation }) => {
             ) : (
                 <Text style={styles.noNotifications}>No notifications available</Text>
             )}
-            <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => navigation.navigate('Home')}
-                >
-                    <Text style={styles.buttonText}>Back to Home</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.clearButton} onPress={clearNotifications}>
-                    <Text style={styles.buttonText}>Clear All</Text>
-                </TouchableOpacity>
-            </View>
         </View>
     );
 };
