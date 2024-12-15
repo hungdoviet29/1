@@ -20,6 +20,7 @@ const ProductScreen = () => {
 
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false); // State to toggle description
 
   const handleIncreaseQuantity = () => {
     setQuantity(quantity + 1);
@@ -42,7 +43,7 @@ const ProductScreen = () => {
         navigation.navigate('Login');
         return;
       }
-      await axios.post('http://172.20.10.6:3000/cart/add', {
+      await axios.post('http://10.24.25.222:3000/cart/add', {
         userId,
         productId: product._id,
         quantity,
@@ -57,66 +58,72 @@ const ProductScreen = () => {
 
   const toggleFavorite = async () => {
     try {
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) {
+        Alert.alert('Lỗi', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+        navigation.navigate('Login');
+        return;
+      }
+
+      if (isFavorite) {
+        await axios.delete(`http://10.24.25.222:3000/favorites/${userId}/${product._id}`);
+        setIsFavorite(false);
+        Alert.alert('Thành công', 'Sản phẩm đã bị gỡ khỏi danh sách yêu thích');
+      } else {
+        await axios.post(`http://10.24.25.222:3000/favorites`, {
+          userId,
+          productId: product._id,
+        });
+        setIsFavorite(true);
+        Alert.alert('Thành công', 'Sản phẩm đã được thêm vào danh sách yêu thích');
+      }
+    } catch (error) {
+      console.error('Lỗi khi cập nhật danh sách yêu thích:', error.response?.data || error.message);
+      Alert.alert('Lỗi', 'Không thể cập nhật danh sách yêu thích');
+    }
+  };
+
+  useEffect(() => {
+    const checkIfFavorite = async () => {
+      try {
         const userId = await AsyncStorage.getItem('userId');
         if (!userId) {
-            Alert.alert('Lỗi', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
-            navigation.navigate('Login');
-            return;
+          console.error('User ID không tồn tại');
+          return;
         }
 
-        if (isFavorite) {
-            // Xóa sản phẩm khỏi yêu thích
-            await axios.delete(`http://172.20.10.6:3000/favorites/${userId}/${product._id}`);
-            setIsFavorite(false);
-            Alert.alert('Thành công', 'Sản phẩm đã bị gỡ khỏi danh sách yêu thích');
-        } else {
-            // Thêm sản phẩm vào yêu thích
-            await axios.post(`http://172.20.10.6:3000/favorites`, { userId, productId: product._id });
-            setIsFavorite(true);
-            Alert.alert('Thành công', 'Sản phẩm đã được thêm vào danh sách yêu thích');
-        }
-    } catch (error) {
-        console.error('Lỗi khi cập nhật danh sách yêu thích:', error.response?.data || error.message);
-        Alert.alert('Lỗi', 'Không thể cập nhật danh sách yêu thích');
-    }
-};
-
-
-  
-useEffect(() => {
-  const checkIfFavorite = async () => {
-      try {
-          const userId = await AsyncStorage.getItem('userId');
-          if (!userId) {
-              console.error('User ID không tồn tại');
-              return;
-          }
-
-          const response = await axios.get(`http://172.20.10.6:3000/favorites/${userId}`);
-          const favoriteList = response.data.favorites || [];
-          const isFav = favoriteList.some(item => item._id === product._id);
-          setIsFavorite(isFav);
+        const response = await axios.get(`http://10.24.25.222:3000/favorites/${userId}`);
+        const favoriteList = response.data.favorites || [];
+        const isFav = favoriteList.some((item) => item._id === product._id);
+        setIsFavorite(isFav);
       } catch (error) {
-          console.error('Lỗi khi kiểm tra danh sách yêu thích:', error);
+        console.error('Lỗi khi kiểm tra danh sách yêu thích:', error);
       }
-  };
-  checkIfFavorite();
-}, [product._id]);
+    };
+    checkIfFavorite();
+  }, [product._id]);
 
+  const toggleDescription = () => {
+    setIsDescriptionExpanded(!isDescriptionExpanded);
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-      <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}>
-            <Text style={styles.backIcon}>←</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}>
+          <Text style={styles.backIcon}>←</Text>
+        </TouchableOpacity>
         <TouchableOpacity onPress={toggleFavorite}>
-        <Image
-  source={isFavorite ? require('../acssets/heart1.png') : require('../acssets/Vector.png')}
-  style={[styles.iconHeart, isFavorite && {tintColor: 'red'}]}
-/>
+          <Image
+            source={
+              isFavorite
+                ? require('../acssets/heart1.png')
+                : require('../acssets/Vector.png')
+            }
+            style={[styles.iconHeart, isFavorite && {tintColor: 'red'}]}
+          />
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.contentContainer}>
@@ -124,14 +131,16 @@ useEffect(() => {
         <View style={styles.productInfo}>
           <Text style={styles.productTitle}>{product.hang}</Text>
           <Text style={styles.productName}>{product.ten}</Text>
-          <Text style={styles.productPrice}>
-            {product.gia.toLocaleString()} VND
-          </Text>
+          <Text style={styles.productPrice}>{product.gia.toLocaleString()} VND</Text>
           <View style={styles.rating}>
             <Text>⭐⭐⭐⭐</Text>
             <Text style={styles.ratingText}>(4.5)</Text>
           </View>
           <View style={styles.quantityShareContainer}>
+          <View style={styles.descriptionContainer}>
+            
+            <Text style={styles.sectionTitle1}>Số lượng máy còn lại :{product.soLuong}</Text>
+          </View>
             <View style={styles.quantityContainer}>
               <TouchableOpacity
                 onPress={handleDecreaseQuantity}
@@ -147,42 +156,51 @@ useEffect(() => {
             </View>
           </View>
           
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.sectionTitle}>CPU</Text>
-            <Text style={styles.descriptionText}>{product.CPU}</Text>
-          </View>
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.sectionTitle}>RAM</Text>
-            <Text style={styles.descriptionText}>{product.RAM}</Text>
-          </View>
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.sectionTitle}>CardManHinh</Text>
-<Text style={styles.descriptionText}>{product.CardManHinh}</Text>
-          </View><View style={styles.descriptionContainer}>
-            <Text style={styles.sectionTitle}>KichThuocManHinh</Text>
-            <Text style={styles.descriptionText}>{product.KichThuocManHinh}</Text>
-          </View>
+          <View style={styles.descriptionRow}>
+  <View style={styles.descriptionItem}>
+    <Text style={styles.sectionTitle}>CPU</Text>
+    <Text style={styles.descriptionText}>{product.CPU}</Text>
+  </View>
+  <View style={styles.descriptionItem}>
+    <Text style={styles.sectionTitle}>RAM</Text>
+    <Text style={styles.descriptionText}>{product.RAM}</Text>
+  </View>
+</View>
+<View style={styles.descriptionRow}>
+  <View style={styles.descriptionItem}>
+    <Text style={styles.sectionTitle}>Card Màn Hình</Text>
+    <Text style={styles.descriptionText}>{product.CardManHinh}</Text>
+  </View>
+  <View style={styles.descriptionItem}>
+    <Text style={styles.sectionTitle}>Kích Thước Màn Hình</Text>
+    <Text style={styles.descriptionText}>{product.KichThuocManHinh}</Text>
+  </View>
+</View> 
           <View style={styles.descriptionContainer}>
             <Text style={styles.sectionTitle}>MÔ TẢ</Text>
-            <Text style={styles.descriptionText}>{product.moTa}</Text>
+            <Text style={styles.descriptionText} numberOfLines={isDescriptionExpanded ? undefined : 3}>
+              {product.moTa}
+            </Text>
+            <TouchableOpacity onPress={toggleDescription}>
+              <Text style={styles.toggleDescriptionText}>
+                {isDescriptionExpanded ? 'Ẩn bớt' : 'Xem thêm'}
+              </Text>
+            </TouchableOpacity>
           </View>
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.sectionTitle}>Số lượng máy còn lại</Text>
-            <Text style={styles.descriptionText}>{product.soLuong}</Text>
-          </View>
+
           <View style={styles.buttonContainer}>
-  <TouchableOpacity
-    style={styles.addToCartButton}
-    onPress={handleAddToCart}>
-    <Text style={styles.addToCartText}>THÊM VÀO GIỎ HÀNG</Text>
-  </TouchableOpacity>
-</View>
+            <TouchableOpacity
+              style={styles.addToCartButton}
+              onPress={handleAddToCart}>
+              <Text style={styles.addToCartText}>THÊM VÀO GIỎ HÀNG</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </View>
   );
 };
-//fdgsdfsgt
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -190,25 +208,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
-    
   },
-  buttonContainer: {
-    marginTop: 16,  // Space above the button
-    marginBottom: 24, // Space below the button
-    width: '100%', // Ensure the container is full width
-    alignItems: 'center', // Center the button horizontally
-  },
-  
-  addToCartButton: {
-    backgroundColor: '#4A90E2',
-    borderRadius: 25,
-    paddingVertical: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 350, // Fixed width in pixels
-    alignSelf: 'center', // Centers the button horizontally
-  },
-  
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -217,16 +217,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
   },
-  
   backButton: {
     marginRight: 10,
   },
   backIcon: {
     fontSize: 30,
-  },
-  icon: {
-    width: 24,
-    height: 24,
   },
   iconHeart: {
     width: 24,
@@ -271,6 +266,53 @@ const styles = StyleSheet.create({
     color: '#888',
     fontSize: 16,
   },
+  descriptionContainer: {
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#333',
+  },
+  sectionTitle1: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#333',
+  },
+  descriptionText1: {
+    fontSize: 14,
+    color: '#888',
+    lineHeight: 20,
+  },
+  toggleDescriptionText: {
+    fontSize: 14,
+    color: '#4A90E2',
+    fontWeight: 'bold',
+    marginTop: 8,
+  },
+  buttonContainer: {
+    marginTop: 16,
+    marginBottom: 24,
+    width: '100%',
+    alignItems: 'center',
+  },
+  addToCartButton: {
+    backgroundColor: '#4A90E2',
+    borderRadius: 25,
+    paddingVertical: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 350,
+    alignSelf: 'center',
+    marginTop: 16,
+  },
+  addToCartText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
   quantityShareContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -300,32 +342,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     color: '#333',
   },
-  descriptionContainer: {
+  descriptionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 16,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#333',
-  },
-  descriptionText: {
-    fontSize: 14,
-    color: '#888',
-    lineHeight: 20,
-  },
-  addToCartButton: {
-    backgroundColor: '#4A90E2',
-    borderRadius: 25,
-    paddingVertical: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  addToCartText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+  descriptionItem: {
+    flex: 1,
+    marginHorizontal: 8,
   },
 });
 

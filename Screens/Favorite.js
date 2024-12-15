@@ -17,7 +17,7 @@ const FavoriteScreen = () => {
                     navigation.navigate('Login');
                     return;
                 }
-                const response = await axios.get(`http://192.168.3.105:3000/favorites/${userId}`);
+                const response = await axios.get(`http://10.24.25.222:3000/favorites/${userId}`);
                 setFavoriteItems(response.data.favorites || []);
             } catch (error) {
                 console.error('Lỗi khi tải danh sách yêu thích:', error.response || error.message);
@@ -26,7 +26,7 @@ const FavoriteScreen = () => {
         };
 
         fetchFavorites();
-    }, []);
+    }, [navigation]);
 
     const handleRemoveFromFavorites = async (productId) => {
         try {
@@ -36,12 +36,10 @@ const FavoriteScreen = () => {
                 navigation.navigate('Login');
                 return;
             }
-            // Gửi yêu cầu xóa sản phẩm khỏi yêu thích
-            const response = await axios.delete(`http://192.168.3.105:3000/favorites/${userId}/${productId}`);
+            const response = await axios.delete(`http://10.24.25.222:3000/favorites/${userId}/${productId}`);
 
             if (response.status === 200) {
-                // Cập nhật lại danh sách yêu thích trên giao diện
-                setFavoriteItems(prevItems => prevItems.filter(item => item._id !== productId));
+                setFavoriteItems((prevItems) => prevItems.filter((item) => item._id !== productId));
                 Alert.alert('Thành công', 'Sản phẩm đã được xóa khỏi danh sách yêu thích');
             } else {
                 Alert.alert('Lỗi', 'Không thể xóa sản phẩm khỏi danh sách yêu thích');
@@ -51,15 +49,59 @@ const FavoriteScreen = () => {
             Alert.alert('Lỗi', 'Không thể xóa sản phẩm khỏi danh sách yêu thích');
         }
     };
+
     const renderFavoriteItem = ({ item }) => (
-        <TouchableOpacity style={styles.favoriteItem} onPress={() =>
-            navigation.navigate('ProductScreen', { product: item })}>
+        <TouchableOpacity
+            style={styles.favoriteItem}
+            onPress={() => navigation.navigate('ProductScreen', { product: item })}
+        >
             <Image source={{ uri: item.hinhAnh }} style={styles.itemImage} />
             <View style={styles.itemDetails}>
                 <Text style={styles.itemName}>{item.ten}</Text>
                 <Text style={styles.itemPrice}>{item.gia.toLocaleString()} VND</Text>
+                <View style={styles.rating}>
+                    <Text>⭐⭐⭐⭐</Text>
+                    <Text style={styles.ratingText}>(4.5)</Text>
+                </View>
+                <View style={styles.descriptionRow}>
+                    <View style={styles.descriptionItem}>
+                        <Image 
+                            source={require('../acssets/cpu.png')} 
+                            style={styles.iconImage} 
+                        />
+                        <Text style={styles.descriptionText}>{item.CPU}</Text>
+                    </View>
+                    <View style={styles.descriptionItem}>
+                        <Image 
+                            source={require('../acssets/RAM.png')} 
+                            style={styles.iconImage} 
+                        />
+                        <Text style={styles.descriptionText}>{item.RAM}</Text>
+                    </View>
+                </View>
+
+                <View style={styles.descriptionRow}>
+                    <View style={styles.descriptionItem}>
+                        <Image 
+                            source={require('../acssets/Card1.png')} 
+                            style={styles.iconImage} 
+                        />
+                        <Text style={styles.descriptionText}>{item.CardManHinh}</Text>
+                    </View>
+                    <View style={styles.descriptionItem}>
+                        <Image 
+                            source={require('../acssets/kichthuoc.png')} 
+                            style={styles.iconImage} 
+                        />
+                        <Text style={styles.descriptionText}>{item.KichThuocManHinh}</Text>
+                    </View>
+                </View>
             </View>
-            <TouchableOpacity style={styles.deleteButton} onPress={() => handleRemoveFromFavorites(item._id)}>
+
+            <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleRemoveFromFavorites(item._id)}
+            >
                 <Text style={styles.deleteText}>✕</Text>
             </TouchableOpacity>
         </TouchableOpacity>
@@ -74,11 +116,13 @@ const FavoriteScreen = () => {
             <FlatList
                 data={favoriteItems}
                 renderItem={renderFavoriteItem}
-                keyExtractor={item => item._id}
+                keyExtractor={(item) => item._id}
                 contentContainerStyle={styles.favoriteContainer}
-                numColumns={2} // Số cột hiển thị
+                numColumns={2}
                 ListEmptyComponent={
-                    <Text style={styles.emptyMessage}>Chưa có sản phẩm nào trong danh sách yêu thích!</Text>
+                    <Text style={styles.emptyMessage}>
+                        Chưa có sản phẩm nào trong danh sách yêu thích!
+                    </Text>
                 }
             />
         </View>
@@ -93,7 +137,6 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 10,
         borderBottomWidth: 1,
@@ -111,32 +154,50 @@ const styles = StyleSheet.create({
     favoriteItem: {
         flex: 1,
         flexDirection: 'column',
-        alignItems: 'center',
         backgroundColor: '#F2F4FA',
         borderRadius: 10,
         padding: 16,
         margin: 8,
-        maxWidth: '48%', // Chiều rộng tối đa để chia đều cột
+        maxWidth: '49%',
     },
     itemImage: {
         width: 100,
         height: 80,
         resizeMode: 'contain',
         marginBottom: 8,
+        alignSelf: 'center',
     },
-    itemDetails: {
-        alignItems: 'center',
-    },
+    itemDetails: {},
     itemName: {
         fontSize: 14,
         fontWeight: 'bold',
         color: '#333',
-        textAlign: 'center',
     },
     itemPrice: {
+        fontSize: 15,
+        color: '#FF0000',
+        marginTop: 4,
+    },
+    descriptionRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+    },
+    descriptionItem: {
+        flex: 1,
+        marginHorizontal: 4,
+        alignItems: 'center', // Center content horizontally
+    },
+    iconImage: {
+        width: 24,
+        height: 24,
+        marginBottom: 4,
+        alignSelf: 'center', // Center the image
+    },
+    descriptionText: {
         fontSize: 12,
         color: '#888',
-        marginTop: 4,
+        textAlign: 'center', // Center text
     },
     deleteButton: {
         position: 'absolute',
@@ -152,6 +213,16 @@ const styles = StyleSheet.create({
         color: '#888',
         textAlign: 'center',
         marginTop: 20,
+    },
+    rating: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    ratingText: {
+        marginLeft: 5,
+        color: '#888',
+        fontSize: 16,
     },
 });
 
