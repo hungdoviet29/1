@@ -258,7 +258,7 @@ console.log(req.body.embed_data);
         console.log(response.data);
 
         if (response.data.return_code === 1) {
-            res.status(200).json({ success: true, payment_url: response.data.order_url,zp_trans_token:response.zp_trans_token });
+            res.status(200).json({ success: true, payment_url: response.data.order_url,zp_trans_token:response.data.zp_trans_token });
         } else {
             res.status(400).json({ message: response.data.return_message, detail: response.data });
             console.log(response.data);
