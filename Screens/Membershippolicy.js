@@ -53,30 +53,7 @@ const MembershipPolicy = ({ navigation }) => {
           -Thành viên chịu trách nhiệm bảo vệ thông tin tài khoản cá nhân, tránh chia sẻ với người khác để bảo đảm an toàn.{"\n\n"}
         </Text>
         <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.checkboxContainer}
-            onPress={() => setIsAgreed(!isAgreed)}
-          >
-            <View style={[styles.checkbox, isAgreed && styles.checkboxChecked]}>
-              {isAgreed && <Text style={styles.checkmark}>✓</Text>}
-            </View>
-            <Text style={styles.checkboxLabel}>Tôi đồng ý với các điều khoản trên</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.button,
-              {
-                backgroundColor: isAgreed ? '#007AFF' : '#FFFFFF',
-                borderColor: isAgreed ? '#007AFF' : '#CCCCCC',
-              },
-            ]}
-            onPress={handleAgree}
-            disabled={!isAgreed}
-          >
-            <Text style={[styles.buttonText, { color: isAgreed ? '#FFFFFF' : '#000000' }]}>
-              Tiếp tục
-            </Text>
-          </TouchableOpacity>
+          
         </View>
       </ScrollView>
     </View>
