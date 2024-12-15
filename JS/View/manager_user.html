@@ -275,73 +275,79 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
         /* Responsive cho các thiết bị nhỏ */
-@media (max-width: 768px) {
-    .summary-cards {
-        flex-direction: column;
-        align-items: center;
-    }
+        @media (max-width: 768px) {
+            .summary-cards {
+                flex-direction: column;
+                align-items: center;
+            }
 
-    .card {
-        width: 90%; /* Thu nhỏ card để vừa màn hình */
-    }
+            .card {
+                width: 90%;
+                /* Thu nhỏ card để vừa màn hình */
+            }
 
-    nav ul {
-        flex-direction: column;
-        align-items: center;
-    }
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
 
-    nav ul li {
-        margin: 5px 0;
-    }
+            nav ul li {
+                margin: 5px 0;
+            }
 
-    .table-container {
-        padding: 10px;
-    }
+            .table-container {
+                padding: 10px;
+            }
 
-    table th,
-    table td {
-        font-size: 12px; /* Giảm kích thước chữ */
-        padding: 8px;
-    }
+            table th,
+            table td {
+                font-size: 12px;
+                /* Giảm kích thước chữ */
+                padding: 8px;
+            }
 
-    table {
-        display: block;
-        overflow-x: auto; /* Thêm cuộn ngang khi bảng quá lớn */
-    }
-}
+            table {
+                display: block;
+                overflow-x: auto;
+                /* Thêm cuộn ngang khi bảng quá lớn */
+            }
+        }
 
-/* Responsive cho các thiết bị rất nhỏ (điện thoại) */
-@media (max-width: 480px) {
-    header {
-        font-size: 20px; /* Thu nhỏ kích thước tiêu đề */
-    }
+        /* Responsive cho các thiết bị rất nhỏ (điện thoại) */
+        @media (max-width: 480px) {
+            header {
+                font-size: 20px;
+                /* Thu nhỏ kích thước tiêu đề */
+            }
 
-    .card {
-        padding: 15px;
-        text-align: left; /* Canh trái nội dung */
-    }
+            .card {
+                padding: 15px;
+                text-align: left;
+                /* Canh trái nội dung */
+            }
 
-    table th,
-    table td {
-        font-size: 10px; /* Giảm thêm kích thước chữ */
-        padding: 6px;
-    }
+            table th,
+            table td {
+                font-size: 10px;
+                /* Giảm thêm kích thước chữ */
+                padding: 6px;
+            }
 
-    .search-container {
-        flex-direction: column;
-        gap: 5px;
-    }
+            .search-container {
+                flex-direction: column;
+                gap: 5px;
+            }
 
-    .search-container input {
-        width: 100%;
-    }
+            .search-container input {
+                width: 100%;
+            }
 
-    .search-container button {
-        width: 100%;
-    }
-}
-
+            .search-container button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <header>Bảng Điều Khiển Quản Lý</header>
@@ -363,8 +369,8 @@
 <div class="container">
 
     <div class="summary-cards">
-    
-        
+
+
         <div class="card">
             <h3>Tổng Người Dùng</h3>
             <p id="total-orders">0</p>
@@ -404,7 +410,7 @@
     <form id="edit-user-form">
         <h3>Sửa Trạng Thái Người Dùng</h3>
         <input type="hidden" id="edit-user-id">
-        
+
         <label for="edit-user-status">Trạng Thái:</label>
         <select id="edit-user-status">
             <option value="active">Hoạt Động</option>
@@ -421,22 +427,23 @@
 
 <script>
     const apiUrl = "http://localhost:3000/users";
-// Hàm để tải nội dung từ file summary-cards.html
-async function loadSummaryCards() {
-    try {
-        const response = await fetch('summary-cards.html');
-        const content = await response.text();
-        document.getElementById('summary-cards-container').innerHTML = content;
-    } catch (error) {
-        console.error('Lỗi khi tải component:', error);
+    // Hàm để tải nội dung từ file summary-cards.html
+    async function loadSummaryCards() {
+        try {
+            const response = await fetch('summary-cards.html');
+            const content = await response.text();
+            document.getElementById('summary-cards-container').innerHTML = content;
+        } catch (error) {
+            console.error('Lỗi khi tải component:', error);
+        }
     }
-}
 
-// Gọi hàm khi tải trang
-loadSummaryCards();
+    // Gọi hàm khi tải trang
+    loadSummaryCards();
 
     // Fetch và hiển thị danh sách người dùng
-  async function fetchUsers() {
+    // Fetch và hiển thị danh sách người dùng
+    async function fetchUsers() {
         try {
             const response = await fetch(apiUrl);
             const users = await response.json();
@@ -444,29 +451,37 @@ loadSummaryCards();
             tableBody.innerHTML = "";
 
             users.forEach(user => {
+                // Bỏ qua các người dùng có vai trò là "Quản trị"
+                if (user.vaiTro === "admin") {
+                    return;
+                }
+
                 const row = `
-                        <tr>
-                            <td><img src="${user.avatar}" alt="Avatar"></td>
-                            <td>${user._id}</td>
-                            <td>${user.tenDangNhap}</td>
-                            <td>${user.email || "Chưa cập nhật"}</td>
-                            <td>${user.phone || "Chưa cập nhật"}</td>
-                            <td>${user.vaiTro === "admin" ? "Quản trị" : "Người dùng"}</td>
-                            <td>${user.trangThai === "active" ? "Hoạt động" : "Ngưng hoạt động"}</td>
-                            <td>
-                                <button class="edit-button" onclick='showEditDialog(${JSON.stringify(user)})'>Sửa</button>
-                            </td>
-                        </tr>
-                    `;
+                <tr>
+                    <td><img src="${user.avatar}" alt="Avatar"></td>
+                    <td>${user._id}</td>
+                    <td>${user.tenDangNhap}</td>
+                    <td>${user.email || "Chưa cập nhật"}</td>
+                    <td>${user.phone || "Chưa cập nhật"}</td>
+                    <td>${user.vaiTro === "admin" ? "Quản trị" : "Người dùng"}</td>
+                    <td>${user.trangThai === "active" ? "Hoạt động" : "Ngưng hoạt động"}</td>
+                    <td>
+                        <button class="edit-button" onclick='showEditDialog(${JSON.stringify(user)})'>Sửa</button>
+                    </td>
+                </tr>
+            `;
                 tableBody.insertAdjacentHTML("beforeend", row);
-                  // Cập nhật tổng số đơn hàng
-            document.getElementById('total-orders').textContent = users.length;
             });
+
+            // Cập nhật tổng số người dùng (chỉ tính người dùng không phải "Quản trị")
+            const totalUsers = users.filter(user => user.vaiTro !== "admin").length;
+            document.getElementById('total-orders').textContent = totalUsers;
         } catch (error) {
             console.error("Lỗi:", error.message);
             alert("Không thể tải danh sách người dùng.");
         }
     }
+
 
     // Lấy tổng số người dùng
     async function fetchTotalUsers() {
@@ -501,56 +516,56 @@ loadSummaryCards();
     }
 
     // Lấy tổng số người dùng
-    
+
     // Hiển thị dialog sửa
     function showEditDialog(user) {
-    document.getElementById("edit-user-id").value = user._id;
-    document.getElementById("edit-user-status").value = user.trangThai; // Cập nhật trạng thái
+        document.getElementById("edit-user-id").value = user._id;
+        document.getElementById("edit-user-status").value = user.trangThai; // Cập nhật trạng thái
 
-    // Hiển thị dialog sửa
-    document.getElementById("edit-dialog").style.display = "block";
-    document.getElementById("edit-dialog-overlay").style.display = "block";
-}
+        // Hiển thị dialog sửa
+        document.getElementById("edit-dialog").style.display = "block";
+        document.getElementById("edit-dialog-overlay").style.display = "block";
+    }
 
 
-// Đóng dialog
-function closeDialog() {
-    document.getElementById("edit-dialog").style.display = "none";
-    document.getElementById("edit-dialog-overlay").style.display = "none"; // Ẩn overlay
-}
+    // Đóng dialog
+    function closeDialog() {
+        document.getElementById("edit-dialog").style.display = "none";
+        document.getElementById("edit-dialog-overlay").style.display = "none"; // Ẩn overlay
+    }
 
-// Lưu thông tin người dùng đã sửa
-document.getElementById("edit-user-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+    // Lưu thông tin người dùng đã sửa
+    document.getElementById("edit-user-form").addEventListener("submit", function (e) {
+        e.preventDefault();
 
-    const userId = document.getElementById("edit-user-id").value;
+        const userId = document.getElementById("edit-user-id").value;
 
-    const updatedData = {
-        trangThai: document.getElementById("edit-user-status").value, // Chỉ cập nhật trạng thái
-    };
+        const updatedData = {
+            trangThai: document.getElementById("edit-user-status").value, // Chỉ cập nhật trạng thái
+        };
 
-    fetch(`${apiUrl}/update/${userId}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedData),
-    })
-    .then(response => {
-        if (response.ok) {
-            alert("Cập nhật trạng thái thành công!");
-            fetchUsers(); // Làm mới danh sách người dùng
-        } else {
-            alert("Lỗi khi cập nhật trạng thái.");
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("Đã có lỗi xảy ra.");
+        fetch(`${apiUrl}/update/${userId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedData),
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("Cập nhật trạng thái thành công!");
+                    fetchUsers(); // Làm mới danh sách người dùng
+                } else {
+                    alert("Lỗi khi cập nhật trạng thái.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Đã có lỗi xảy ra.");
+            });
+
+        closeDialog(); // Đóng dialog sau khi lưu
     });
-
-    closeDialog(); // Đóng dialog sau khi lưu
-});
 
 
 
