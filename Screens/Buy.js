@@ -6,12 +6,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
 } from 'react-native';
 import {useRoute} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 const ProductScreen = () => {
   const navigation = useNavigation();
@@ -20,7 +20,13 @@ const ProductScreen = () => {
 
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false); // State to toggle description
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [buttonPosition, setButtonPosition] = useState(0);
+
+  const handleLayout = (event) => {
+    const { y, height } = event.nativeEvent.layout;
+    setButtonPosition(y + height); // Calculate button position
+  }; 
 
   const handleIncreaseQuantity = () => {
     setQuantity(quantity + 1);
@@ -32,27 +38,39 @@ const ProductScreen = () => {
     }
   };
 
+  const showToast = (type, text) => {
+    Toast.show({
+      type,
+      text1: text,
+      position: 'bottom',
+      visibilityTime: 5000,
+      bottomOffset:   60, // Adjust position dynamically
+    });
+  };
+
   const handleAddToCart = async () => {
     try {
       const userId = await AsyncStorage.getItem('userId');
       if (!userId) {
-        Alert.alert(
-          'Lỗi',
-          'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.',
-        );
+        showToast('error', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
         navigation.navigate('Login');
         return;
       }
-      await axios.post('http://10.24.25.222:3000/cart/add', {
+
+      const response = await axios.post('http://192.168.1.37:3000/cart/add', {
         userId,
         productId: product._id,
         quantity,
       });
-      Alert.alert('Thành công', 'Sản phẩm đã được thêm vào giỏ hàng');
-      navigation.navigate('Cart');
+
+      if (response.status === 200) {
+        showToast('success', 'Sản phẩm đã được thêm vào giỏ hàng');
+        // navigation.navigate('Cart');
+      } else {
+        throw new Error(response.data?.message || 'Không thể thêm sản phẩm vào giỏ hàng');
+      }
     } catch (error) {
-      console.error('Lỗi khi thêm vào giỏ hàng:', error);
-      Alert.alert('Lỗi', 'Không thể thêm sản phẩm vào giỏ hàng');
+      showToast('error', `${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -60,26 +78,33 @@ const ProductScreen = () => {
     try {
       const userId = await AsyncStorage.getItem('userId');
       if (!userId) {
-        Alert.alert('Lỗi', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+        showToast('error', 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
         navigation.navigate('Login');
         return;
       }
 
       if (isFavorite) {
-        await axios.delete(`http://10.24.25.222:3000/favorites/${userId}/${product._id}`);
-        setIsFavorite(false);
-        Alert.alert('Thành công', 'Sản phẩm đã bị gỡ khỏi danh sách yêu thích');
+        const response = await axios.delete(`http://192.168.1.37:3000/favorites/${userId}/${product._id}`);
+        if (response.status === 200) {
+          setIsFavorite(false);
+          showToast('success', 'Sản phẩm đã bị gỡ khỏi danh sách yêu thích');
+        } else {
+          throw new Error(response.data?.message || 'Không thể gỡ sản phẩm khỏi danh sách yêu thích');
+        }
       } else {
-        await axios.post(`http://10.24.25.222:3000/favorites`, {
+        const response = await axios.post('http://192.168.1.37:3000/favorites', {
           userId,
           productId: product._id,
         });
-        setIsFavorite(true);
-        Alert.alert('Thành công', 'Sản phẩm đã được thêm vào danh sách yêu thích');
+        if (response.status === 200) {
+          setIsFavorite(true);
+          showToast('success', 'Sản phẩm đã được thêm vào danh sách yêu thích');
+        } else {
+          throw new Error(response.data?.message || 'Không thể thêm sản phẩm vào danh sách yêu thích');
+        }
       }
     } catch (error) {
-      console.error('Lỗi khi cập nhật danh sách yêu thích:', error.response?.data || error.message);
-      Alert.alert('Lỗi', 'Không thể cập nhật danh sách yêu thích');
+      showToast('error', `Lỗi: ${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -92,8 +117,8 @@ const ProductScreen = () => {
           return;
         }
 
-        const response = await axios.get(`http://10.24.25.222:3000/favorites/${userId}`);
-        const favoriteList = response.data.favorites || [];
+        const response = await axios.get(`http://192.168.1.37:3000/favorites/${userId}`);
+        const favoriteList = response.data?.favorites || [];
         const isFav = favoriteList.some((item) => item._id === product._id);
         setIsFavorite(isFav);
       } catch (error) {
@@ -137,10 +162,9 @@ const ProductScreen = () => {
             <Text style={styles.ratingText}>(4.5)</Text>
           </View>
           <View style={styles.quantityShareContainer}>
-          <View style={styles.descriptionContainer}>
-            
-            <Text style={styles.sectionTitle1}>Số lượng máy còn lại :{product.soLuong}</Text>
-          </View>
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.sectionTitle1}>Số lượng máy còn lại :{product.soLuong}</Text>
+            </View>
             <View style={styles.quantityContainer}>
               <TouchableOpacity
                 onPress={handleDecreaseQuantity}
@@ -155,27 +179,26 @@ const ProductScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-          
           <View style={styles.descriptionRow}>
-  <View style={styles.descriptionItem}>
-    <Text style={styles.sectionTitle}>CPU</Text>
-    <Text style={styles.descriptionText}>{product.CPU}</Text>
-  </View>
-  <View style={styles.descriptionItem}>
-    <Text style={styles.sectionTitle}>RAM</Text>
-    <Text style={styles.descriptionText}>{product.RAM}</Text>
-  </View>
-</View>
-<View style={styles.descriptionRow}>
-  <View style={styles.descriptionItem}>
-    <Text style={styles.sectionTitle}>Card Màn Hình</Text>
-    <Text style={styles.descriptionText}>{product.CardManHinh}</Text>
-  </View>
-  <View style={styles.descriptionItem}>
-    <Text style={styles.sectionTitle}>Kích Thước Màn Hình</Text>
-    <Text style={styles.descriptionText}>{product.KichThuocManHinh}</Text>
-  </View>
-</View> 
+            <View style={styles.descriptionItem}>
+              <Text style={styles.sectionTitle}>CPU</Text>
+              <Text style={styles.descriptionText}>{product.CPU}</Text>
+            </View>
+            <View style={styles.descriptionItem}>
+              <Text style={styles.sectionTitle}>RAM</Text>
+              <Text style={styles.descriptionText}>{product.RAM}</Text>
+            </View>
+          </View>
+          <View style={styles.descriptionRow}>
+            <View style={styles.descriptionItem}>
+              <Text style={styles.sectionTitle}>Card Màn Hình</Text>
+              <Text style={styles.descriptionText}>{product.CardManHinh}</Text>
+            </View>
+            <View style={styles.descriptionItem}>
+              <Text style={styles.sectionTitle}>Kích Thước Màn Hình</Text>
+              <Text style={styles.descriptionText}>{product.KichThuocManHinh}</Text>
+            </View>
+          </View>
           <View style={styles.descriptionContainer}>
             <Text style={styles.sectionTitle}>MÔ TẢ</Text>
             <Text style={styles.descriptionText} numberOfLines={isDescriptionExpanded ? undefined : 3}>
@@ -187,16 +210,24 @@ const ProductScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
-
-          <View style={styles.buttonContainer}>
+          <View
+            style={styles.buttonContainer}
+            onLayout={handleLayout}
+          >
             <TouchableOpacity
               style={styles.addToCartButton}
-              onPress={handleAddToCart}>
+              onPress={() => {
+                handleAddToCart();
+                showToast('success', 'Sản phẩm đã thêm vào giỏ hàng!');
+              }}
+            >
               <Text style={styles.addToCartText}>THÊM VÀO GIỎ HÀNG</Text>
             </TouchableOpacity>
           </View>
+          <Toast />
         </View>
       </ScrollView>
+      <Toast />
     </View>
   );
 };
