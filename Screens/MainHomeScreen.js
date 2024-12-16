@@ -8,12 +8,10 @@ import {
   ActivityIndicator,
   StyleSheet,
   Dimensions,
-  Modal,
+  Linking,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import { Linking } from 'react-native';
-
 
 const screenWidth = Dimensions.get('window').width;
 const banners = [
@@ -31,7 +29,7 @@ const BannerSlider = () => {
       setCurrentIndex((prevIndex) => {
         const nextIndex = (prevIndex + 1) % banners.length;
         const offset = nextIndex * (screenWidth * 0.85 + 20);
-        scrollViewRef.current.scrollTo({ x: offset, animated: true });
+        scrollViewRef.current?.scrollTo({ x: offset, animated: true });
         return nextIndex;
       });
     }, 3000);
@@ -61,8 +59,6 @@ const MainHome = () => {
   const [saleLaptops, setSaleLaptops] = useState([]);
   const [trendingLaptops, setTrendingLaptops] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterVisible, setFilterVisible] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState({});
 
   useEffect(() => {
     fetchAllData();
@@ -72,9 +68,9 @@ const MainHome = () => {
     setLoading(true);
     try {
       const [popularResponse, saleResponse, trendingResponse] = await Promise.all([
-        axios.get('http://172.20.10.6:3000/LapTop/getPopularLapTop'),
-        axios.get('http://172.20.10.6:3000/LapTop/getSaleLapTop'),
-        axios.get('http://172.20.10.6:3000/LapTop/getTrendingLapTop'),
+        axios.get('http://192.168.1.37:3000/LapTop/getPopularLapTop'),
+        axios.get('http://192.168.1.37:3000/LapTop/getSaleLapTop'),
+        axios.get('http://192.168.1.37:3000/LapTop/getTrendingLapTop'),
       ]);
 
       setPopularLaptops(popularResponse.data.data);
@@ -87,44 +83,72 @@ const MainHome = () => {
     }
   };
 
-  const handleToggleOption = (key, value) => {
-    setSelectedOptions((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
-
   const renderProducts = (laptops) =>
-    laptops.filter((laptop) => laptop.soLuong > 0).slice(0, 5).map((laptop) => (
+    laptops
+      .filter((laptop) => laptop.soLuong > 0)
+      .slice(0, 5)
+      .map((laptop) => (
         <View style={styles.product} key={laptop._id}>
-            <TouchableOpacity
-                onPress={() => navigation.navigate('ProductScreen', { product: laptop })}
-            >
-                <Image source={{ uri: laptop.hinhAnh }} style={styles.productImage} />
-                <Text style={styles.productName}>{laptop.ten}</Text>
-                <Text style={styles.productPrice}>
-                    {laptop.gia.toLocaleString()} VND
-                </Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ProductScreen', { product: laptop })}
+          >
+            <View style={styles.productRow}>
+              <Image source={{ uri: laptop.hinhAnh }} style={styles.productImage} />
+              <View style={styles.descriptionContainer}>
+                <View style={styles.descriptionRow}>
+                  <View style={styles.descriptionItem}>
+                    <Image source={require('../acssets/cpu.png')} style={styles.iconImage} />
+                    <Text style={styles.descriptionText}>{laptop.CPU}</Text>
+                  </View>
+                  {/* <View style={styles.descriptionItem}>
+                    <Image source={require('../acssets/RAM.png')} style={styles.iconImage} />
+                    <Text style={styles.descriptionText}>{laptop.RAM}</Text>
+                  </View> */}
+                </View>
+                <View style={styles.descriptionRow}>
+                  <View style={styles.descriptionItem}>
+                    <Image source={require('../acssets/RAM.png')} style={styles.iconImage} />
+                    <Text style={styles.descriptionText}>{laptop.RAM}</Text>
+                  </View>
+                  {/* <View style={styles.descriptionItem}>
+                    <Image source={require('../acssets/RAM.png')} style={styles.iconImage} />
+                    <Text style={styles.descriptionText}>{laptop.RAM}</Text>
+                  </View> */}
+                </View>
+                
+                <View style={styles.descriptionRow}>
+                  <View style={styles.descriptionItem}>
+                    <Image source={require('../acssets/Card1.png')} style={styles.iconImage} />
+                    <Text style={styles.descriptionText}>{laptop.CardManHinh}</Text>
+                  </View>
+                  {/* <View style={styles.descriptionItem}>
+                    <Image source={require('../acssets/kichthuoc.png')} style={styles.iconImage} />
+                    <Text style={styles.descriptionText}>{laptop.KichThuocManHinh}</Text>
+                  </View> */}
+                </View>
+              </View>
+            </View>
+            <Text style={styles.productName}>{laptop.ten}</Text>
+            <Text style={styles.productPrice}>{laptop.gia.toLocaleString()} VND</Text>
+          </TouchableOpacity>
         </View>
-    ));
+      ));
 
-    const openZalo = () => {
-      const phoneNumber = '0357103658';
-      const zaloUrl = `zalo://chat?phone=${phoneNumber}`;
-      const fallbackUrl = `https://zalo.me/${phoneNumber}`; // Trang web Zalo.
-    
-      Linking.canOpenURL(zaloUrl)
-        .then((supported) => {
-          if (supported) {
-            Linking.openURL(zaloUrl); // Mở ứng dụng Zalo.
-          } else {
-            console.log('Mở Zalo thành công');
-            Linking.openURL(fallbackUrl); 
-          }
-        })
-        .catch((err) => console.error('Lỗi khi mở Zalo:', err));
-    };
+  const openZalo = () => {
+    const phoneNumber = '0357103658';
+    const zaloUrl = `zalo://chat?phone=${phoneNumber}`;
+    const fallbackUrl = `https://zalo.me/${phoneNumber}`;
+
+    Linking.canOpenURL(zaloUrl)
+      .then((supported) => {
+        if (supported) {
+          Linking.openURL(zaloUrl);
+        } else {
+          Linking.openURL(fallbackUrl);
+        }
+      })
+      .catch((err) => console.error('Error opening Zalo:', err));
+  };
 
   return (
     <View style={styles.container}>
@@ -132,108 +156,94 @@ const MainHome = () => {
         <ActivityIndicator size="large" color="#6C63FF" style={styles.loader} />
       ) : (
         <ScrollView style={styles.mainContent}>
-          {/* Header */}
           <View style={styles.header}>
-  <Image
-    source={require('../acssets/lapstore_logo.png')}
-    style={styles.profileImage}
-  />
-  <View style={styles.headerIcons}>
-    <TouchableOpacity
-      onPress={() => navigation.navigate('NotificationScreen')}
-      style={styles.iconButton}
-    >
-      <Image
-        source={require('../acssets/bell.png')}
-        style={styles.icon}
-      />
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => navigation.navigate('Find')}
-      style={styles.iconButton}>
-      <Image
-        source={require('../acssets/SearchIcon.png')}
-        style={styles.icon}
-      />
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => navigation.navigate('CustomDrawerContent')}
-      style={styles.iconButton}
-    >
-      <Image
-        source={require('../acssets/Menu.png')}
-        style={styles.icon}
-      />
-    </TouchableOpacity>
-  </View>
-</View>
-
-          {/* Banner */}
-          <BannerSlider />
-
-          {/* Filter Button */}
-          {/* <TouchableOpacity
-            style={styles.filterButton}
-            onPress={() => setFilterVisible(true)}
-          >
             <Image
-              source={require('../acssets/filter1.png')}
-              style={styles.filterIcon}
+              source={require('../acssets/lapstore_logo.png')}
+              style={styles.profileImage}
             />
-          </TouchableOpacity> */}
-
-
-
-          {/* Product Categories */}
+            <View style={styles.headerIcons}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('NotificationScreen')}
+                style={styles.iconButton}
+              >
+                <Image
+                  source={require('../acssets/bell.png')}
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Find')}
+                style={styles.iconButton}
+              >
+                <Image
+                  source={require('../acssets/SearchIcon.png')}
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('CustomDrawerContent')}
+                style={styles.iconButton}
+              >
+                <Image
+                  source={require('../acssets/Menu.png')}
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <BannerSlider />
           <View style={styles.fixedCategories}>
             <TouchableOpacity onPress={() => navigation.navigate('Home', { category: 'Popular' })}>
-              <Text style={styles.category}>Popular ➞</Text>
+              <Text style={styles.category}>Phổ biến ➞</Text>
             </TouchableOpacity>
-            
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.productScrollView}
+          >
             {renderProducts(popularLaptops)}
           </ScrollView>
-
           <View style={styles.fixedCategories}>
             <TouchableOpacity onPress={() => navigation.navigate('Home', { category: 'Sale' })}>
-              <Text style={styles.category}>Sale ➞</Text>
+              <Text style={styles.category}>Giảm Giá ➞</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.productScrollView}
+          >
             {renderProducts(saleLaptops)}
           </ScrollView>
-
           <View style={styles.fixedCategories}>
-            <TouchableOpacity onPress={() => navigation.navigate('Home', { category: 'Trending' })}>
-              <Text style={styles.category}>Trending ➞</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Home', { category: 'Trending' })}
+            >
+              <Text style={styles.category}>Xu hướng ➞</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productScrollView}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.productScrollView}
+          >
             {renderProducts(trendingLaptops)}
           </ScrollView>
-
-          <View style={styles.bottomSpacing} />
-
-        
         </ScrollView>
-        
       )}
-       <TouchableOpacity
-    style={styles.fixedZaloButton}
-    onPress={openZalo}
-  >
-    <Image
-      source={require('../acssets/Zalo.png')}
-      style={styles.zaloIcon}
-    />
-  </TouchableOpacity>
+      <TouchableOpacity style={styles.fixedZaloButton} onPress={openZalo}>
+        <Image
+          source={require('../acssets/Zalo.png')}
+          style={styles.zaloIcon}
+        />
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  /* Đầy đủ như code ban đầu */
-  container: { flex: 1, backgroundColor: '#fff' , padding:5},
+  container: { flex: 1, backgroundColor: '#fff', padding: 5 },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: {
     flexDirection: 'row',
@@ -241,45 +251,11 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
   },
-  profileImage: { width: 40, height: 40, borderRadius: 20 },
-  headerIcons: { flexDirection: 'row', margin: 10 },
-
-  filterButton: {
-    position: 'absolute',  // Đặt vị trí tuyệt đối
-    right: 10,             // Cách bên phải 10 đơn vị (có thể thay đổi theo nhu cầu)
-    top: 270,               // Cách trên 10 đơn vị (có thể thay đổi theo nhu cầu)
-    zIndex: 10,            // Đảm bảo nút nổi lên trên các thành phần khác
-  },
-  filterIcon: {
-    width: 30,   // Chỉnh kích thước icon (có thể thay đổi theo yêu cầu)
-    height: 30,  // Chỉnh kích thước icon (có thể thay đổi theo yêu cầu)
-  },
-
-
-    // Các style khác...
-    zaloButton: {
-      position: 'absolute', // Đặt vị trí tuyệt đối
-      right: 10,            // Cách từ phải 10 đơn vị
-      bottom:'50%',           // Cách từ dưới lên 20 đơn vị (có thể thay đổi tùy nhu cầu)
-      zIndex: 1,            // Đảm bảo nút nổi lên trên các thành phần khác
-    },
-    zaloIcon: {
-      width: 50,   // Kích thước icon Zalo
-      height: 50,
-    },
-    // Các style khác...
-
-  
-  iconButton: {
-    marginHorizontal: 5,           // Khoảng cách 5 đơn vị giữa các icon
-  },
-  icon: { width: 24, height: 24, margin: 16 },
-  bannerSlider: {
-    height: 200,
-    width: screenWidth * 0.9,
-    marginLeft: screenWidth * 0.05,
-    marginBottom: 20,
-  },
+  profileImage: { width: 60, height: 60, borderRadius: 20 },
+  headerIcons: { flexDirection: 'row' },
+  iconButton: { marginHorizontal: 5 },
+  icon: { width: 24, height: 24 },
+  bannerSlider: { height: 200, marginBottom: 20 },
   banner: {
     width: screenWidth * 0.85,
     height: 170,
@@ -287,164 +263,51 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     borderRadius: 10,
   },
-  fixedCategories: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 16,
-    marginBottom: 10,
-  },
-  category: { fontSize: 18, fontWeight: 'bold', color: '#6C63FF' },
-  productScrollView: {
-    paddingHorizontal: 16,
-    marginBottom: 20,
-  },
+  fixedCategories: { paddingHorizontal: 16, marginBottom: 10 },
+  category: { fontSize: 18, fontWeight: 'bold', color: '#333' },
+  productScrollView: { marginBottom: 20, paddingHorizontal: 16 },
   product: {
-    width: 140,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 10,
-    padding: 16,
-    marginRight: 16,
-    alignItems: 'center',
-  },
-  productImage: { width: 100, height: 100, resizeMode: 'contain' },
-  productName: { fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginTop: 5 },
-  productPrice: { fontSize: 14, color: '#000', marginTop: 5 },
-  productRating: { fontSize: 12, color: '#888', marginTop: 5 },
-  bottomSpacing: { height: 80 },
-  bottomNavigation: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingVertical: 10,
-    backgroundColor: '#f1f1f1',
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
-  },
-  iconNav: { width: 24, height: 24 },
-  modalOverlay: {
-    flex: 1,
-   
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContainer: {
-    backgroundColor: 'white',
-    width: '100%',
-    borderRadius: 10,
-    padding: 20,
-    maxHeight: '80%',
-   
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  icon: {
-    width: 24,
-    height: 24,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    flex: 1,
-    textAlign: 'center',
-  },
-  closeIcon: {
-    width: 24,
-    height: 24,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginVertical: 10,
-  },
-  optionsContainer: {
-    flexDirection: 'row', // Vẫn giữ 'row' để các nút nằm ngang
-    flexWrap: 'wrap',      // Cho phép bọc các phần tử khi không còn không gian
-    justifyContent: 'space-between', // Đảm bảo khoảng cách đều giữa các nút
-    alignItems: 'flex-start', // Căn lề các nút ở phía trên cùng
-  },
-  
-  optionButton: {
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-    borderRadius: 5,
-    margin:2,
-    width: '40%', // Điều chỉnh width để mỗi nút chiếm 48% chiều rộng
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  
-  selectedOption: {
-    backgroundColor: '#6C63FF',
-  },
-  optionText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  checkboxContainer: {
-    marginVertical: 10,
-  },
-  checkboxOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#333',
+    width: 180,
     marginRight: 10,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
   },
-  checkedCheckbox: {
-    backgroundColor: '#6C63FF',
-  },
-  checkboxText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  actionButtons: {
+  productRow: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginVertical: 10,
+   
+  },
+  productImage: { width: 80, height: 80, resizeMode: 'contain', marginRight: 20 },
+  descriptionContainer: { flex: 1 },
+  descriptionRow: {
+    flexDirection: 'column',
     justifyContent: 'space-between',
-    marginTop: 20,
+    marginVertical: 5,
   },
-  resetButton: {
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-    borderRadius: 5,
-    width: '48%',
-    alignItems: 'center',
-  },
-  applyButton: {
-    backgroundColor: '#6C63FF',
-    padding: 10,
-    borderRadius: 5,
-    width: '48%',
-    alignItems: 'center',
-  },
-  resetText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  applyText: {
-    fontSize: 14,
-    color: 'white',
-  },
+  descriptionItem: { flexDirection: 'column', alignItems: 'center' },
+  iconImage: { width: 16, height: 16, marginRight: 5 , },
+  descriptionText: { fontSize: 12, color: '#666' },
+  productName: { fontSize: 14, fontWeight: 'bold', marginTop: 5 },
+  productPrice: { fontSize: 14, color: '#FF5733', fontWeight: 'bold' },
   fixedZaloButton: {
-    position: 'absolute', // Đặt vị trí cố định
-    bottom: 70,           // Khoảng cách phía trên BottomNavigation
-    right: 20,            // Cách mép phải
-    zIndex: 10,           // Hiển thị trên các thành phần khác
+    position: 'absolute',
+    bottom: 80,
+    right: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 30,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  zaloIcon: {
-    width: 50,            // Kích thước icon Zalo
-    height: 50,
-  },
-  
+  zaloIcon: { width: 60, height: 60 },
 });
 
 export default MainHome;

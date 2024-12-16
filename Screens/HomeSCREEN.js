@@ -56,20 +56,20 @@ const HomeScreen = () => {
     let apiUrl = '';
 
     switch (category) {
-      case 'Popular':
-        apiUrl = 'http://192.168.3.105:3000/LapTop/getPopularLapTop';
+      case 'Phổ biến':
+        apiUrl = 'http://192.168.1.37:3000/LapTop/getPopularLapTop';
         break;
-      case 'Trending':
-        apiUrl = 'http://192.168.3.105:3000/LapTop/getTrendingLapTop';
+      case 'Xu hướng':
+        apiUrl = 'http://192.168.1.37:3000/LapTop/getTrendingLapTop';
         break;
-      case 'News':
-        apiUrl = 'http://192.168.3.105:3000/LapTop/getNewsLapTop';
+      case 'Mới':
+        apiUrl = 'http://192.168.1.37:3000/LapTop/getNewsLapTop';
         break;
-      case 'Sale':
-        apiUrl = 'http://192.168.3.105:3000/LapTop/getSaleLapTop';
+      case 'Giảm Giá':
+        apiUrl = 'http://192.168.1.37:3000/LapTop/getSaleLapTop';
         break;
-      case 'All':
-        apiUrl = 'http://192.168.3.105:3000/LapTop/getListLapTop';
+      case 'Tất cả':
+        apiUrl = 'http://192.168.1.37:3000/LapTop/getListLapTop';
         break;
       default:
     }
@@ -80,7 +80,7 @@ const HomeScreen = () => {
         setLaptops(response.data.data || []);
       })
       .catch(error => {
-        console.error('Error fetching laptop data:', error);
+        // console.error('Error fetching laptop data:', error);
         setLaptops([]);
       })
       .finally(() => {
@@ -124,7 +124,7 @@ const HomeScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <Image
-          source={require('../acssets/profile1.png')}
+          source={require('../acssets/lapstore_logo.png')}
           style={styles.profileImage}
         />
         <View style={styles.headerIcons}>
@@ -153,7 +153,7 @@ const HomeScreen = () => {
 
       {/* Categories */}
       <View style={styles.categories}>
-        {['All', 'Popular', 'Trending', 'News', 'Sale'].map(category => (
+        {['Tất cả', 'Phổ biến', 'Xu hướng', 'Mới', 'Giảm Giá'].map(category => (
           <TouchableOpacity
             key={category}
             onPress={() => handleCategoryPress(category)}>
@@ -191,19 +191,42 @@ const HomeScreen = () => {
                     onPress={() =>
                       navigation.navigate('ProductScreen', { product: laptop })
                     }>
-                    <View style={styles.productContainer}>
-                      {/* Ảnh sản phẩm */}
-                      <Image source={{ uri: laptop.hinhAnh }} style={styles.productImage} />
-
-                      {/* Thông tin bên phải ảnh */}
-                      <View style={styles.productDetails}>
-                        <Text style={styles.productDetailText}>{laptop.CPU || 'N/A'}</Text>
-                        <Text style={styles.productDetailText}>{laptop.RAM || 'N/A'}</Text>
-                        <Text style={styles.productDetailText}>
-                          {laptop.KichThuocManHinh || 'N/A'}
-                        </Text>
-                      </View>
-                    </View>
+                     <View style={styles.productRow}>
+                                  <Image source={{ uri: laptop.hinhAnh }} style={styles.productImage} />
+                                  <View style={styles.descriptionContainer}>
+                                    <View style={styles.descriptionRow}>
+                                      <View style={styles.descriptionItem}>
+                                        <Image source={require('../acssets/cpu.png')} style={styles.iconImage} />
+                                        <Text style={styles.descriptionText}>{laptop.CPU}</Text>
+                                      </View>
+                                      {/* <View style={styles.descriptionItem}>
+                                        <Image source={require('../acssets/RAM.png')} style={styles.iconImage} />
+                                        <Text style={styles.descriptionText}>{laptop.RAM}</Text>
+                                      </View> */}
+                                    </View>
+                                    <View style={styles.descriptionRow}>
+                                      <View style={styles.descriptionItem}>
+                                        <Image source={require('../acssets/RAM.png')} style={styles.iconImage} />
+                                        <Text style={styles.descriptionText}>{laptop.RAM}</Text>
+                                      </View>
+                                      {/* <View style={styles.descriptionItem}>
+                                        <Image source={require('../acssets/RAM.png')} style={styles.iconImage} />
+                                        <Text style={styles.descriptionText}>{laptop.RAM}</Text>
+                                      </View> */}
+                                    </View>
+                                    
+                                    <View style={styles.descriptionRow}>
+                                      <View style={styles.descriptionItem}>
+                                        <Image source={require('../acssets/Card1.png')} style={styles.iconImage} />
+                                        <Text style={styles.descriptionText}>{laptop.CardManHinh}</Text>
+                                      </View>
+                                      {/* <View style={styles.descriptionItem}>
+                                        <Image source={require('../acssets/kichthuoc.png')} style={styles.iconImage} />
+                                        <Text style={styles.descriptionText}>{laptop.KichThuocManHinh}</Text>
+                                      </View> */}
+                                    </View>
+                                  </View>
+                                </View>
 
                     {/* Tên sản phẩm */}
                     <Text style={styles.productName} numberOfLines={1}>
@@ -337,7 +360,7 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
   },
-  profileImage: { width: 40, height: 40, borderRadius: 20 },
+  profileImage: { width: 60, height: 60, borderRadius: 20 },
   headerIcons: { flexDirection: 'row' },
   icon: { width: 24, height: 24, marginLeft: 16 },
   categories: {
@@ -541,6 +564,22 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     borderWidth: 1,
   },
+  productRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginVertical: 10,
+   
+  },
+  productImage: { width: 80, height: 80, resizeMode: 'contain', marginRight: 20 },
+  descriptionContainer: { flex: 1 },
+  descriptionRow: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    marginVertical: 5,
+  },
+  descriptionItem: { flexDirection: 'column', alignItems: 'center' },
+  iconImage: { width: 16, height: 16, marginRight: 5 , },
+  descriptionText: { fontSize: 12, color: '#666' },
 
 });
 
