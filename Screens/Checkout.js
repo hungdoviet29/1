@@ -54,7 +54,7 @@ const CheckoutScreen = ({navigation, route}) => {
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
-        const url = `http://10.24.24.5:3000/vouchers?userId=${userId}`;
+        const url = `http://172.20.10.6:3000/vouchers?userId=${userId}`;
         const response = await fetch(url);
         const data = await response.json();
         if (response.ok) {
@@ -73,7 +73,7 @@ const CheckoutScreen = ({navigation, route}) => {
     const fetchCartItems = async id => {
       setLoading(true);
       try {
-        const response = await fetch(`http://10.24.24.5:3000/cart/${id}`);
+        const response = await fetch(`http://172.20.10.6:3000/cart/${id}`);
         const data = await response.json();
         if (response.ok) {
           // Filter out items with invalid productId
@@ -93,7 +93,7 @@ const CheckoutScreen = ({navigation, route}) => {
         setLoading(false);
       }
     };
-  }
+  };
 
 
   const handleZaloPayCheckout = async () => {
@@ -111,37 +111,78 @@ const CheckoutScreen = ({navigation, route}) => {
             productId: item.productId._id,
             quantity: item.quantity,
         })),
-        embed_data:{
-          orderId:orderId,
-          shippingInfo:shippingInfo
-        }
+        embed_data: {
+            orderId: orderId,
+            shippingInfo: shippingInfo,
+        },
     };
 
     console.log('Dữ liệu gửi đến server:', payload);
 
     try {
-        const response = await fetch('http://10.24.24.5:3000/donhang/zalopay', {
+        const response = await fetch('http://172.20.10.6:3000/donhang/zalopay', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
         });
 
         const data = await response.json();
-const zp_trans_token=data.zp_trans_token
+        const zp_trans_token = data.zp_trans_token;
+
         if (data.success && data.payment_url) {
-          const result = await ZaloPayBridge.payOrder(zp_trans_token);
-          if (result.startsWith('success')) {
-              // Thanh toán thành công -> Chuyển màn hình
-              const transactionId = result.split('|')[1];
+            const result = await ZaloPayBridge.payOrder(zp_trans_token);
+            if (result.startsWith('success')) {
+                // Thanh toán thành công -> Tạo đơn hàng
+                const transactionId = result.split('|')[1];
+                console.log('Thanh toán thành công:', transactionId);
 
-              console.log('Thanh toán thành công:', transactionId);
-              Alert.alert('Thanh toán thành công', 'Cảm ơn bạn đã đặt hàng')
+                // Gọi API để tạo đơn hàng
+                const orderData = {
+                    userId,
+                    cartItems: cartItems.map(item => ({
+                        productId: item.productId._id,
+                        quantity: item.quantity,
+                    })),
+                    totalAmount: total,
+                    paymentMethod: 'ZaloPay',
+                    shippingInfo: shippingInfo,
+                    voucher: selectedVoucher ? selectedVoucher._id : null,
+                    transactionId: transactionId, // Lưu Transaction ID
+                };
 
-              
-          } else if (result.startsWith('canceled')) {
-              // Thanh toán bị hủy -> Xử lý
-              console.log('Thanh toán bị hủy');
-          }
+                try {
+                    const orderResponse = await fetch(
+                        'http://172.20.10.6:3000/donhang',
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(orderData),
+                        }
+                    );
+
+                    const orderResponseBody = await orderResponse.json();
+                    if (orderResponse.ok && orderResponseBody.success) {
+                        Alert.alert('Thành công', 'Đơn hàng đã được tạo.');
+
+                        // Xóa giỏ hàng sau khi tạo đơn hàng thành công
+                        await resetCart();
+                        navigation.navigate('NotificationScreen', {
+                            message: 'Đơn hàng của bạn đã được tạo thành công!',
+                        });
+                    } else {
+                        Alert.alert(
+                            'Lỗi',
+                            orderResponseBody.message || 'Không thể tạo đơn hàng.'
+                        );
+                    }
+                } catch (error) {
+                    Alert.alert('Lỗi', 'Lỗi khi tạo đơn hàng. Vui lòng thử lại.');
+                    console.error('Lỗi khi tạo đơn hàng:', error);
+                }
+            } else if (result.startsWith('canceled')) {
+                // Thanh toán bị hủy -> Xử lý
+                console.log('Thanh toán bị hủy');
+            }
         } else {
             Alert.alert('Lỗi', data.message || 'Không thể khởi tạo thanh toán.');
         }
@@ -150,6 +191,8 @@ const zp_trans_token=data.zp_trans_token
         Alert.alert('Lỗi', 'Không thể kết nối đến máy chủ.');
     }
 };
+
+
 
 const handleSelectPaymentMethod = method => {
   setSelectedPaymentMethod(method);
@@ -235,7 +278,7 @@ const handleSelectPaymentMethod = method => {
 
             try {
               const response = await fetch(
-                'http://10.24.24.5:3000/donhang',
+                'http://172.20.10.6:3000/donhang',
                 {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
@@ -278,7 +321,7 @@ const handleSelectPaymentMethod = method => {
         quantity: selectedVoucher.quantity - 1,
       };
       const response = await fetch(
-        `http://10.24.24.5:3000/vouchers/${voucherId}`,
+        `http://172.20.10.6:3000/vouchers/${voucherId}`,
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
@@ -295,11 +338,11 @@ const handleSelectPaymentMethod = method => {
 
   const resetCart = async () => {
     try {
-      const response = await fetch(`http://10.24.24.5:3000/cart/${userId}`);
+      const response = await fetch(`http://172.20.10.6:3000/cart/${userId}`);
       const data = await response.json();
       if (data && data.items && data.items.length > 0) {
         const deleteResponse = await fetch(
-          `http://10.24.24.5:3000/cart/${userId}`,
+          `http://172.20.10.6:3000/cart/${userId}`,
           {
             method: 'DELETE',
           },

@@ -331,7 +331,7 @@
                         <option value="Chờ xác nhận">Chờ xác nhận</option>
                         <option value="Chờ vận chuyển">Chờ vận chuyển</option>
                         <option value="Đang vận chuyển">Đang vận chuyển</option>
-                        <option value="Thành công">Thành công</option>
+                        <option value="thành công">thành công</option>
                         <option value="Đã hủy">Đã hủy</option>
                     </select>
 
@@ -473,9 +473,9 @@
                                 actionCell.appendChild(shipButton);
                             } else if (status === 'đang vận chuyển') {
                                 const successButton = document.createElement('button');
-                                successButton.textContent = 'Thành công';
+                                successButton.textContent = 'thành công';
                                 successButton.className = 'success';
-                                successButton.addEventListener('click', () => updateOrderStatus(order._id, 'Thành công', row));
+                                successButton.addEventListener('click', () => updateOrderStatus(order._id, 'thành công', row));
                                 actionCell.appendChild(successButton);
 
                                 const cancelButton = document.createElement('button');
@@ -483,7 +483,7 @@
                                 cancelButton.className = 'cancel';
                                 // cancelButton.addEventListener('click', () => updateOrderStatus(order._id, 'Đã hủy', row));
                                 actionCell.appendChild(cancelButton);
-                            } else if (status === 'Thành công') {
+                            } else if (status === 'thành công') {
                                 const cancelButton = document.createElement('button');
                                 cancelButton.textContent = 'Hủy đơn';
                                 cancelButton.className = 'cancel';
@@ -528,7 +528,7 @@
                             const actionCell = row.querySelector('td:last-child');
                             actionCell.innerHTML = '';
 
-                            if (newStatus === 'Thành công') {
+                            if (newStatus === 'thành công') {
                                 actionCell.innerHTML = '<span class="status-icon complete">✔</span>';
                             }
                         } else {

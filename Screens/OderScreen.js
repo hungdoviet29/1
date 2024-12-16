@@ -22,22 +22,22 @@ const OrderScreen = ({navigation}) => {
   const [refreshTrigger, setRefreshTrigger] = useState(false);
 
   const statusMap = {
-    'Tất cả': id => `http://10.24.25.172:3000/donhang/user/${id}`,
+    'Tất cả': id => `http://172.20.10.6:3000/donhang/user/${id}`,
     'Chờ xác nhận': id =>
-      `http://10.24.25.172:3000/donhang/user/${id}/status?status=${encodeURIComponent(
-        'Chờ xác nhận',
+      `http://172.20.10.6:3000/donhang/user/${id}/status?status=${encodeURIComponent(
+        'chờ xác nhận',
       )}`,
     'Chờ vận chuyển': id =>
-      `http://10.24.25.172:3000/donhang/user/${id}/status?status=${encodeURIComponent(
-        'Chờ vận chuyển',
+      `http://172.20.10.6:3000/donhang/user/${id}/status?status=${encodeURIComponent(
+        'chờ vận chuyển',
       )}`,
     'Đang vận chuyển': id =>
-      `http://10.24.25.172:3000/donhang/user/${id}/status?status=${encodeURIComponent(
-        'Đang vận chuyển',
+      `http://172.20.10.6:3000/donhang/user/${id}/status?status=${encodeURIComponent(
+        'đang vận chuyển',
       )}`,
     'Đã được hủy': id =>
-      `http://10.24.25.172:3000/donhang/user/${id}/status?status=${encodeURIComponent(
-        'Đã được hủy',
+      `http://172.20.10.6:3000/donhang/user/${id}/status?status=${encodeURIComponent(
+        'đã được hủy',
       )}`,
   };
 
@@ -103,7 +103,7 @@ const OrderScreen = ({navigation}) => {
   const cancelOrder = async orderId => {
     try {
       const response = await fetch(
-        `http://10.24.25.172:3000/donhang/${orderId}`,
+        `http://172.20.10.6:3000/donhang/${orderId}`,
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
@@ -116,7 +116,7 @@ const OrderScreen = ({navigation}) => {
       }
 
       const data = await response.json();
-      Alert.alert('Hoàn Thành', data.message);
+      Alert.alert('thành công', data.message);
       setRefreshTrigger(prev => !prev);
     } catch (error) {
       console.error('Lỗi khi hủy đơn hàng:', error.message);
@@ -127,11 +127,11 @@ const OrderScreen = ({navigation}) => {
   const confirmReceived = async orderId => {
     try {
       const response = await fetch(
-        `http://10.24.25.172:3000/donhang/${orderId}`,
+        `http://172.20.10.6:3000/donhang/${orderId}`,
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({status: 'Hoàn Thành'}),
+          body: JSON.stringify({status: 'thành công'}),
         },
       );
 
@@ -140,7 +140,7 @@ const OrderScreen = ({navigation}) => {
       }
 
       const data = await response.json();
-      Alert.alert('Hoàn Thành', data.message);
+      Alert.alert('thành công', data.message);
       setRefreshTrigger(prev => !prev);
     } catch (error) {
       console.error('Lỗi khi xác nhận đơn hàng:', error.message);
@@ -218,14 +218,14 @@ const OrderScreen = ({navigation}) => {
         </View>
 
         {/* Phần nút bấm cho trạng thái đơn hàng */}
-        {order.status === 'Chờ xác nhận' && (
+        {order.status === 'chờ xác nhận' && (
           <TouchableOpacity
             style={styles.cancelButton}
             onPress={() => cancelOrder(order._id)}>
             <Text style={styles.buttonText}>Hủy đơn</Text>
           </TouchableOpacity>
         )}
-        {order.status === 'Đang vận chuyển' && (
+        {order.status === 'đang vận chuyển' && (
           <TouchableOpacity
             style={styles.confirmButton}
             onPress={() => confirmReceived(order._id)}>
