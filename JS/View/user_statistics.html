@@ -29,76 +29,30 @@
 
         .filters {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .filters label {
-            font-size: 14px;
-            color: #333;
-            margin-right: 6px;
-        }
-
+        .filters label,
         .filters select,
-        .filters input {
-            padding: 8px 10px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            transition: border-color 0.3s ease;
-            outline: none;
-            width: 150px;
-        }
-
-        .filters select:hover,
-        .filters input:hover,
-        .filters select:focus,
-        .filters input:focus {
-            border-color: #6c63ff;
+        .filters input,
+        .filters button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
 
         .filters button {
-            background-color: #006eff;
+            background-color: #6c63ff;
             color: white;
-            border: none;
-            padding: 8px 20px;
-            font-size: 14px;
-            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            border: none;
         }
 
         .filters button:hover {
-            background-color: #0056d2;
+            background-color: #5a54d6;
         }
-
-        .filters select {
-            appearance: none;
-            /* Xóa dấu mũi tên mặc định */
-            background: url('data:image/svg+xml;utf8,<svg fill="%23006eff" height="18" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M5 8l4 4 4-4z"/></svg>') no-repeat;
-            background-position: right 8px center;
-            background-size: 14px 14px;
-            padding-right: 25px;
-        }
-
-        .filters input[type="date"] {
-            appearance: none;
-            background: #fff url('data:image/svg+xml;utf8,<svg fill="%23006eff" height="18" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M12 2v1H6V2H4v2H2v14h20V4h-2V2h-2v2h-8V2zm0 4v2H6V6h6zm-8 0v2H4V6h2zm12 4v2H6v-2h10zm-8 4v2H6v-2h6zm8 0v2H6v-2h10z"/></svg>') no-repeat;
-            background-position: right 8px center;
-            background-size: 14px 14px;
-            padding-right: 25px;
-        }
-
-        .filters input[type="date"]::-webkit-calendar-picker-indicator {
-            opacity: 0;
-        }
-
 
         .table-container {
             background-color: white;
@@ -124,7 +78,6 @@
             background-color: #6c63ff;
             color: white;
         }
-
         nav {
             background-color: #fff;
             padding: 10px;
@@ -154,7 +107,6 @@
         nav ul li a:hover {
             text-decoration: underline;
         }
-
         .button-container {
             display: flex;
             justify-content: center;
@@ -259,7 +211,6 @@
                 <thead>
                     <tr>
                         <th>ID Người Dùng</th>
-                        <th>Tên Người Dùng</th>
                         <th>Email</th>
                         <th>Số Điện Thoại</th>
                         <th>Tổng Số Đơn Hàng</th>
@@ -281,7 +232,7 @@
             const month = document.getElementById("month").value;
             const userStatisticsBody = document.getElementById("user-statistics-body");
 
-            fetch("http://localhost:3000/donhang")
+            fetch("http://192.168.101.9:3000/donhang")
                 .then(response => response.json())
                 .then(orders => {
                     // Tính toán thống kê người dùng
@@ -332,7 +283,6 @@
                         const row = document.createElement("tr");
                         row.innerHTML = `
                             <td>${userId}</td>
-                            <td>${stats.name}</td>
                             <td>${stats.email}</td>
                             <td>${stats.phone}</td>
                             <td>${stats.orders}</td>
