@@ -233,7 +233,7 @@ document.getElementById("filter-button").addEventListener("click", () => {
     const userStatisticsBody = document.getElementById("user-statistics-body");
 
     // Fetch danh sách người dùng để lấy email
-    fetch("http://localhost:3000/users")
+    fetch("http://192.168.101.9:3000/users")
         .then(response => response.json())
         .then(users => {
             const userMap = {};
@@ -242,7 +242,7 @@ document.getElementById("filter-button").addEventListener("click", () => {
             });
 
             // Fetch đơn hàng
-            return fetch("http://localhost:3000/donhang")
+            return fetch("http://192.168.101.9:3000/donhang")
                 .then(response => response.json())
                 .then(orders => {
                     const userStatistics = {};
