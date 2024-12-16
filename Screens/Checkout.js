@@ -54,7 +54,7 @@ const CheckoutScreen = ({navigation, route}) => {
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
-        const url = `http://172.20.10.2:3000/vouchers?userId=${userId}`;
+        const url = `http://172.20.10.6:3000/vouchers?userId=${userId}`;
         const response = await fetch(url);
         const data = await response.json();
         if (response.ok) {
@@ -73,7 +73,7 @@ const CheckoutScreen = ({navigation, route}) => {
     const fetchCartItems = async id => {
       setLoading(true);
       try {
-        const response = await fetch(`http://172.20.10.2:3000/cart/${id}`);
+        const response = await fetch(`http://172.20.10.6:3000/cart/${id}`);
         const data = await response.json();
         if (response.ok) {
           // Filter out items with invalid productId
@@ -94,6 +94,33 @@ const CheckoutScreen = ({navigation, route}) => {
       }
     };
   };
+
+  const validateShippingInfo = () => {
+    const { name, phone, address } = shippingInfo;
+
+    // Validate tên
+    const nameRegex = /^[a-zA-Z\s]{5,}$/;
+    if (!nameRegex.test(name)) {
+        Alert.alert('Lỗi', 'Tên phải có ít nhất 5 ký tự và không chứa ký tự đặc biệt.');
+        return false;
+    }
+
+    // Validate số điện thoại
+    const phoneRegex = /^0\d{9}$/;
+    if (!phoneRegex.test(phone)) {
+        Alert.alert('Lỗi', 'Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0.');
+        return false;
+    }
+
+    // Validate địa chỉ
+    const addressRegex = /^[a-zA-Z0-9\s]{5,}$/;
+    if (!addressRegex.test(address)) {
+        Alert.alert('Lỗi', 'Địa chỉ phải dài ít nhất 5 ký tự và chỉ chứa chữ và số.');
+        return false;
+    }
+
+    return true;
+};
 
 
   const handleZaloPayCheckout = async () => {
@@ -120,7 +147,7 @@ const CheckoutScreen = ({navigation, route}) => {
     console.log('Dữ liệu gửi đến server:', payload);
 
     try {
-        const response = await fetch('http://172.20.10.2:3000/donhang/zalopay', {
+        const response = await fetch('http://172.20.10.6:3000/donhang/zalopay', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -152,7 +179,7 @@ const CheckoutScreen = ({navigation, route}) => {
 
                 try {
                     const orderResponse = await fetch(
-                        'http://172.20.10.2:3000/donhang',
+                        'http://172.20.10.6:3000/donhang',
                         {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -166,7 +193,7 @@ const CheckoutScreen = ({navigation, route}) => {
 
                         // Xóa giỏ hàng sau khi tạo đơn hàng thành công
                         await resetCart();
-                        navigation.navigate('NotificationScreen', {
+                        navigation.navigate('MainHomeScreen', {
                             message: 'Đơn hàng của bạn đã được tạo thành công!',
                         });
                     } else {
@@ -232,6 +259,10 @@ const handleSelectPaymentMethod = method => {
       Alert.alert('Lỗi', 'Vui lòng chọn phương thức thanh toán.');
       return;
   }
+  // Gọi hàm validate
+  if (!validateShippingInfo()) {
+    return; // Dừng nếu thông tin không hợp lệ
+  }
 
   if (selectedPaymentMethod === 'Thanh toán qua ZaloPay') {
       handleZaloPayCheckout();
@@ -278,7 +309,7 @@ const handleSelectPaymentMethod = method => {
 
             try {
               const response = await fetch(
-                'http://172.20.10.2:3000/donhang',
+                'http://172.20.10.6:3000/donhang',
                 {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
@@ -295,7 +326,7 @@ const handleSelectPaymentMethod = method => {
                 }
 
                 await resetCart();
-                navigation.navigate('NotificationScreen', {
+                navigation.navigate('MainHomeScreen', {
                   message: 'Đơn hàng của bạn đã được tạo thành công!',
                 });
               } else {
@@ -321,7 +352,7 @@ const handleSelectPaymentMethod = method => {
         quantity: selectedVoucher.quantity - 1,
       };
       const response = await fetch(
-        `http://172.20.10.2:3000/vouchers/${voucherId}`,
+        `http://172.20.10.6:3000/vouchers/${voucherId}`,
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
@@ -338,11 +369,11 @@ const handleSelectPaymentMethod = method => {
 
   const resetCart = async () => {
     try {
-      const response = await fetch(`http://172.20.10.2:3000/cart/${userId}`);
+      const response = await fetch(`http://172.20.10.6:3000/cart/${userId}`);
       const data = await response.json();
       if (data && data.items && data.items.length > 0) {
         const deleteResponse = await fetch(
-          `http://172.20.10.2:3000/cart/${userId}`,
+          `http://172.20.10.6:3000/cart/${userId}`,
           {
             method: 'DELETE',
           },
@@ -432,34 +463,47 @@ const handleSelectPaymentMethod = method => {
       <View style={styles.shippingContainer}>
         <Text style={styles.shippingTitle}>Thông tin vận chuyển</Text>
         <TextInput
-          style={styles.input}
-          placeholder="Tên người nhận"
-          value={shippingInfo.name}
-          onChangeText={text => setShippingInfo({...shippingInfo, name: text})}
-        />
+    style={styles.input}
+    placeholder="Tên người nhận"
+    value={shippingInfo.name}
+    onChangeText={text => setShippingInfo({ ...shippingInfo, name: text })}
+    onBlur={() => {
+        if (!/^[a-zA-Z\s]{5,}$/.test(shippingInfo.name)) {
+            // Alert.alert('Lỗi', 'Tên phải có ít nhất 5 ký tự và không chứa ký tự đặc biệt.');
+        }
+    }}
+/>
         {!shippingInfo.name.trim() && (
           <Text style={styles.errorText}>Vui lòng nhập tên người nhận.</Text>
         )}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Số điện thoại"
-          keyboardType="numeric"
-          value={shippingInfo.phone}
-          onChangeText={text => setShippingInfo({...shippingInfo, phone: text})}
-        />
+<TextInput
+    style={styles.input}
+    placeholder="Số điện thoại"
+    keyboardType="numeric"
+    value={shippingInfo.phone}
+    onChangeText={text => setShippingInfo({ ...shippingInfo, phone: text })}
+    onBlur={() => {
+        if (!/^0\d{9}$/.test(shippingInfo.phone)) {
+            // Alert.alert('Lỗi', 'Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0.');
+        }
+    }}
+/>
         {!shippingInfo.phone.trim() && (
           <Text style={styles.errorText}>Vui lòng nhập số điện thoại.</Text>
         )}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Địa chỉ giao hàng"
-          value={shippingInfo.address}
-          onChangeText={text =>
-            setShippingInfo({...shippingInfo, address: text})
-          }
-        />
+<TextInput
+    style={styles.input}
+    placeholder="Địa chỉ giao hàng"
+    value={shippingInfo.address}
+    onChangeText={text => setShippingInfo({ ...shippingInfo, address: text })}
+    onBlur={() => {
+        if (!/^[a-zA-Z0-9\s]{5,}$/.test(shippingInfo.address)) {
+            // Alert.alert('Lỗi', 'Địa chỉ phải dài ít nhất 5 ký tự và chỉ chứa chữ và số.');
+        }
+    }}
+/>
         {!shippingInfo.address.trim() && (
           <Text style={styles.errorText}>Vui lòng nhập địa chỉ giao hàng.</Text>
         )}
