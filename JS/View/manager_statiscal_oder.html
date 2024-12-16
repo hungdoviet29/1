@@ -206,11 +206,13 @@
         <div class="filters">
             <label for="time-range">Khoảng thời gian:</label>
             <select id="time-range">
+                <option value="all">Tất cả</option>
                 <option value="today">Hôm nay</option>
                 <option value="yesterday">Hôm qua</option>
                 <option value="last-month">1 tháng trước</option>
                 <option value="last-year">1 năm trước</option>
             </select>
+            
             <label for="start-date">Từ ngày:</label>
             <input type="date" id="start-date">
             <label for="end-date">Đến ngày:</label>
@@ -245,77 +247,84 @@
 
     <script>
         // Lắng nghe thay đổi trong dropdown "Khoảng thời gian"
-        document.getElementById("time-range").addEventListener("change", () => {
-            const timeRange = document.getElementById("time-range").value;
-            const startDateInput = document.getElementById("start-date");
-            const endDateInput = document.getElementById("end-date");
+      // Xử lý sự kiện thay đổi dropdown "Khoảng thời gian"
+      document.getElementById("time-range").addEventListener("change", () => {
+    const timeRange = document.getElementById("time-range").value;
+    const startDateInput = document.getElementById("start-date");
+    const endDateInput = document.getElementById("end-date");
 
-            const now = new Date();
-            let start, end;
+    const now = new Date(); // Ngày hiện tại theo hệ thống
+    let start = null;
+    let end = null;
 
-            switch (timeRange) {
-                case "today":
-                    start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-                    break;
-                case "yesterday":
-                    start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-                    end = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 59, 59);
-                    break;
-                case "last-month":
-                    start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-                    end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59); // Ngày cuối cùng của tháng trước
-                    break;
-                case "last-year":
-                    start = new Date(now);
-                    start.setDate(now.getDate() - 365); // Lùi lại 365 ngày
-                    end = now; // Ngày hiện tại
-                    break;
-                default:
-                    start = null;
-                    end = null;
-                    break;
-            }
+    switch (timeRange) {
+        case "today":
+            // Đặt ngày bắt đầu và kết thúc là ngày hôm nay
+            start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+            end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+            break;
+        case "yesterday":
+            // Đặt ngày bắt đầu và kết thúc là ngày hôm qua
+            start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 0, 0, 0, 0);
+            end = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 59, 59, 999);
+            break;
+        case "last-month":
+            // Từ đầu tháng trước đến cuối tháng trước
+            start = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
+            end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+            break;
+        case "last-year":
+            // Từ ngày hôm nay lùi lại 1 năm
+            start = new Date(new Date().setFullYear(now.getFullYear() - 1, now.getMonth(), now.getDate()));
+            start.setHours(0, 0, 0, 0);
+            end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+            break;
+        case "all":
+        default:
+            // Đặt null nếu là "Tất cả"
+            start = null;
+            end = null;
+            break;
+    }
 
-            // Điền giá trị vào ô "Từ ngày" và "Đến ngày"
-            startDateInput.value = start ? start.toISOString().split("T")[0] : "";
-            endDateInput.value = end ? end.toISOString().split("T")[0] : "";
-        });
+    // Đặt giá trị ngày vào các input hoặc xóa nếu là "Tất cả"
+    startDateInput.value = start ? start.toISOString().split("T")[0] : "";
+    endDateInput.value = end ? end.toISOString().split("T")[0] : "";
+});
 
-        // Lắng nghe sự kiện nút "Lọc"
-        document.getElementById("filter-button").addEventListener("click", () => {
-            const startDate = document.getElementById("start-date").value;
-            const endDate = document.getElementById("end-date").value;
 
-            // Kiểm tra ngày nhập vào
-            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-                alert("Ngày bắt đầu không được lớn hơn ngày kết thúc.");
-                return;
-            }
 
-            fetch("http://localhost:3000/donhang")
-                .then(response => response.json())
-                .then(orders => {
-                    const filteredOrders = orders.filter(order => {
-                        if (!order.createdAt || order.status.toLowerCase() !== "thành công") return false;
+// Lọc dữ liệu dựa trên ngày
+document.getElementById("filter-button").addEventListener("click", () => {
+    const startDateInput = document.getElementById("start-date").value;
+    const endDateInput = document.getElementById("end-date").value;
 
-                        const orderDate = new Date(order.createdAt);
-                        const start = new Date(startDate + "T00:00:00");
-                        const end = new Date(endDate + "T23:59:59");
-                        return orderDate >= start && orderDate <= end;
-                    });
+    // Chuyển giá trị ngày nhập thành timestamp
+    const startDate = startDateInput ? new Date(startDateInput).setHours(0, 0, 0, 0) : null;
+    const endDate = endDateInput ? new Date(endDateInput).setHours(23, 59, 59, 999) : null;
 
-                    if (filteredOrders.length === 0) {
-                        alert("Không tìm thấy đơn hàng nào trong trạng thái 'Thành công' trong khoảng thời gian này.");
-                        return;
-                    }
+    fetch("http://localhost:3000/donhang")
+        .then(response => response.json())
+        .then(orders => {
+            const filteredOrders = orders.filter(order => {
+                if (!order.createdAt || order.status.toLowerCase() !== "thành công") return false;
 
-                    updateSummary(filteredOrders);
-                    displayChart(filteredOrders);
-                    populateTable(filteredOrders);
-                })
-                .catch(error => console.error("Lỗi khi tải dữ liệu:", error));
-        });
+                const orderDate = new Date(order.createdAt).getTime();
+                const isStartMatch = startDate ? orderDate >= startDate : true;
+                const isEndMatch = endDate ? orderDate <= endDate : true;
+
+                return isStartMatch && isEndMatch;
+            });
+
+            // Hiển thị dữ liệu sau khi lọc
+            updateSummary(filteredOrders);
+            displayChart(filteredOrders);
+            populateTable(filteredOrders);
+        })
+        .catch(error => console.error("Lỗi khi tải dữ liệu:", error));
+});
+
+
 
         // Hàm cập nhật tổng quan
         function updateSummary(orders) {
