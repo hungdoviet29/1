@@ -397,59 +397,58 @@
 
 
             function fetchData() {
-                const statusFilter = document.getElementById('status-filter').value.toLowerCase();
-                const startDate = document.getElementById('start-date').value;
-                const endDate = document.getElementById('end-date').value;
-                const searchQuery = document.getElementById('search-box').value.toLowerCase();
+    const statusFilter = document.getElementById('status-filter').value.toLowerCase();
+    const startDateInput = document.getElementById('start-date').value;
+    const endDateInput = document.getElementById('end-date').value;
+    const searchQuery = document.getElementById('search-box').value.toLowerCase();
 
-                fetch('http://localhost:3000/donhang')
-                    .then(response => response.json())
-                    .then(data => {
-                        const orderList = document.getElementById('order-list');
-                        const totalOrdersElement = document.getElementById('total-orders');
+    // Chuyển đổi ngày sang thời gian cục bộ GMT+7
+    const startDate = startDateInput ? new Date(startDateInput + 'T00:00:00+07:00').getTime() : null;
+    const endDate = endDateInput ? new Date(endDateInput + 'T23:59:59+07:00').getTime() : null;
 
-                        orderList.innerHTML = ''; // Xóa dữ liệu cũ trước khi cập nhật
-                        const filteredData = data.filter(order => {
-                            const orderDate = new Date(order.createdAt);
+    fetch('http://localhost:3000/donhang')
+        .then(response => response.json())
+        .then(data => {
+            const orderList = document.getElementById('order-list');
+            const totalOrdersElement = document.getElementById('total-orders');
 
-                            const isStatusMatch = statusFilter ? order.status.toLowerCase() === statusFilter : true;
-                            const isStartMatch = startDate ? orderDate >= new Date(startDate) : true;
-                            const isEndMatch = endDate ? orderDate <= new Date(new Date(endDate).setHours(23, 59, 59, 999)) : true;
-                            const isSearchMatch = searchQuery
-                                ? order._id.toLowerCase().includes(searchQuery) ||
-                                order.shippingInfo.name.toLowerCase().includes(searchQuery) ||
-                                order.shippingInfo.phone.includes(searchQuery)
-                                : true;
+            orderList.innerHTML = ''; // Xóa dữ liệu cũ trước khi cập nhật
+            const filteredData = data.filter(order => {
+                const orderDate = new Date(order.createdAt).getTime(); // Dữ liệu từ API
 
-                            return isStatusMatch && isStartMatch && isEndMatch && isSearchMatch;
-                        });
+                const isStatusMatch = statusFilter ? order.status.toLowerCase() === statusFilter : true;
+                const isStartMatch = startDate ? orderDate >= startDate : true;
+                const isEndMatch = endDate ? orderDate <= endDate : true;
+                const isSearchMatch = searchQuery
+                    ? order._id.toLowerCase().includes(searchQuery) ||
+                      order.shippingInfo.name.toLowerCase().includes(searchQuery) ||
+                      order.shippingInfo.phone.includes(searchQuery)
+                    : true;
 
+                return isStatusMatch && isStartMatch && isEndMatch && isSearchMatch;
+            });
 
-                        // Cập nhật tổng số đơn hàng
-                        totalOrdersElement.textContent = filteredData.length;
+            // Cập nhật tổng số đơn hàng
+            totalOrdersElement.textContent = filteredData.length;
 
-                        // Sắp xếp theo ngày mới nhất
-                        filteredData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            // Sắp xếp theo ngày mới nhất
+            filteredData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-                        filteredData.forEach(order => {
-    const row = document.createElement('tr');
+            filteredData.forEach(order => {
+                const row = document.createElement('tr');
 
-    row.innerHTML = `
-        <td>${order._id}</td>
-        <td>${order.userId}</td>
-        <td>${order.cartItems.map(item => item.productId ? `${item.productId.ten} (x${item.quantity})` : 'Sản phẩm không tồn tại').join('<br>')}</td>
-        <td>${order.totalAmount.toLocaleString()} VND</td>
-        <td>${order.shippingInfo.address}</td>
-        <td>${order.shippingInfo.name}</td>
-        <td>${order.shippingInfo.phone}</td>
-        <td>${new Date(order.createdAt).toLocaleDateString('vi-VN')} ${new Date(order.createdAt).toLocaleTimeString('vi-VN')}</td>
-        <td>
-            ${order.status}
-            ${order.status.toLowerCase() === 'đã được hủy' && order.cancelReason ? `<br><strong>Lý do:</strong> ${order.cancelReason}` : ''}
-        </td>
-        <td><button>Chi tiết đơn hàng</button></td>
-    `;
-
+                row.innerHTML = `
+                    <td>${order._id}</td>
+                    <td>${order.userId}</td>
+                    <td>${order.cartItems.map(item => item.productId ? `${item.productId.ten} (x${item.quantity})` : 'Sản phẩm không tồn tại').join('<br>')}</td>
+                    <td>${order.totalAmount.toLocaleString()} VND</td>
+                    <td>${order.shippingInfo.address}</td>
+                    <td>${order.shippingInfo.name}</td>
+                    <td>${order.shippingInfo.phone}</td>
+                    <td>${new Date(order.createdAt).toLocaleDateString('vi-VN')} ${new Date(order.createdAt).toLocaleTimeString('vi-VN')}</td>
+                    <td>${order.status}</td>
+                    <td><button>Chi tiết đơn hàng</button></td>
+                `;
                             const actionCell = document.createElement('td');
                             const status = order.status.toLowerCase();
                             if (status === 'chờ xác nhận') {
@@ -650,7 +649,7 @@ document.getElementById('order-list').addEventListener('click', (event) => {
     }
 });
 
-        </script>v
+        </script>
 </body>
 
 </html>
