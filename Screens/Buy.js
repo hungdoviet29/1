@@ -12,7 +12,7 @@ import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
-//djfdoifj
+
 const ProductScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
