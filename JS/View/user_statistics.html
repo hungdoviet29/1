@@ -78,6 +78,7 @@
             background-color: #6c63ff;
             color: white;
         }
+
         nav {
             background-color: #fff;
             padding: 10px;
@@ -107,6 +108,7 @@
         nav ul li a:hover {
             text-decoration: underline;
         }
+
         .button-container {
             display: flex;
             justify-content: center;
@@ -227,8 +229,8 @@
 
     <script>
         document.getElementById("filter-button").addEventListener("click", () => {
-            const startDate = document.getElementById("start-date").value;
-            const endDate = document.getElementById("end-date").value;
+            const startDateInput = document.getElementById("start-date").value;
+            const endDateInput = document.getElementById("end-date").value;
             const year = document.getElementById("year").value;
             const month = document.getElementById("month").value;
             const userStatisticsBody = document.getElementById("user-statistics-body");
@@ -236,16 +238,19 @@
             fetch("http://localhost:3000/donhang")
                 .then(response => response.json())
                 .then(orders => {
-                    // Tính toán thống kê người dùng
                     const userStatistics = {};
 
-                    orders.forEach(order => {
-                        const orderDate = new Date(order.createdAt);
+                    // Chuyển thời gian bắt đầu và kết thúc về đầu và cuối ngày
+                    const startDate = startDateInput ? new Date(startDateInput).setHours(0, 0, 0, 0) : null;
+                    const endDate = endDateInput ? new Date(endDateInput).setHours(23, 59, 59, 999) : null;
 
-                        const isYearMatch = year ? orderDate.getFullYear() === parseInt(year) : true;
-                        const isMonthMatch = month ? (orderDate.getMonth() + 1) === parseInt(month) : true;
-                        const isStartDateMatch = startDate ? orderDate >= new Date(startDate) : true;
-                        const isEndDateMatch = endDate ? orderDate <= new Date(new Date(endDate).setHours(23, 59, 59, 999)) : true;
+                    orders.forEach(order => {
+                        const orderDate = new Date(order.createdAt).getTime();
+
+                        const isYearMatch = year ? new Date(order.createdAt).getFullYear() === parseInt(year) : true;
+                        const isMonthMatch = month ? (new Date(order.createdAt).getMonth() + 1) === parseInt(month) : true;
+                        const isStartDateMatch = startDate ? orderDate >= startDate : true;
+                        const isEndDateMatch = endDate ? orderDate <= endDate : true;
 
                         if (
                             order.status.toLowerCase() === "thành công" &&
@@ -283,18 +288,19 @@
                     sortedStatistics.forEach(([userId, stats]) => {
                         const row = document.createElement("tr");
                         row.innerHTML = `
-                            <td>${userId}</td>
-                            <td>${stats.name}</td>
-                            <td>${stats.email}</td>
-                            <td>${stats.phone}</td>
-                            <td>${stats.orders}</td>
-                            <td>${stats.revenue.toLocaleString()} VND</td>
-                        `;
+                    <td>${userId}</td>
+                    <td>${stats.name}</td>
+                    <td>${stats.email}</td>
+                    <td>${stats.phone}</td>
+                    <td>${stats.orders}</td>
+                    <td>${stats.revenue.toLocaleString()} VND</td>
+                `;
                         userStatisticsBody.appendChild(row);
                     });
                 })
                 .catch(error => console.error("Lỗi khi tải dữ liệu:", error));
         });
+
     </script>
 </body>
 

@@ -275,8 +275,8 @@
     document.getElementById("filter-button").addEventListener("click", () => {
   const month = document.getElementById("month").value;
   const year = document.getElementById("year").value;
-  const startDate = document.getElementById("start-date").value;
-  const endDate = document.getElementById("end-date").value;
+  const startDateInput = document.getElementById("start-date").value;
+  const endDateInput = document.getElementById("end-date").value;
 
   const statisticsBody = document.getElementById("statistics-body");
   statisticsBody.innerHTML = ""; // Xóa dữ liệu cũ
@@ -285,17 +285,19 @@
   fetch("http://localhost:3000/donhang")
     .then(response => response.json())
     .then(orders => {
-      // Lọc đơn hàng theo trạng thái "Thành công" và các bộ lọc khác
+      // Chuyển ngày bắt đầu và kết thúc về đúng khoảng thời gian trong ngày
+      const startDate = startDateInput ? new Date(startDateInput).setHours(0, 0, 0, 0) : null;
+      const endDate = endDateInput ? new Date(endDateInput).setHours(23, 59, 59, 999) : null;
+
+      // Lọc đơn hàng theo trạng thái "Thành công" và ngày chính xác
       const filteredOrders = orders.filter(order => {
-        const orderDate = new Date(order.createdAt);
+        const orderDate = new Date(order.createdAt).getTime();
 
         const isStatusSuccess = order.status.toLowerCase() === "thành công";
-        const isMonthMatch = month ? orderDate.getMonth() + 1 === parseInt(month) : true;
-        const isYearMatch = year ? orderDate.getFullYear() === parseInt(year) : true;
-        const isStartMatch = startDate ? orderDate >= new Date(startDate) : true;
-        const isEndMatch = endDate ? orderDate <= new Date(new Date(endDate).setHours(23, 59, 59, 999)) : true;
+        const isStartMatch = startDate ? orderDate >= startDate : true;
+        const isEndMatch = endDate ? orderDate <= endDate : true;
 
-        return isStatusSuccess && isMonthMatch && isYearMatch && isStartMatch && isEndMatch;
+        return isStatusSuccess && isStartMatch && isEndMatch;
       });
 
       // Tính toán thống kê sản phẩm
@@ -332,13 +334,14 @@
           <td>${stat.name}</td>
           <td>${stat.sold}</td>
           <td>${stat.revenue.toLocaleString()} VND</td>
-          <td>${startDate || "Toàn thời gian"}</td>
+          <td>${startDateInput || "Toàn thời gian"}</td>
         `;
         statisticsBody.appendChild(row);
       });
     })
     .catch(error => console.error("Lỗi khi tải dữ liệu thống kê:", error));
 });
+
 
 
   </script>
