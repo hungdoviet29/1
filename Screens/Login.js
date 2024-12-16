@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,11 @@ import {
   ImageBackground,
   StyleSheet,
 } from 'react-native';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ScrollView} from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
 
-const Login = ({route}) => {
+const Login = ({ route }) => {
   const navigation = useNavigation();
   const [tenDangNhap, setTenDangNhap] = useState('');
   const [matKhau, setMatKhau] = useState('');
@@ -46,7 +46,7 @@ const Login = ({route}) => {
   }, []);
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://192.168.3.105:3000/users');
+      const response = await fetch('http://192.168.0.245:3000/users');
       const users = await response.json();
       const user = users.find(
         user => user.tenDangNhap === tenDangNhap && user.matKhau === matKhau,
@@ -82,78 +82,95 @@ const Login = ({route}) => {
       setError('Lỗi kết nối mạng.');
     }
   };
+  const [showPassword, setShowPassword] = useState(false);
+
 
   return (
-    
-      <View style={styles.container}>
-        <View style={styles.form}>
-          <ImageBackground
-            source={require('../acssets/laplogin.png')}
-            style={styles.background}
-            imageStyle={{
-              borderBottomLeftRadius: 30,
-              borderBottomRightRadius: 30,
-            }}>
-            <Text style={styles.welcomeText}>Welcome Back!</Text>
-          </ImageBackground>
-          <Text style={styles.loginText}>LOG IN</Text>
 
-          <Text style={styles.label}>User name</Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              value={tenDangNhap}
-              onChangeText={setTenDangNhap}
-              placeholder="Enter your user name"
-              keyboardType="email-address"
-              placeholderTextColor="#C1C1C1"
-              autoCapitalize="none"
+    <View style={styles.container}>
+      <View style={styles.form}>
+        <ImageBackground
+          source={require('../acssets/laplogin.png')}
+          style={styles.background}
+          imageStyle={{
+            borderBottomLeftRadius: 30,
+            borderBottomRightRadius: 30,
+          }}>
+          <Text style={styles.welcomeText}>Chào mừng bạn đã trở lại!</Text>
+        </ImageBackground>
+        <Text style={styles.loginText}>ĐĂNG NHẬP</Text>
+
+        <Text style={styles.label}>Tên đăng nhập</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            value={tenDangNhap}
+            onChangeText={setTenDangNhap}
+            placeholder="Enter your user name"
+            keyboardType="email-address"
+            placeholderTextColor="#C1C1C1"
+            autoCapitalize="none"
+          />
+        </View>
+
+        <Text style={styles.label1}>Mật khẩu</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your password"
+            value={matKhau}
+            onChangeText={setMatKhau}
+            secureTextEntry={!showPassword} // Điều khiển hiển thị mật khẩu
+            placeholderTextColor="#C1C1C1"
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Image
+              source={
+                showPassword
+                  ? require('../acssets/htmk.png') // Đường dẫn tới icon mắt mở
+                  : require('../acssets/htmk.png') // Đường dẫn tới icon mắt đóng
+              }
+              style={styles.eyeIcon}
             />
-          </View>
-
-          <Text style={styles.label1}>Password</Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your password"
-              value={matKhau}
-              onChangeText={setMatKhau}
-              secureTextEntry
-              placeholderTextColor="#C1C1C1"
-            />
-          </View>
-
-          {error && <Text style={styles.errorText}>{error}</Text>}
-
-          <View style={styles.optionsContainer}>
-            <TouchableOpacity
-              onPress={() => setRememberMe(!rememberMe)}
-              style={styles.checkboxContainer}>
-              <View
-                style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
-                {rememberMe && <View style={styles.checkboxTick} />}
-              </View>
-              <Text style={styles.rememberMeText}>Remember me</Text>
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>SIGN IN</Text>
           </TouchableOpacity>
-          <View style={styles.signupContainer}>
+        </View>
+
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
+        <View style={styles.optionsContainer}>
+          <TouchableOpacity
+            onPress={() => setRememberMe(!rememberMe)}
+            style={styles.checkboxContainer}>
+            <View
+              style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+              {rememberMe && <View style={styles.checkboxTick} />}
+            </View>
+            <Text style={styles.rememberMeText}>Nhớ mật khẩu</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginButtonText}>Đăng nhập</Text>
+        </TouchableOpacity>
+        <View style={styles.signupContainer}>
+          <View style={styles.row}>
             <Text style={styles.signupText}>Bạn chưa có mật khẩu?</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
               <Text style={styles.signupLink}> Đăng kí.</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.forgotPasswordContainer}
-              onPress={() => navigation.navigate('ForgotPasswordScreen')}>
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
           </View>
+          <TouchableOpacity
+            style={styles.forgotPasswordContainer}
+            onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+            <Text style={styles.forgotPasswordText}>Quyên mật khẩu?</Text>
+          </TouchableOpacity>
         </View>
+
+
+
       </View>
-    
+    </View>
+
   );
 };
 
@@ -272,19 +289,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   signupContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
+    flexDirection: 'column', // Xếp các phần tử theo chiều dọc
+    alignItems: 'center', // Căn giữa nội dung
+    marginTop: 20, // Khoảng cách phía trên
+  },
+  row: {
+    flexDirection: 'row', // Xếp chữ "Bạn chưa có mật khẩu?" và "Đăng kí" trên cùng một dòng
+    alignItems: 'center', // Căn giữa theo chiều dọc
   },
   signupText: {
-    fontSize: 14,
-    color: '#333',
+    fontSize: 16,
+    color: '#333', // Màu chữ
   },
   signupLink: {
-    fontSize: 14,
-    color: '#4B4B8F',
-    fontWeight: 'bold',
+    fontSize: 16,
+    color: '#007BFF', // Màu xanh để nhấn mạnh
+    marginLeft: 5, // Khoảng cách giữa "Bạn chưa có mật khẩu?" và "Đăng kí"
+  },
+  forgotPasswordContainer: {
+    marginTop: 20, // Khoảng cách phía trên giữa dòng trên và "Quyên mật khẩu?"
+  },
+  forgotPasswordText: {
+    fontSize: 16,
+    color: '#007BFF', // Màu xanh để nhấn mạnh
+    textAlign: 'center', // Căn giữa nội dung
   },
   errorText: {
     color: 'red',
@@ -292,6 +320,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 14,
   },
+  eyeIcon: {
+    width: 24, // Kích thước icon
+    height: 24,
+
+  },
+
+
 });
 //lo
 

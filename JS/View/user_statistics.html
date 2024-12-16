@@ -29,30 +29,76 @@
 
         .filters {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .filters label,
-        .filters select,
-        .filters input,
-        .filters button {
-            padding: 10px;
-            font-size: 16px;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            padding: 15px;
+            background-color: #f9f9f9;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .filters label {
+            font-size: 14px;
+            color: #333;
+            margin-right: 6px;
+        }
+
+        .filters select,
+        .filters input {
+            padding: 8px 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            transition: border-color 0.3s ease;
+            outline: none;
+            width: 150px;
+        }
+
+        .filters select:hover,
+        .filters input:hover,
+        .filters select:focus,
+        .filters input:focus {
+            border-color: #6c63ff;
         }
 
         .filters button {
-            background-color: #6c63ff;
+            background-color: #006eff;
             color: white;
-            cursor: pointer;
             border: none;
+            padding: 8px 20px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         .filters button:hover {
-            background-color: #5a54d6;
+            background-color: #0056d2;
         }
+
+        .filters select {
+            appearance: none;
+            /* Xóa dấu mũi tên mặc định */
+            background: url('data:image/svg+xml;utf8,<svg fill="%23006eff" height="18" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M5 8l4 4 4-4z"/></svg>') no-repeat;
+            background-position: right 8px center;
+            background-size: 14px 14px;
+            padding-right: 25px;
+        }
+
+        .filters input[type="date"] {
+            appearance: none;
+            background: #fff url('data:image/svg+xml;utf8,<svg fill="%23006eff" height="18" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M12 2v1H6V2H4v2H2v14h20V4h-2V2h-2v2h-8V2zm0 4v2H6V6h6zm-8 0v2H4V6h2zm12 4v2H6v-2h10zm-8 4v2H6v-2h6zm8 0v2H6v-2h10z"/></svg>') no-repeat;
+            background-position: right 8px center;
+            background-size: 14px 14px;
+            padding-right: 25px;
+        }
+
+        .filters input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0;
+        }
+
 
         .table-container {
             background-color: white;
@@ -78,6 +124,7 @@
             background-color: #6c63ff;
             color: white;
         }
+
         nav {
             background-color: #fff;
             padding: 10px;
@@ -107,6 +154,7 @@
         nav ul li a:hover {
             text-decoration: underline;
         }
+
         .button-container {
             display: flex;
             justify-content: center;
