@@ -22,21 +22,21 @@ const OrderScreen = ({navigation}) => {
   const [refreshTrigger, setRefreshTrigger] = useState(false);
 
   const statusMap = {
-    'Tất cả': id => `http://172.20.10.6:3000/donhang/user/${id}`,
+    'Tất cả': id => `http://172.20.10.2:3000/donhang/user/${id}`,
     'Chờ xác nhận': id =>
-      `http://172.20.10.6:3000/donhang/user/${id}/status?status=${encodeURIComponent(
-        'chờ xác nhận',
+      `http://172.20.10.2:3000/donhang/user/${id}/status?status=${encodeURIComponent(
+        'Chờ xác nhận',
       )}`,
     'Chờ vận chuyển': id =>
-      `http://172.20.10.6:3000/donhang/user/${id}/status?status=${encodeURIComponent(
+      `http://172.20.10.2:3000/donhang/user/${id}/status?status=${encodeURIComponent(
         'chờ vận chuyển',
       )}`,
     'Đang vận chuyển': id =>
-      `http://172.20.10.6:3000/donhang/user/${id}/status?status=${encodeURIComponent(
+      `http://172.20.10.2:3000/donhang/user/${id}/status?status=${encodeURIComponent(
         'đang vận chuyển',
       )}`,
     'Đã được hủy': id =>
-      `http://172.20.10.6:3000/donhang/user/${id}/status?status=${encodeURIComponent(
+      `http://172.20.10.2:3000/donhang/user/${id}/status?status=${encodeURIComponent(
         'đã được hủy',
       )}`,
   };
@@ -103,7 +103,7 @@ const OrderScreen = ({navigation}) => {
   const cancelOrder = async orderId => {
     try {
       const response = await fetch(
-        `http://172.20.10.6:3000/donhang/${orderId}`,
+        `http://172.20.10.2:3000/donhang/${orderId}`,
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
@@ -127,7 +127,7 @@ const OrderScreen = ({navigation}) => {
   const confirmReceived = async orderId => {
     try {
       const response = await fetch(
-        `http://172.20.10.6:3000/donhang/${orderId}`,
+        `http://172.20.10.2:3000/donhang/${orderId}`,
         {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
@@ -218,7 +218,7 @@ const OrderScreen = ({navigation}) => {
         </View>
 
         {/* Phần nút bấm cho trạng thái đơn hàng */}
-        {order.status === 'chờ xác nhận' && (
+        {order.status === 'Chờ xác nhận' && (
           <TouchableOpacity
             style={styles.cancelButton}
             onPress={() => cancelOrder(order._id)}>
