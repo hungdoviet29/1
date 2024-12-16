@@ -91,22 +91,123 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    /* Tổng thể phần bộ lọc và bảng */
+.table-container {
+    font-family: Arial, sans-serif;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+    padding: 20px;
+}
+
+/* Tiêu đề chính */
+.table-container h3 {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+/* Bộ lọc */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filters label {
+    font-weight: 600;
+    color: #555;
+    margin-right: 3px;
+}
+
+.filters select, .filters input[type="date"] {
+    border: 1px solid #d1d1d1;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.filters select:focus, .filters input[type="date"]:focus {
+    border-color: #6c63ff;
+}
+
+/* Nút lọc */
+#filter-button {
+    background-color: #6c63ff;
+    color: #ffffff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+#filter-button:hover {
+    background-color: #554fc6;
+}
+
+/* Bảng thống kê */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+table th, table td {
+    padding: 12px 10px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+}
+
+table th {
+    background-color: #6c63ff;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tr:hover {
+    background-color: #f1f5ff;
+    transition: background-color 0.3s ease;
+}
+
+/* Tăng tính thẩm mỹ khi hover */
+.filters select:hover, .filters input[type="date"]:hover {
+    border-color: #6c63ff;
+}
+
+/* Responsive cho màn hình nhỏ */
+@media screen and (max-width: 768px) {
+    .filters {
+        flex-direction: column;
+        gap: 10px;
     }
 
-    table th,
-    table td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: center;
+    table th, table td {
+        font-size: 12px;
+        padding: 10px;
     }
 
-    table th {
-      background-color: #6c63ff;
-      color: white;
+    #filter-button {
+        width: 100%;
     }
+}
+
 
     .button-container {
       display: flex;
@@ -253,11 +354,6 @@
       }
     });
 
-
-
-
-
-
     document.getElementById("month").addEventListener("change", () => {
       const month = document.getElementById("month").value;
       const year = document.getElementById("year").value || new Date().getFullYear();
@@ -273,76 +369,69 @@
     });
 
     document.getElementById("filter-button").addEventListener("click", () => {
-  const month = document.getElementById("month").value;
-  const year = document.getElementById("year").value;
-  const startDateInput = document.getElementById("start-date").value;
-  const endDateInput = document.getElementById("end-date").value;
+      const month = document.getElementById("month").value;
+      const year = document.getElementById("year").value;
+      const startDate = document.getElementById("start-date").value;
+      const endDate = document.getElementById("end-date").value;
 
-  const statisticsBody = document.getElementById("statistics-body");
-  statisticsBody.innerHTML = ""; // Xóa dữ liệu cũ
+      const statisticsBody = document.getElementById("statistics-body");
+      statisticsBody.innerHTML = ""; // Xóa dữ liệu cũ
 
-  // Gọi API đơn hàng
-  fetch("http://localhost:3000/donhang")
-    .then(response => response.json())
-    .then(orders => {
-      // Chuyển ngày bắt đầu và kết thúc về đúng khoảng thời gian trong ngày
-      const startDate = startDateInput ? new Date(startDateInput).setHours(0, 0, 0, 0) : null;
-      const endDate = endDateInput ? new Date(endDateInput).setHours(23, 59, 59, 999) : null;
+      // Gọi API đơn hàng
+      fetch("http://localhost:3000/donhang")
+        .then(response => response.json())
+        .then(orders => {
+          // Lọc đơn hàng theo trạng thái "Thành công" và các bộ lọc khác
+          const filteredOrders = orders.filter(order => {
+            const orderDate = new Date(order.createdAt);
 
-      // Lọc đơn hàng theo trạng thái "Thành công" và ngày chính xác
-      const filteredOrders = orders.filter(order => {
-        const orderDate = new Date(order.createdAt).getTime();
+            const isStatusSuccess = order.status.toLowerCase() === "thành công";
+            const isMonthMatch = month ? orderDate.getMonth() + 1 === parseInt(month) : true;
+            const isYearMatch = year ? orderDate.getFullYear() === parseInt(year) : true;
+            const isStartMatch = startDate ? orderDate >= new Date(startDate) : true;
+            const isEndDateMatch = endDate ? orderDate <= new Date(new Date(endDate).setHours(23, 59, 59, 999)) : true;
 
-        const isStatusSuccess = order.status.toLowerCase() === "thành công";
-        const isStartMatch = startDate ? orderDate >= startDate : true;
-        const isEndMatch = endDate ? orderDate <= endDate : true;
+            return isStatusSuccess && isMonthMatch && isYearMatch && isStartMatch && isEndMatch;
+          });
 
-        return isStatusSuccess && isStartMatch && isEndMatch;
-      });
+          // Tính toán thống kê sản phẩm
+          const statistics = {};
+          filteredOrders.forEach(order => {
+            order.cartItems.forEach(item => {
+              const productId = item.productId?._id || "unknown";
+              const productName = item.productId?.ten || "Sản phẩm không xác định";
+              const productPrice = item.productId?.gia || 0;
 
-      // Tính toán thống kê sản phẩm
-      const statistics = {};
-      filteredOrders.forEach(order => {
-        order.cartItems.forEach(item => {
-          const productId = item.productId?._id || "unknown";
-          const productName = item.productId?.ten || "Sản phẩm không xác định";
-          const productPrice = item.productId?.gia || 0;
+              if (!statistics[productId]) {
+                statistics[productId] = {
+                  id: productId,
+                  name: productName,
+                  sold: 0,
+                  revenue: 0,
+                };
+              }
+              statistics[productId].sold += item.quantity;
+              statistics[productId].revenue += item.quantity * productPrice;
+            });
+          });
 
-          // Bỏ qua sản phẩm có ID là "unknown"
-          if (productId === "unknown") return;
+          // Hiển thị dữ liệu thống kê
+          const sortedStatistics = Object.values(statistics).sort((a, b) => b.sold - a.sold);
 
-          if (!statistics[productId]) {
-            statistics[productId] = {
-              id: productId,
-              name: productName,
-              sold: 0,
-              revenue: 0,
-            };
-          }
-          statistics[productId].sold += item.quantity;
-          statistics[productId].revenue += item.quantity * productPrice;
-        });
-      });
-
-      // Hiển thị dữ liệu thống kê
-      const sortedStatistics = Object.values(statistics).sort((a, b) => b.sold - a.sold);
-
-      sortedStatistics.forEach(stat => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${stat.id}</td>
-          <td>${stat.name}</td>
-          <td>${stat.sold}</td>
-          <td>${stat.revenue.toLocaleString()} VND</td>
-          <td>${startDateInput || "Toàn thời gian"}</td>
-        `;
-        statisticsBody.appendChild(row);
-      });
-    })
-    .catch(error => console.error("Lỗi khi tải dữ liệu thống kê:", error));
-});
-
-
+          sortedStatistics.forEach(stat => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                    <td>${stat.id}</td>
+                    <td>${stat.name}</td>
+                    <td>${stat.sold}</td>
+                    <td>${stat.revenue.toLocaleString()} VND</td>
+                    <td>${startDate || "Toàn thời gian"}</td>
+                `;
+            statisticsBody.appendChild(row);
+          });
+        })
+        .catch(error => console.error("Lỗi khi tải dữ liệu thống kê:", error));
+    });
 
   </script>
 
