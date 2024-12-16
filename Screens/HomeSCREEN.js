@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Nền mờ
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1000, // Đảm bảo luôn hiển thị trên các thành phần khác
+    zIndex: 1000, 
   },
   modalContainer: {
     backgroundColor: '#fff',
