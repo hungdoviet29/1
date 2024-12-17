@@ -245,7 +245,7 @@ const MainHome = () => {
     </View>
   );
 };
-
+//hhdhfdfdh
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff', padding: 5 },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
