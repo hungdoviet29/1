@@ -58,6 +58,7 @@ const MainHome = () => {
   const [popularLaptops, setPopularLaptops] = useState([]);
   const [saleLaptops, setSaleLaptops] = useState([]);
   const [trendingLaptops, setTrendingLaptops] = useState([]);
+  const [NewsLapTops, setNewsLapTops] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -67,15 +68,18 @@ const MainHome = () => {
   const fetchAllData = async () => {
     setLoading(true);
     try {
-      const [popularResponse, saleResponse, trendingResponse] = await Promise.all([
-        axios.get('http://192.168.1.37:3000/LapTop/getPopularLapTop'),
-        axios.get('http://192.168.1.37:3000/LapTop/getSaleLapTop'),
-        axios.get('http://192.168.1.37:3000/LapTop/getTrendingLapTop'),
+      const [popularResponse, saleResponse, trendingResponse,newsResponse] = await Promise.all([
+        axios.get('http://10.24.27.16:3000/LapTop/getPopularLapTop'),
+        axios.get('http://10.24.27.16:3000/LapTop/getSaleLapTop'),
+        axios.get('http://10.24.27.16:3000/LapTop/getTrendingLapTop'),
+        axios.get('http://10.24.27.16:3000/LapTop/getNewsLapTop'),
       ]);
 
       setPopularLaptops(popularResponse.data.data);
       setSaleLaptops(saleResponse.data.data);
       setTrendingLaptops(trendingResponse.data.data);
+      setNewsLapTops(newsResponse.data.data);
+
     } catch (error) {
       console.error('Error fetching laptop data:', error);
     } finally {
@@ -193,7 +197,7 @@ const MainHome = () => {
           </View>
           <BannerSlider />
           <View style={styles.fixedCategories}>
-            <TouchableOpacity onPress={() => navigation.navigate('Home', { category: 'Popular' })}>
+            <TouchableOpacity onPress={() => navigation.navigate('Home', { category: 'Phổ biến' })}>
               <Text style={styles.category}>Phổ biến ➞</Text>
             </TouchableOpacity>
           </View>
@@ -205,8 +209,8 @@ const MainHome = () => {
             {renderProducts(popularLaptops)}
           </ScrollView>
           <View style={styles.fixedCategories}>
-            <TouchableOpacity onPress={() => navigation.navigate('Home', { category: 'Sale' })}>
-              <Text style={styles.category}>Giảm Giá ➞</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Home', { category: 'Mới' })}>
+              <Text style={styles.category}>Mới  ➞</Text>
             </TouchableOpacity>
           </View>
           <ScrollView
@@ -214,11 +218,11 @@ const MainHome = () => {
             showsHorizontalScrollIndicator={false}
             style={styles.productScrollView}
           >
-            {renderProducts(saleLaptops)}
+            {renderProducts(NewsLapTops)}
           </ScrollView>
           <View style={styles.fixedCategories}>
             <TouchableOpacity
-              onPress={() => navigation.navigate('Home', { category: 'Trending' })}
+              onPress={() => navigation.navigate('Home', { category: 'Xu hướng' })}
             >
               <Text style={styles.category}>Xu hướng ➞</Text>
             </TouchableOpacity>

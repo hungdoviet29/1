@@ -57,19 +57,19 @@ const HomeScreen = () => {
 
     switch (category) {
       case 'Phổ biến':
-        apiUrl = 'http://192.168.1.37:3000/LapTop/getPopularLapTop';
+        apiUrl = 'http://10.24.27.16:3000/LapTop/getPopularLapTop';
         break;
       case 'Xu hướng':
-        apiUrl = 'http://192.168.1.37:3000/LapTop/getTrendingLapTop';
+        apiUrl = 'http://10.24.27.16:3000/LapTop/getTrendingLapTop';
         break;
       case 'Mới':
-        apiUrl = 'http://192.168.1.37:3000/LapTop/getNewsLapTop';
+        apiUrl = 'http://10.24.27.16:3000/LapTop/getNewsLapTop';
         break;
       case 'Giảm Giá':
-        apiUrl = 'http://192.168.1.37:3000/LapTop/getSaleLapTop';
+        apiUrl = 'http://10.24.27.16:3000/LapTop/getSaleLapTop';
         break;
       case 'Tất cả':
-        apiUrl = 'http://192.168.1.37:3000/LapTop/getListLapTop';
+        apiUrl = 'http://10.24.27.16:3000/LapTop/getListLapTop';
         break;
       default:
     }
@@ -153,7 +153,7 @@ const HomeScreen = () => {
 
       {/* Categories */}
       <View style={styles.categories}>
-        {['Tất cả', 'Phổ biến', 'Xu hướng', 'Mới', 'Giảm Giá'].map(category => (
+        {['Tất cả', 'Phổ biến', 'Xu hướng', 'Mới'].map(category => (
           <TouchableOpacity
             key={category}
             onPress={() => handleCategoryPress(category)}>
@@ -166,8 +166,7 @@ const HomeScreen = () => {
             </Text>
           </TouchableOpacity>
         ))}
-      </View>
-      <TouchableOpacity
+        <TouchableOpacity
         style={styles.filterButton}
         onPress={() => setFilterVisible(true)}>
         <Image
@@ -175,6 +174,8 @@ const HomeScreen = () => {
           style={styles.filterIcon}
         />
       </TouchableOpacity>
+        
+      </View>
 
       {/* Product List */}
       {loading ? (
@@ -266,7 +267,7 @@ const HomeScreen = () => {
               <Text style={styles.title}>Bộ lọc tìm kiếm</Text>
               <TouchableOpacity onPress={() => setFilterVisible(false)}>
                 <Image
-                  source={require('../acssets/but.png')}
+                  source={require('../acssets/delete.png')}
                   style={styles.closeIcon}
                 />
               </TouchableOpacity>
@@ -445,8 +446,8 @@ const styles = StyleSheet.create({
     color: '#333', // Màu chữ tiêu đề
   },
   closeIcon: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
   },
   sectionTitle: {
     fontSize: 16,
