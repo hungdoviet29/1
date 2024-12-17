@@ -313,5 +313,5 @@ const styles = StyleSheet.create({
   },
   zaloIcon: { width: 60, height: 60 },
 });
-//djfhd
+
 export default MainHome;
