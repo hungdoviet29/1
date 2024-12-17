@@ -275,8 +275,16 @@
     document.getElementById("filter-button").addEventListener("click", () => {
   const month = document.getElementById("month").value;
   const year = document.getElementById("year").value;
-  const startDate = document.getElementById("start-date").value;
-  const endDate = document.getElementById("end-date").value;
+  const startDateInput = document.getElementById("start-date").value;
+  const endDateInput = document.getElementById("end-date").value;
+
+  const startDate = startDateInput
+    ? new Date(`${startDateInput}T00:00:00`)
+    : null;
+
+  const endDate = endDateInput
+    ? new Date(`${endDateInput}T23:59:59.999`)
+    : null;
 
   const statisticsBody = document.getElementById("statistics-body");
   statisticsBody.innerHTML = ""; // Xóa dữ liệu cũ
@@ -285,15 +293,14 @@
   fetch("http://localhost:3000/donhang")
     .then(response => response.json())
     .then(orders => {
-      // Lọc đơn hàng theo trạng thái "Thành công" và các bộ lọc khác
       const filteredOrders = orders.filter(order => {
         const orderDate = new Date(order.createdAt);
 
         const isStatusSuccess = order.status.toLowerCase() === "thành công";
         const isMonthMatch = month ? orderDate.getMonth() + 1 === parseInt(month) : true;
         const isYearMatch = year ? orderDate.getFullYear() === parseInt(year) : true;
-        const isStartMatch = startDate ? orderDate >= new Date(startDate) : true;
-        const isEndMatch = endDate ? orderDate <= new Date(new Date(endDate).setHours(23, 59, 59, 999)) : true;
+        const isStartMatch = startDate ? orderDate >= startDate : true;
+        const isEndMatch = endDate ? orderDate <= endDate : true;
 
         return isStatusSuccess && isMonthMatch && isYearMatch && isStartMatch && isEndMatch;
       });
@@ -306,7 +313,6 @@
           const productName = item.productId?.ten || "Sản phẩm không xác định";
           const productPrice = item.productId?.gia || 0;
 
-          // Bỏ qua sản phẩm có ID là "unknown"
           if (productId === "unknown") return;
 
           if (!statistics[productId]) {
@@ -332,13 +338,16 @@
           <td>${stat.name}</td>
           <td>${stat.sold}</td>
           <td>${stat.revenue.toLocaleString()} VND</td>
-          <td>${startDate || "Toàn thời gian"}</td>
+          <td>${startDateInput || "Toàn thời gian"}</td>
         `;
         statisticsBody.appendChild(row);
       });
     })
     .catch(error => console.error("Lỗi khi tải dữ liệu thống kê:", error));
 });
+
+
+
 
 
   </script>

@@ -179,18 +179,106 @@
     border-radius: 5px;
     cursor: pointer;
 }
+/* Dialog chung */
 #add-dialog, #edit-dialog {
-       position: fixed;
-       top: 50%;
-       left: 50%;
-       transform: translate(-50%, -50%);
-       background-color: white;
-       padding: 20px;
-       box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-       border-radius: 10px;
-       z-index: 1000;
-   }
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 25px 30px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    z-index: 1000;
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+#add-dialog h3, #edit-dialog h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 20px;
+    font-weight: bold;
+}
 
+/* Input và Select */
+#add-dialog input, #edit-dialog input,
+#add-dialog select, #edit-dialog select {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease-in-out;
+}
+
+#add-dialog input:focus, #edit-dialog input:focus,
+#add-dialog select:focus, #edit-dialog select:focus {
+    border-color: #6c63ff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(108, 99, 255, 0.3);
+}
+
+/* Nút */
+#add-dialog button, #edit-dialog button {
+    padding: 10px 15px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Nút Thêm/Lưu */
+#add-dialog button[type="button"], #edit-dialog button[type="button"] {
+    background-color: #4caf50;
+    color: white;
+    transition: background-color 0.3s ease-in-out;
+}
+
+#add-dialog button[type="button"]:hover, #edit-dialog button[type="button"]:hover {
+    background-color: #45a049;
+}
+
+/* Nút Đóng */
+#add-dialog button[type="submit"], #edit-dialog button[type="submit"] {
+    background-color: #f44336;
+    color: white;
+    transition: background-color 0.3s ease-in-out;
+}
+
+#add-dialog button[type="submit"]:hover, #edit-dialog button[type="submit"]:hover {
+    background-color: #e53935;
+}
+
+/* Nút đóng góc */
+.dialog-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #999;
+}
+
+.dialog-close:hover {
+    color: #333;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
    #add-dialog input, #edit-dialog input {
        width: 100%;
        padding: 10px;
@@ -367,6 +455,9 @@
    .delete-button:hover {
        background-color: #e53935;
    }
+   #productDetailModal .close:hover {
+    color: #333;
+}
    .modal {
     display: none;
     position: fixed;
@@ -379,7 +470,31 @@
     background-color: rgb(0,0,0);
     background-color: rgba(0,0,0,0.4);
 }
+#productDetailModal .product-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
 
+#productDetailModal .product-detail img {
+    max-width: 100%; /* Ảnh co giãn theo chiều rộng */
+    max-height: 300px; /* Giới hạn chiều cao ảnh */
+    border-radius: 10px;
+    object-fit: cover; /* Đảm bảo không bị méo hình */
+    margin: 10px 0;
+}
+
+/* Thông tin sản phẩm */
+#productDetailModal .product-info p {
+    font-size: 16px;
+    margin: 5px 0;
+    color: #555;
+}
+
+#productDetailModal .product-info p strong {
+    color: #333;
+    font-weight: bold;
+}
 .modal-content {
     background-color: #fefefe;
     margin: 15% auto;
@@ -395,20 +510,52 @@
     font-size: 28px;
     font-weight: bold;
 }
-
+#productDetailModal .close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
 .close:hover,
 .close:focus {
     color: black;
     text-decoration: none;
     cursor: pointer;
 }
-#productDetailModal img {
-    max-width: 100%; /* Ảnh sẽ tự động nhỏ lại theo chiều rộng container */
-    max-height: 200px; /* Giới hạn chiều cao tối đa */
-    display: block; /* Hiển thị dạng khối */
-    margin: 10px auto; /* Căn giữa hình ảnh */
-    border-radius: 8px; /* Bo góc */
-    object-fit: contain; /* Đảm bảo ảnh không bị méo */
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+#productDetailModal .modal-content {
+    background-color: #fff;
+    margin: 5% auto; /* Căn giữa */
+    padding: 20px;
+    border-radius: 10px;
+    width: 60%; /* Chiều rộng dialog */
+    max-width: 700px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease-in-out;
+}
+#productDetailModal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6); /* Overlay mờ */
 }
 
     </style>
@@ -475,14 +622,19 @@
     </div>
 
    <!-- Dialog thêm sản phẩm -->
-<div id="add-dialog">
+   <div id="add-dialog">
     <h3>Thêm Sản Phẩm</h3>
     <form>
         <input id="ten" type="text" placeholder="Tên sản phẩm" required>
         <input id="moTa" type="text" placeholder="Mô tả" required>
         <input id="gia" type="number" placeholder="Giá" required>
         <input id="hinhAnh" type="text" placeholder="Link hình ảnh" required>
-        <input id="danhMuc" type="text" placeholder="Danh mục" required>
+        <select id="danhMuc" required>
+            <option value="" disabled selected>Chọn danh mục</option>
+            <option value="Popular">Popular</option>
+            <option value="News">News</option>
+            <option value="Trending">Trending</option>
+        </select>
         <input id="soLuong" type="number" placeholder="Số lượng" required>
         <input id="hang" type="text" placeholder="Hãng" required>
         <input id="cpu" type="text" placeholder="CPU" required>
@@ -494,6 +646,7 @@
     </form>
 </div>
 
+
     <!-- Dialog sửa sản phẩm -->
 <div id="edit-dialog" style="display: none;">
     <h3>Sửa Sản Phẩm</h3>
@@ -503,7 +656,12 @@
         <input id="edit-product-description" type="text" placeholder="Mô tả" required>
         <input id="edit-product-price" type="number" placeholder="Giá" required>
         <input id="edit-product-image" type="text" placeholder="Hình ảnh" required>
-        <input id="edit-product-category" type="text" placeholder="Danh mục" required>
+        <select id="edit-product-category" required>
+            <option value="Popular">Popular</option>
+            <option value="News">News</option>
+            <option value="Trending">Trending</option>
+        </select>
+        
         <input id="edit-product-quantity" type="number" placeholder="Số lượng" required>
         <input id="edit-product-brand" type="text" placeholder="Hãng" required>
         <input id="edit-cpu" type="text" placeholder="CPU" required>
@@ -601,18 +759,22 @@ function filterProducts() {
 // Thêm sản phẩm mới
 function addLaptop() {
     const product = {
-        ten: document.getElementById("ten").value,
-        moTa: document.getElementById("moTa").value,
+        ten: document.getElementById("ten").value.trim(),
+        moTa: document.getElementById("moTa").value.trim(),
         gia: parseInt(document.getElementById("gia").value),
-        hinhAnh: document.getElementById("hinhAnh").value,
+        hinhAnh: document.getElementById("hinhAnh").value.trim(),
         danhMuc: document.getElementById("danhMuc").value,
         soLuong: parseInt(document.getElementById("soLuong").value),
-        hang: document.getElementById("hang").value,
-        CPU: document.getElementById("cpu").value,
-        CardManHinh: document.getElementById("cardmanhinh").value,
-        KichThuocManHinh: document.getElementById("kichthuocmanhinh").value,
-        RAM: document.getElementById("ram").value,
+        hang: document.getElementById("hang").value.trim(),
+        CPU: document.getElementById("cpu").value.trim(),
+        CardManHinh: document.getElementById("cardmanhinh").value.trim(),
+        KichThuocManHinh: document.getElementById("kichthuocmanhinh").value.trim(),
+        RAM: document.getElementById("ram").value.trim(),
     };
+
+    if (!validateProductForm(product)) {
+        return; // Ngừng nếu dữ liệu không hợp lệ
+    }
 
     fetch(`${API_BASE_URL}/addLapTop`, {
         method: "POST",
@@ -627,6 +789,7 @@ function addLaptop() {
         })
         .catch(error => console.error("Error adding product:", error));
 }
+
 
 // Show edit dialog
 // Hàm để lấy sản phẩm theo ID từ API
@@ -683,18 +846,22 @@ function showDialog(dialogId) {
 function editLaptop() {
     const id = document.getElementById("edit-product-id").value;
     const product = {
-        ten: document.getElementById("edit-product-name").value,
-        moTa: document.getElementById("edit-product-description").value,
+        ten: document.getElementById("edit-product-name").value.trim(),
+        moTa: document.getElementById("edit-product-description").value.trim(),
         gia: parseInt(document.getElementById("edit-product-price").value),
-        hinhAnh: document.getElementById("edit-product-image").value,
+        hinhAnh: document.getElementById("edit-product-image").value.trim(),
         danhMuc: document.getElementById("edit-product-category").value,
         soLuong: parseInt(document.getElementById("edit-product-quantity").value),
-        hang: document.getElementById("edit-product-brand").value,
-        CPU: document.getElementById("edit-cpu").value,
-        CardManHinh: document.getElementById("edit-cardmanhinh").value,
-        KichThuocManHinh: document.getElementById("edit-kichthuocmanhinh").value,
-        RAM: document.getElementById("edit-ram").value,
+        hang: document.getElementById("edit-product-brand").value.trim(),
+        CPU: document.getElementById("edit-cpu").value.trim(),
+        CardManHinh: document.getElementById("edit-cardmanhinh").value.trim(),
+        KichThuocManHinh: document.getElementById("edit-kichthuocmanhinh").value.trim(),
+        RAM: document.getElementById("edit-ram").value.trim(),
     };
+
+    if (!validateProductForm(product, true)) {
+        return; // Ngừng nếu dữ liệu không hợp lệ
+    }
 
     fetch(`${API_BASE_URL}/updateLapTop/${id}`, {
         method: "PUT",
@@ -703,12 +870,9 @@ function editLaptop() {
     })
         .then(response => response.json())
         .then(data => {
-            // Kiểm tra nếu sửa thành công
             if (data.status === 200) {
                 alert("Sửa sản phẩm thành công!");
                 closeDialog("edit-dialog");
-
-                // Gọi lại API để lấy danh sách sản phẩm mới
                 fetchProducts();
             } else {
                 alert("Sửa sản phẩm không thành công. Vui lòng thử lại.");
@@ -719,6 +883,7 @@ function editLaptop() {
             alert("Đã có lỗi xảy ra, vui lòng thử lại.");
         });
 }
+
 // Delete a product
 function deleteLaptop(id) {
     if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
@@ -779,5 +944,52 @@ function showProductDetails(productId) {
 document.getElementById('closeModal').onclick = () => {
     document.getElementById('productDetailModal').style.display = 'none';
 };
+function validateProductForm(product, isEdit = false) {
+    if (!product.ten || product.ten.trim().length < 3) {
+        alert("Tên sản phẩm phải có ít nhất 3 ký tự.");
+        return false;
+    }
+    if (!product.moTa || product.moTa.trim().length < 10) {
+        alert("Mô tả sản phẩm phải có ít nhất 10 ký tự.");
+        return false;
+    }
+    if (!product.gia || isNaN(product.gia) || product.gia <= 0) {
+        alert("Giá sản phẩm phải là số và lớn hơn 0.");
+        return false;
+    }
+    if (!product.hinhAnh || !product.hinhAnh.startsWith("http")) {
+        alert("Hình ảnh phải là một đường dẫn hợp lệ (URL).");
+        return false;
+    }
+    if (!product.danhMuc || (product.danhMuc !== "Popular" && product.danhMuc !== "News" && product.danhMuc !== "Trending")) {
+        alert("Danh mục phải là 'Popular', 'News' hoặc 'Trending'.");
+        return false;
+    }
+    if (!product.soLuong || isNaN(product.soLuong) || product.soLuong < 0) {
+        alert("Số lượng phải là số và không được nhỏ hơn 0.");
+        return false;
+    }
+    if (!product.hang || product.hang.trim().length < 2) {
+        alert("Hãng sản xuất phải có ít nhất 2 ký tự.");
+        return false;
+    }
+    if (!product.CPU || product.CPU.trim().length < 3) {
+        alert("CPU phải có ít nhất 3 ký tự.");
+        return false;
+    }
+    if (!product.CardManHinh || product.CardManHinh.trim().length < 3) {
+        alert("Card màn hình phải có ít nhất 3 ký tự.");
+        return false;
+    }
+    if (!product.KichThuocManHinh || product.KichThuocManHinh.trim().length < 3) {
+        alert("Kích thước màn hình phải có ít nhất 3 ký tự.");
+        return false;
+    }
+    if (!product.RAM || product.RAM.trim().length < 2) {
+        alert("RAM phải có ít nhất 2 ký tự.");
+        return false;
+    }
+    return true;
+}
 
 </script>

@@ -226,14 +226,18 @@
 
     <script>
 document.getElementById("filter-button").addEventListener("click", () => {
-    const startDate = document.getElementById("start-date").value;
-    const endDate = document.getElementById("end-date").value;
+    const startDateInput = document.getElementById("start-date").value;
+    const endDateInput = document.getElementById("end-date").value;
     const year = document.getElementById("year").value;
     const month = document.getElementById("month").value;
     const userStatisticsBody = document.getElementById("user-statistics-body");
 
-    // Fetch danh sách người dùng để lấy email
-    fetch("http://192.168.101.9:3000/users")
+    // Đảm bảo startDate và endDate có thời gian cụ thể
+    const startDate = startDateInput ? new Date(`${startDateInput}T00:00:00`) : null;
+    const endDate = endDateInput ? new Date(`${endDateInput}T23:59:59.999`) : null;
+
+    // Fetch danh sách người dùng để lấy email và số điện thoại
+    fetch("http://localhost:3000/users")
         .then(response => response.json())
         .then(users => {
             const userMap = {};
@@ -242,7 +246,7 @@ document.getElementById("filter-button").addEventListener("click", () => {
             });
 
             // Fetch đơn hàng
-            return fetch("http://192.168.101.9:3000/donhang")
+            return fetch("http://localhost:3000/donhang")
                 .then(response => response.json())
                 .then(orders => {
                     const userStatistics = {};
@@ -250,10 +254,11 @@ document.getElementById("filter-button").addEventListener("click", () => {
                     orders.forEach(order => {
                         const orderDate = new Date(order.createdAt);
 
+                        // Lọc theo điều kiện thời gian
                         const isYearMatch = year ? orderDate.getFullYear() === parseInt(year) : true;
                         const isMonthMatch = month ? (orderDate.getMonth() + 1) === parseInt(month) : true;
-                        const isStartDateMatch = startDate ? orderDate >= new Date(startDate) : true;
-                        const isEndDateMatch = endDate ? orderDate <= new Date(new Date(endDate).setHours(23, 59, 59, 999)) : true;
+                        const isStartDateMatch = startDate ? orderDate >= startDate : true;
+                        const isEndDateMatch = endDate ? orderDate <= endDate : true;
 
                         if (
                             order.status.toLowerCase() === "thành công" &&
@@ -264,7 +269,7 @@ document.getElementById("filter-button").addEventListener("click", () => {
                         ) {
                             const userId = order.userId;
                             const user = userMap[userId] || {}; // Lấy thông tin người dùng từ userMap
-                            const userEmail = user.email || "Không xác định"; // Đảm bảo lấy đúng email từ người dùng
+                            const userEmail = user.email || "Không xác định";
                             const userPhone = user.phone || "Không xác định";
 
                             if (!userStatistics[userId]) {
@@ -302,6 +307,7 @@ document.getElementById("filter-button").addEventListener("click", () => {
         })
         .catch(error => console.error("Lỗi khi tải dữ liệu:", error));
 });
+
 
 
 

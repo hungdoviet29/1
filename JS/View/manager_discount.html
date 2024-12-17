@@ -181,14 +181,29 @@
             </div>
             <form id="createVoucherForm">
                 <input type="text" id="userId" placeholder="userId" required>
+                <span id="error-userId" class="error-message"></span>
+
                 <input type="text" id="type" placeholder="Loại voucher" required>
+                <span id="error-type" class="error-message"></span>
+
                 <input type="text" id="title" placeholder="Phần trăm giảm" required>
+                <span id="error-title" class="error-message"></span>
+
                 <input type="text" id="description" placeholder="Mô tả" required>
+                <span id="error-description" class="error-message"></span>
+
                 <input type="date" id="startDate" required>
+                <span id="error-startDate" class="error-message"></span>
+
                 <input type="date" id="expirationDate" required>
+                <span id="error-expirationDate" class="error-message"></span>
+
                 <input type="number" id="quantity" placeholder="Số lượng" required>
+                <span id="error-quantity" class="error-message"></span>
+
                 <button type="submit" class="btn-primary">Tạo Voucher</button>
             </form>
+
         </dialog>
 
         <hr>
@@ -236,30 +251,30 @@
 </html>
 
 
-    <script>
-        const apiUrl = 'http://localhost:3000/vouchers/all'; // Địa chỉ API để lấy tất cả các voucher
+<script>
+    const apiUrl = 'http://localhost:3000/vouchers/all'; // Địa chỉ API để lấy tất cả các voucher
 
-        document.addEventListener('DOMContentLoaded', fetchVouchers);
+    document.addEventListener('DOMContentLoaded', fetchVouchers);
 
-        // Hàm lấy tất cả danh sách voucher
-        async function fetchVouchers() {
-            try {
-                const response = await fetch(apiUrl);
-                const vouchers = await response.json();
-                displayVouchers(vouchers);
-            } catch (error) {
-                console.error('Error fetching vouchers:', error);
-            }
+    // Hàm lấy tất cả danh sách voucher
+    async function fetchVouchers() {
+        try {
+            const response = await fetch(apiUrl);
+            const vouchers = await response.json();
+            displayVouchers(vouchers);
+        } catch (error) {
+            console.error('Error fetching vouchers:', error);
         }
+    }
 
-        // Hàm hiển thị danh sách voucher lên bảng
-        function displayVouchers(vouchers) {
-            const voucherTableBody = document.querySelector('#voucherTable tbody');
-            voucherTableBody.innerHTML = '';
+    // Hàm hiển thị danh sách voucher lên bảng
+    function displayVouchers(vouchers) {
+        const voucherTableBody = document.querySelector('#voucherTable tbody');
+        voucherTableBody.innerHTML = '';
 
-            vouchers.forEach(voucher => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
+        vouchers.forEach(voucher => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
             <td>${voucher.userId}</td>
             <td>${voucher.title}</td>
             <td>${voucher.type}</td>
@@ -271,75 +286,119 @@
                 <button onclick="deleteVoucher('${voucher._id}', '${voucher.userId}')">Xóa</button>
             </td>
         `;
-                voucherTableBody.appendChild(row);
-            });
-        }
-
-        // Hàm xóa voucher
-        async function deleteVoucher(voucherId, userId) {
-            try {
-                const response = await fetch(`http://localhost:3000/vouchers/${voucherId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId }), // Gửi userId trong body
-                });
-
-                const result = await response.json();
-                if (response.ok) {
-                    alert(result.message);
-                    fetchVouchers(); // Reload danh sách voucher
-                } else {
-                    alert(result.message);
-                }
-            } catch (error) {
-                console.error('Error deleting voucher:', error);
-            }
-        }
-
-        // Hàm tạo voucher mới
-        document.getElementById('createVoucherForm').addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    const title = document.getElementById('title').value;
-
-    // Kiểm tra Phần trăm giảm chỉ cho phép số và nằm trong khoảng từ 1 đến 99
-    if (!/^\d+$/.test(title) || parseInt(title) <= 0 || parseInt(title) >= 100) {
-        alert('Phần trăm giảm phải là một số lớn hơn 0 và nhỏ hơn 100');
-        return;
-    }
-
-    const newVoucher = {
-        userId: document.getElementById('userId').value,
-        type: document.getElementById('type').value,
-        title: title,
-        description: document.getElementById('description').value,
-        startDate: new Date(document.getElementById('startDate').value).toISOString(),
-        expirationDate: new Date(document.getElementById('expirationDate').value).toISOString(),
-        quantity: parseInt(document.getElementById('quantity').value),
-    };
-
-    try {
-        const response = await fetch('http://localhost:3000/vouchers', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newVoucher),
+            voucherTableBody.appendChild(row);
         });
-
-        const result = await response.json();
-        if (response.ok) {
-            alert(result.message);
-            fetchVouchers(); // Reload danh sách voucher
-        } else {
-            alert(result.message);
-        }
-    } catch (error) {
-        console.error('Error creating voucher:', error);
     }
-});
 
-    </script>
+    // Hàm xóa voucher
+    async function deleteVoucher(voucherId, userId) {
+        try {
+            const response = await fetch(`http://localhost:3000/vouchers/${voucherId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId }), // Gửi userId trong body
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.message);
+                fetchVouchers(); // Reload danh sách voucher
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error('Error deleting voucher:', error);
+        }
+    }
+
+    // Hàm tạo voucher mới
+    document.getElementById('createVoucherForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const newVoucher = {
+            userId: document.getElementById('userId').value.trim(),
+            type: document.getElementById('type').value.trim(),
+            title: document.getElementById('title').value.trim(),
+            description: document.getElementById('description').value.trim(),
+            startDate: new Date(document.getElementById('startDate').value).toISOString(),
+            expirationDate: new Date(document.getElementById('expirationDate').value).toISOString(),
+            quantity: parseInt(document.getElementById('quantity').value),
+        };
+
+        // Gọi validateVoucherForm
+        if (!validateVoucherForm(newVoucher)) {
+            return; // Dừng lại nếu dữ liệu không hợp lệ
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/vouchers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newVoucher),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.message);
+                fetchVouchers(); // Tải lại danh sách voucher
+                document.getElementById('voucherDialog').close(); // Đóng dialog
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error('Error creating voucher:', error);
+        }
+    });
+
+    function validateVoucherForm(voucher) {
+        // Kiểm tra userId không được để trống
+        if (!voucher.userId || voucher.userId.trim().length < 3) {
+            alert("ID người dùng phải có ít nhất 3 ký tự.");
+            return false;
+        }
+
+        // Kiểm tra type không được để trống
+        if (!voucher.type || voucher.type.trim().length < 3) {
+            alert("Loại voucher phải có ít nhất 3 ký tự.");
+            return false;
+        }
+
+        // Kiểm tra title (Phần trăm giảm) phải là số từ 1 đến 99
+        if (!/^\d+$/.test(voucher.title) || parseInt(voucher.title) <= 0 || parseInt(voucher.title) >= 100) {
+            alert("Phần trăm giảm phải là một số lớn hơn 0 và nhỏ hơn 100.");
+            return false;
+        }
+
+        // Kiểm tra description không được để trống
+        if (!voucher.description || voucher.description.trim().length < 10) {
+            alert("Mô tả phải có ít nhất 10 ký tự.");
+            return false;
+        }
+
+        // Kiểm tra ngày bắt đầu phải nhỏ hơn ngày hết hạn
+        const startDate = new Date(voucher.startDate);
+        const expirationDate = new Date(voucher.expirationDate);
+        if (isNaN(startDate) || isNaN(expirationDate)) {
+            alert("Ngày bắt đầu và ngày hết hạn không hợp lệ.");
+            return false;
+        }
+        if (startDate >= expirationDate) {
+            alert("Ngày bắt đầu phải nhỏ hơn ngày hết hạn.");
+            return false;
+        }
+
+        // Kiểm tra số lượng phải là số lớn hơn 0
+        if (!Number.isInteger(voucher.quantity) || voucher.quantity <= 0) {
+            alert("Số lượng phải là số nguyên lớn hơn 0.");
+            return false;
+        }
+
+        return true;
+    }
+
+</script>
 
 </body>
 
